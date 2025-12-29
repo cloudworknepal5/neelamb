@@ -56,11 +56,11 @@
         <div id="popup-overlay">
             <div id="popup-content">
                 <button id="close-popup" aria-label="Close">&times;</button>
-                <img src="YOUR_IMAGE_URL_HERE" alt="Promo" id="popup-img">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg0bGmyBe0orDC5j2U0Ub6jozlvss61koZFkG9Y7coUSmyWB7QBmOQONIWoibT8eLiFIgGyPkUuA4s5iiL3EX4hlGIpn203Qru2WT_Yrp4QgVXEwKYACs5agx_y9mhT-ceXQUUWiAcIisDUZy6arHf8y2YhJSPatV6sZXpbEXJnujlRjlvssjVVWJNiuUDu/s16000/neelamb-ad.gif" alt="Promo" id="popup-img">
                 <div class="popup-body">
-                    <h2>Welcome Back!</h2>
-                    <p>Get the latest updates directly in your inbox or shop our new arrivals.</p>
-                    <a href="YOUR_LINK_HERE" class="popup-button">VISIT NOW</a>
+                    <h2>New Year-2026 Offer!</h2>
+                    <p>Create Dynamic News Portal Just Nrs 5,000.</p>
+                    <a href="https://neelamb.com" class="popup-button">Get Now</a>
                 </div>
             </div>
         </div>
@@ -80,3 +80,4 @@
     closeBtn.onclick = () => overlay.classList.remove('popup-visible');
     overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('popup-visible'); };
 })();
+
