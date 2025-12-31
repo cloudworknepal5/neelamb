@@ -1,7 +1,7 @@
 (function() {
     function initResponsiveAd() {
         const adData = {
-            type: "image", // Switch to "video" for video ads
+            type: "video", // Switch to "video" for video ads
             mediaUrl: "https://youtu.be/CLDDcXV4H50?si=Uhks_KRM4EXVC-Hb?text=Responsive+Ad", // Use a high-res file
             link: "https://neelamb.com",
             aspectRatio: "16/9" // Optional: helps prevent layout shift
