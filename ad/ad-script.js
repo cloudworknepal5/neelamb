@@ -3,7 +3,7 @@
         const adData = {
             type: "image", // Switch to "video" for video ads
             mediaUrl: "https://educationnepal.eu.org/ad/image/new-year-2026.png?text=Responsive+Ad", // Use a high-res file
-            link: "https://yourwebsite.com",
+            link: "https://neelamb.com",
             aspectRatio: "16/9" // Optional: helps prevent layout shift
         };
 
