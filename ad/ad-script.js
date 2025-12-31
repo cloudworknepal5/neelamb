@@ -1,46 +1,52 @@
 (function() {
-    // 1. Configuration: In a real app, this data could come from an API
-    const adData = {
-        type: "video", // Options: "image" or "video"
-        mediaUrl: "https://educationnepal.eu.org/ad/image/new-year-2026.png", // Replace with your file
-        destinationUrl: "https://neelamb.com",
-        width: "300",
-        height: "250",
-        fallbackImg: "https://via.placeholder.com/300x250?text=Click+Here"
-    };
+    function initResponsiveAd() {
+        const adData = {
+            type: "image", // Switch to "video" for video ads
+            mediaUrl: "https://educationnepal.eu.org/ad/image/new-year-2026.png?text=Responsive+Ad", // Use a high-res file
+            link: "https://yourwebsite.com",
+            aspectRatio: "16/9" // Optional: helps prevent layout shift
+        };
 
-    // 2. Find the placeholder div on the host site
-    const adSlot = document.querySelector('.custom-ad-provider');
+        const adSlots = document.querySelectorAll('.custom-ad-provider');
 
-    if (adSlot) {
-        // Set up the container style
-        adSlot.style.width = adData.width + "px";
-        adSlot.style.height = adData.height + "px";
-        adSlot.style.position = "relative";
-        adSlot.style.overflow = "hidden";
-        adSlot.style.display = "inline-block";
-        adSlot.style.border = "1px solid #ccc";
+        adSlots.forEach(slot => {
+            // Prevent double loading
+            if (slot.getAttribute('data-ad-loaded') === 'true') return;
 
-        let adContent = "";
+            // Apply Responsive Styles to Container
+            slot.style.width = "100%";
+            slot.style.maxWidth = "100%"; // Ensures it doesn't overflow
+            slot.style.display = "block";
+            slot.style.position = "relative";
+            slot.style.lineHeight = "0"; // Removes tiny gaps under images
 
-        if (adData.type === "video") {
-            // Video Ad HTML
-            adContent = `
-                <video width="100%" height="100%" autoplay muted loop playsinline style="object-fit: cover;">
-                    <source src="${adData.mediaUrl}" type="video/mp4">
-                    <img src="${adData.fallbackImg}">
-                </video>
-                <a href="${adData.destinationUrl}" target="_blank" 
-                   style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;">
+            let html = "";
+            if (adData.type === "video") {
+                html = `
+                <div style="width:100%; position:relative; padding-top: 56.25%;"> <video autoplay muted loop playsinline 
+                           style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">
+                        <source src="${adData.mediaUrl}" type="video/mp4">
+                    </video>
+                    <a href="${adData.link}" target="_blank" 
+                       style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:10;"></a>
+                </div>`;
+            } else {
+                html = `
+                <a href="${adData.link}" target="_blank" style="display:block; width:100%;">
+                    <img src="${adData.mediaUrl}" 
+                         style="width:100%; height:auto; display:block; border:none; border-radius:4px;">
                 </a>`;
-        } else {
-            // Image Ad HTML
-            adContent = `
-                <a href="${adData.destinationUrl}" target="_blank">
-                    <img src="${adData.mediaUrl}" style="width:100%; height:100%; object-fit: cover; border:none;">
-                </a>`;
-        }
+            }
 
-        adSlot.innerHTML = adContent;
+            slot.innerHTML = html;
+            slot.setAttribute('data-ad-loaded', 'true');
+        });
+    }
+
+    // Run on load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initResponsiveAd);
+    } else {
+        initResponsiveAd();
     }
 })();
