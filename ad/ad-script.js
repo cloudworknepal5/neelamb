@@ -2,8 +2,8 @@
     // 1. Configuration: In a real app, this data could come from an API
     const adData = {
         type: "video", // Options: "image" or "video"
-        mediaUrl: "https://sample-videos.com/video123.mp4", // Replace with your file
-        destinationUrl: "https://yourwebsite.com",
+        mediaUrl: "https://educationnepal.eu.org/ad/image/new-year-2026.png", // Replace with your file
+        destinationUrl: "https://neelamb.com",
         width: "300",
         height: "250",
         fallbackImg: "https://via.placeholder.com/300x250?text=Click+Here"
