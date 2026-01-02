@@ -10,10 +10,10 @@ function renderRecentVerticalPosts(json) {
             var title = post.title.$t;
             var link = post.link.find(l => l.rel === 'alternate').href;
             
-            // Image Processing (1200px size)
+            // Image (Full HD 1200px)
             var img = post.media$thumbnail ? post.media$thumbnail.url.replace('s72-c', 's1200') : 'https://via.placeholder.com/1200x630';
             
-            // Meta Info
+            // Meta Information
             var authorName = post.author[0].name.$t;
             var authorImg = post.author[0].gd$image.src;
             var pubDate = new Date(post.published.$t).toLocaleDateString('ne-NP', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -24,10 +24,10 @@ function renderRecentVerticalPosts(json) {
 
             html += '<article class="vr-post">';
             
-            // १. हेडलाइन (६० पिक्सेल बोल्ड)
+            // १. हेडलाइन (Center)
             html += '<h2 class="vr-title"><a href="' + link + '">' + title + '</a></h2>';
             
-            // २. मेटा इन्फो (लेखकको फोटो र घडी आइकनसहितको मिति)
+            // २. मेटा इन्फो (Center)
             html += '<div class="vr-meta">';
             html += '<img class="vr-author-img" src="' + authorImg + '" alt="' + authorName + '"/>';
             html += '<div class="vr-meta-info">';
@@ -35,13 +35,13 @@ function renderRecentVerticalPosts(json) {
             html += '<div class="vr-date"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ' + pubDate + '</div>';
             html += '</div></div>';
 
-            // ३. फिचर इमेज (१२०० पिक्सेल)
+            // ३. फिचर इमेज (Center)
             html += '<div class="vr-image"><a href="' + link + '"><img src="' + img + '"/></a></div>';
 
-            // ४. स्निपेट (६० शब्द)
+            // ४. स्निपेट (Center)
             html += '<div class="vr-snippet">' + snippet + '</div>';
 
-            // ५. विस्तृतमा पढ्नुहोस् बटन
+            // ५. विस्तृतमा पढ्नुहोस् बटन (Center)
             html += '<a href="' + link + '" class="vr-btn">विस्तृतमा पढ्नुहोस्</a>';
 
             html += '</article>';
