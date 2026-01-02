@@ -2,14 +2,14 @@ function renderRecentByLabel(json) {
     var entries = json.feed.entry;
     var html = '<div class="lp-container">';
 
-    if (entries) {
-        // --- पहिलो (Featured) पोस्ट ---
+    if (entries && entries.length > 0) {
+        // १. पहिलो (Featured) पोस्ट
         var fPost = entries[0];
         var fTitle = fPost.title.$t;
         var fLink = fPost.link.find(l => l.rel === 'alternate').href;
-        var fImg = fPost.media$thumbnail ? fPost.media$thumbnail.url.replace('s72-c', 's1600') : 'https://via.placeholder.com/600x300';
+        var fImg = fPost.media$thumbnail ? fPost.media$thumbnail.url.replace('s72-c', 's1600') : 'https://via.placeholder.com/600x350';
         
-        // स्निपेट (६० शब्द)
+        // स्निपेट निकाल्ने र ६० शब्दमा सीमित गर्ने
         var content = fPost.content ? fPost.content.$t : (fPost.summary ? fPost.summary.$t : "");
         var snippet = content.replace(/<\/?[^>]+(>|$)/g, "").split(/\s+/).slice(0, 60).join(" ") + "...";
 
@@ -19,14 +19,14 @@ function renderRecentByLabel(json) {
         html += '<p class="lp-snippet">' + snippet + '</p>';
         html += '</div>';
 
-        // --- दोस्रो र तेस्रो पोस्ट (Grid) ---
+        // २. दोस्रो र तेस्रो पोस्ट (Grid)
         html += '<div class="lp-grid">';
         for (var i = 1; i < 3; i++) {
             if (entries[i]) {
                 var post = entries[i];
                 var title = post.title.$t;
                 var link = post.link.find(l => l.rel === 'alternate').href;
-                var img = post.media$thumbnail ? post.media$thumbnail.url.replace('s72-c', 's400') : 'https://via.placeholder.com/200x150';
+                var img = post.media$thumbnail ? post.media$thumbnail.url.replace('s72-c', 's600') : 'https://via.placeholder.com/300x200';
 
                 html += '<div class="lp-item">';
                 html += '<a href="' + link + '"><img src="' + img + '"/></a>';
@@ -34,9 +34,9 @@ function renderRecentByLabel(json) {
                 html += '</div>';
             }
         }
-        html += '</div>'; // End Grid
+        html += '</div>';
     }
     
-    html += '</div>'; // End Container
+    html += '</div>';
     document.getElementById('recent-posts-box').innerHTML = html;
 }
