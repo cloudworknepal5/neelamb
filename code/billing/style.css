@@ -1,119 +1,80 @@
-/* Core Settings */
-:root {
-    --primary-font: 'Mukta', sans-serif;
-    --border-light: #dddddd;
-    --text-main: #222222;
-    --text-muted: #666666;
-}
+/* Google Font: Mukta */
+@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;700;800&display=swap');
 
-body {
-    font-family: var(--primary-font);
-    margin: 0;
-    padding: 0;
-    background-color: #ffffff;
-}
-
-.recent-posts-container {
+.vertical-recent-container {
     max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
+    margin: 0 auto;
+    font-family: 'Mukta', sans-serif;
+    padding: 20px;
 }
 
-/* Post Card Layout */
-.post-card {
+/* Post Item Wrapper */
+.vr-post {
     margin-bottom: 60px;
-    padding-bottom: 60px;
-    border-bottom: 1px solid var(--border-light);
-    text-align: center;
+    padding-bottom: 40px;
+    border-bottom: 1px solid #eaeaea; /* पातलो डिभाइडर लाइन */
 }
 
-.post-card:last-child {
+.vr-post:last-child {
     border-bottom: none;
 }
 
 /* Headline Styling */
-.post-title {
-    font-size: 60px; /* Desktop size */
-    font-weight: 700;
+.vr-title {
+    font-size: 60px; /* डेस्कटप साइज */
+    font-weight: 800;
     line-height: 1.1;
-    margin-bottom: 20px;
-    color: #000;
+    margin: 0 0 20px 0;
+    color: #1a1a1a;
+}
+
+.vr-title a {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* Meta Data (Author & Date) */
-.post-meta {
+.vr-meta {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 15px;
-    margin-bottom: 30px;
-    font-size: 18px;
-    color: var(--text-muted);
+    margin-bottom: 25px;
 }
 
-.author-thumb {
+.vr-author-img {
     width: 45px;
     height: 45px;
     border-radius: 50%;
     object-fit: cover;
+    border: 1px solid #ddd;
 }
 
-.date-icon {
-    margin-right: 5px;
+.vr-meta-info {
+    font-size: 16px;
+    color: #666;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Featured Image */
-.feature-img-box {
+.vr-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+/* Featured Image (1200px) */
+.vr-image {
     width: 100%;
-    max-width: 1200px;
     margin-bottom: 30px;
 }
 
-.feature-img-box img {
+.vr-image img {
     width: 100%;
     height: auto;
-    border: 1px solid var(--border-light);
-    display: block;
+    max-height: 630px;
+    object-fit: cover;
+    border-radius: 12px;
 }
 
-/* Post Snippet */
-.post-snippet {
-    font-size: 20px;
-    line-height: 1.7;
-    color: var(--text-main);
-    max-width: 850px;
-    margin: 0 auto 35px auto;
-}
-
-/* Read More Button */
-.btn-read-more {
-    display: inline-block;
-    padding: 15px 40px;
-    background-color: #000000;
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 18px;
-    border-radius: 2px;
-    transition: 0.3s;
-}
-
-.btn-read-more:hover {
-    background-color: #333333;
-}
-
-/* Mobile Responsive Adjustments */
-@media (max-width: 768px) {
-    .post-title {
-        font-size: 40px; /* Mobile size as requested */
-    }
-
-    .post-meta {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .post-snippet {
-        font-size: 18px;
-    }
-}
+/* Snippet (60
