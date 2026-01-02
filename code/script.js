@@ -11,7 +11,7 @@ function renderRecentByLabel(json) {
         
         // स्निपेट निकाल्ने र ६० शब्दमा सीमित गर्ने
         var content = fPost.content ? fPost.content.$t : (fPost.summary ? fPost.summary.$t : "");
-        var snippet = content.replace(/<\/?[^>]+(>|$)/g, "").split(/\s+/).slice(0, 60).join(" ") + "...";
+        var snippet = content.replace(/<\/?[^>]+(>|$)/g, "").split(/\s+/).slice(0, 20).join(" ") + "...";
 
         html += '<div class="lp-featured">';
         html += '<h2><a href="' + fLink + '">' + fTitle + '</a></h2>';
