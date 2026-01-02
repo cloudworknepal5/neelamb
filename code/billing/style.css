@@ -5,96 +5,113 @@
     max-width: 1200px;
     margin: 0 auto;
     font-family: 'Mukta', sans-serif;
-    padding: 20px;
-    text-align: center; /* सबै टेक्स्ट बीचमा पार्न */
+    padding: 10px;
+    text-align: center;
 }
 
 /* Post Wrapper */
 .vr-post {
-    margin-bottom: 80px;
-    padding-bottom: 60px;
-    border-bottom: 1.5px solid #eeeeee;
+    margin-bottom: 40px; /* Reduced vertical gap */
+    padding-bottom: 30px;
+    border-bottom: 1px solid #f0f0f0;
     display: flex;
     flex-direction: column;
-    align-items: center; /* फ्लेक्स आइटमहरू बीचमा पार्न */
+    align-items: center;
 }
 
-.vr-post:last-child {
-    border-bottom: none;
-}
+.vr-post:last-child { border-bottom: none; }
 
-/* Headline - 60px Bold Center */
+/* Headline - 60px Center Desktop, 40px Mobile */
 .vr-title {
     font-size: 60px;
     font-weight: 800;
     line-height: 1.1;
-    margin: 0 0 25px 0;
+    margin: 0 0 15px 0;
     color: #111;
-    max-width: 1000px;
 }
 
-.vr-title a {
-    text-decoration: none;
-    color: inherit;
-}
+.vr-title a { text-decoration: none; color: inherit; }
 
-/* Meta Info Center */
+/* Inline Meta Info (Author Profile + Date) */
 .vr-meta {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 30px;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 .vr-author-img {
-    width: 50px;
-    height: 50px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #f0f0f0;
 }
 
 .vr-meta-info {
     font-size: 16px;
-    color: #555;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Inline spacing between name and date */
 }
 
 .vr-date {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 14px;
-    margin-top: 5px;
+    gap: 5px;
+    color: #888;
 }
 
-/* Featured Image 1200px */
+/* Featured Image (Full 1200px size) */
 .vr-image {
     width: 100%;
     max-width: 1200px;
-    margin-bottom: 35px;
+    margin-bottom: 20px;
 }
 
 .vr-image img {
     width: 100%;
     height: auto;
-    max-height: 650px;
+    max-height: 600px;
     object-fit: cover;
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
-/* Snippet - 60 Words Center */
+/* Snippet Styling with minimal side/top/bottom gaps */
 .vr-snippet {
-    font-size: 20px;
-    line-height: 1.8;
-    color: #333;
-    max-width: 900px;
-    margin: 0 auto 35px auto;
+    font-size: 19px;
+    line-height: 1.6;
+    color: #444;
+    max-width: 1150px; /* Reduced side gaps */
+    margin: 0 auto 20px auto; /* Reduced top/bottom gaps */
     text-align: center;
 }
 
-/* Read More Button Center */
+/* Attractive Red Read More Button */
 .vr-btn {
     display: inline-block;
-    background: #
+    background: linear-gradient(135deg, #ff416c, #ff4b2b); /* High-end red gradient */
+    color: #ffffff;
+    padding: 12px 35px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(255, 75, 43, 0.3);
+    border: none;
+}
+
+.vr-btn:hover {
+    background: linear-gradient(135deg, #ff4b2b, #ff416c);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(255, 75, 43, 0.4);
+}
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+    .vr-title { font-size: 40px; }
+    .vr-meta-info { font-size: 14px; gap: 8px; }
+    .vr-snippet { font-size: 16px; padding: 0 5px; }
+}
