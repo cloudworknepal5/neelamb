@@ -1,62 +1,78 @@
-/* Label Post Container */
+/* मुख्य कन्टेनर */
 .lp-container {
     width: 100%;
     margin: 0 auto;
     font-family: 'Arial', sans-serif;
 }
 
-/* Featured (First) Post */
+/* पहिलो ठुलो पोस्टको हेडलाइन */
 .lp-featured {
     margin-bottom: 25px;
-    text-align: center;
+    text-align: left; /* हेडलाइन बायाँ मिलाउन */
 }
+
 .lp-featured h2 {
-    font-size: 22px;
-    margin-bottom: 10px;
+    font-size: 25px; /* तपाईँले भन्नुभएको साइज */
+    font-weight: bold; /* बोल्ड हेडलाइन */
+    margin-bottom: 12px;
+    line-height: 1.3;
 }
+
+.lp-featured h2 a {
+    color: #000;
+    text-decoration: none;
+}
+
 .lp-featured img {
     width: 100%;
     height: auto;
-    max-height: 350px;
+    border-radius: 8px;
     object-fit: cover;
-    border: 1px solid #ddd;
 }
+
 .lp-snippet {
-    font-size: 15px;
-    color: #555;
-    margin-top: 10px;
+    font-size: 16px;
+    color: #444;
+    margin-top: 12px;
     line-height: 1.6;
 }
 
-/* Grid (Second and Third) Posts */
+/* तलका दुई साना पोस्टहरू (मोबाइलमा २ कोलम) */
 .lp-grid {
     display: flex;
-    flex-wrap: nowrap; /* मोबाइलमा पनि नखुम्चिने गरि */
+    justify-content: space-between;
     gap: 15px;
 }
+
 .lp-item {
-    width: 50%; /* मोबाइलमा पनि ५०% नै राख्ने */
+    width: 50%; /* मोबाइलमा पनि ५०% चौडाई */
     display: flex;
     flex-direction: column;
 }
+
 .lp-item img {
     width: 100%;
-    height: 150px;
+    height: 120px; /* साना इमेजको उचाई */
     object-fit: cover;
-    border: 1px solid #ddd;
-}
-.lp-item h3 {
-    font-size: 14px;
-    margin-top: 8px;
-    line-height: 1.4;
-    font-weight: normal;
+    border-radius: 6px;
 }
 
-/* Links */
-.lp-container a {
-    text-decoration: none;
-    color: #333;
+.lp-item h3 {
+    font-size: 16px; /* साना पोस्टको टाइटल साइज */
+    font-weight: bold; /* साना टाइटल पनि बोल्ड */
+    margin-top: 10px;
+    line-height: 1.4;
 }
-.lp-container a:hover {
-    color: #e74c3c;
+
+/* मोबाइल फ्रेन्डली सेटिङ */
+@media screen and (max-width: 480px) {
+    .lp-featured h2 {
+        font-size: 22px; /* मोबाइलमा अलि सानो देखियोस् भनेर */
+    }
+    .lp-item img {
+        height: 100px; /* मोबाइलमा इमेज अलि सानो */
+    }
+    .lp-item h3 {
+        font-size: 14px;
+    }
 }
