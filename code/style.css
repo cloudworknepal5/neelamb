@@ -1,78 +1,38 @@
-/* मुख्य कन्टेनर */
-.lp-container {
-    width: 100%;
-    margin: 0 auto;
-    font-family: 'Arial', sans-serif;
-}
+.lp-container { width: 100%; font-family: 'Segoe UI', Arial, sans-serif; }
 
-/* पहिलो ठुलो पोस्टको हेडलाइन */
-.lp-featured {
-    margin-bottom: 25px;
-    text-align: left; /* हेडलाइन बायाँ मिलाउन */
-}
+/* Top Row: 2 Big Posts */
+.lp-top-row { display: flex; gap: 20px; margin-bottom: 25px; }
+.lp-big-item { flex: 1; }
+.lp-big-item h2 { font-size: 25px; font-weight: bold; margin-bottom: 10px; line-height: 1.2; letter-spacing: -0.5px; }
+.lp-big-item h2 a { color: #000; text-decoration: none; }
+.lp-big-item img { width: 100%; height: 240px; object-fit: cover; border-radius: 4px; }
 
-.lp-featured h2 {
-    font-size: 25px; /* तपाईँले भन्नुभएको साइज */
-    font-weight: bold; /* बोल्ड हेडलाइन */
-    margin-bottom: 12px;
-    line-height: 1.3;
-}
-
-.lp-featured h2 a {
-    color: #000;
-    text-decoration: none;
-}
-
-.lp-featured img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    object-fit: cover;
-}
-
-.lp-snippet {
-    font-size: 16px;
-    color: #444;
-    margin-top: 12px;
-    line-height: 1.6;
-}
-
-/* तलका दुई साना पोस्टहरू (मोबाइलमा २ कोलम) */
-.lp-grid {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-}
-
-.lp-item {
-    width: 50%; /* मोबाइलमा पनि ५०% चौडाई */
-    display: flex;
-    flex-direction: column;
-}
-
-.lp-item img {
-    width: 100%;
-    height: 120px; /* साना इमेजको उचाई */
-    object-fit: cover;
-    border-radius: 6px;
-}
-
-.lp-item h3 {
-    font-size: 16px; /* साना पोस्टको टाइटल साइज */
-    font-weight: bold; /* साना टाइटल पनि बोल्ड */
-    margin-top: 10px;
+/* Snippet Style for 10 words */
+.lp-snippet { 
+    font-size: 14px; 
+    color: #666; 
+    margin-top: 8px; 
     line-height: 1.4;
+    font-weight: 400;
 }
 
-/* मोबाइल फ्रेन्डली सेटिङ */
-@media screen and (max-width: 480px) {
-    .lp-featured h2 {
-        font-size: 22px; /* मोबाइलमा अलि सानो देखियोस् भनेर */
-    }
-    .lp-item img {
-        height: 100px; /* मोबाइलमा इमेज अलि सानो */
-    }
-    .lp-item h3 {
-        font-size: 14px;
-    }
+/* Bottom Grid: Mobile Friendly 2 Columns */
+.lp-bottom-grid { display: flex; gap: 20px; }
+.lp-col { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+
+.lp-small-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 4px; }
+.lp-small-card h3 { font-size: 16px; font-weight: bold; margin-top: 8px; line-height: 1.3; }
+
+.lp-list-item { display: flex; gap: 12px; align-items: flex-start; }
+.lp-list-img { flex-shrink: 0; width: 100px; }
+.lp-list-img img { width: 100%; height: 75px; object-fit: cover; border-radius: 4px; }
+.lp-list-item h3 { font-size: 15px; font-weight: bold; line-height: 1.3; margin: 0; }
+
+/* Mobile View: 2 Columns Always */
+@media screen and (max-width: 600px) {
+    .lp-top-row, .lp-bottom-grid { gap: 12px; }
+    .lp-big-item h2 { font-size: 18px; }
+    .lp-big-item img { height: 140px; }
+    .lp-list-img { width: 80px; }
+    .lp-list-item h3 { font-size: 13px; }
 }
