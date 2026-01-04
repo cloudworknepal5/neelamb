@@ -3,87 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Education Nepal - Ultimate CMS</title>
+    <title>Education Nepal - Ultimate CMS v2</title>
     
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <style>
-        :root { --primary: #e31e24; --secondary: #1a73e8; --sidebar: #202124; --hover: #3c4043; --bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; display: flex; background: var(--bg); color: #333; }
+        :root { --primary: #e31e24; --secondary: #1a73e8; --sidebar: #202124; --hover: #3c4043; --bg: #f4f6f9; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; display: flex; background: var(--bg); color: #333; }
         
-        /* Sidebar */
-        .sidebar { width: 260px; height: 100vh; background: var(--sidebar); color: #fff; position: fixed; left: 0; top: 0; overflow-y: auto; }
+        /* Sidebar Navigation */
+        .sidebar { width: 260px; height: 100vh; background: var(--sidebar); color: #fff; position: fixed; left: 0; top: 0; z-index: 100; }
         .logo { padding: 25px; font-size: 20px; font-weight: bold; border-bottom: 1px solid var(--hover); text-align: center; color: var(--primary); }
-        .nav-link { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; transition: 0.2s; border-left: 4px solid transparent; }
+        .nav-link { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; transition: 0.2s; border-left: 4px solid transparent; gap: 10px; }
         .nav-link:hover, .nav-link.active { background: var(--hover); border-left-color: var(--primary); }
 
-        /* Main Area */
-        .main { margin-left: 260px; width: calc(100% - 260px); padding: 40px; box-sizing: border-box; }
-        .card { background: #fff; border-radius: 8px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        /* Main Content */
+        .main { margin-left: 260px; width: calc(100% - 260px); padding: 40px; box-sizing: border-box; min-height: 100vh; }
+        .card { background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; }
         .hidden { display: none !important; }
 
-        /* Form Controls */
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #dadce0; border-radius: 5px; box-sizing: border-box; }
-        #editor { height: 400px; background: #fff; margin-bottom: 20px; }
+        /* Form Styling */
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+        #editor-container { height: 450px; background: #fff; margin-bottom: 20px; border-radius: 0 0 6px 6px; }
+        .ql-toolbar { border-radius: 6px 6px 0 0; }
         
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; transition: 0.3s; }
-        .btn-main { background: var(--primary); color: #fff; flex: 2; }
-        .btn-sec { background: #5f6368; color: #fff; flex: 1; }
-        .btn-main:hover { opacity: 0.9; }
+        .btn-group { display: flex; gap: 12px; margin-top: 25px; }
+        button { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 15px; transition: all 0.2s; }
+        .btn-pub { background: var(--primary); color: #fff; flex: 2; }
+        .btn-draft { background: #5f6368; color: #fff; flex: 1; }
+        .btn-pub:hover { background: #c2181d; }
 
-        /* Post List Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #f1f3f4; padding: 15px; text-align: left; font-size: 14px; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; font-weight: bold; }
-        .badge-live { background: #e6f4ea; color: #1e8e3e; }
-        .badge-draft { background: #f1f3f4; color: #5f6368; }
-        .action-btns button { padding: 5px 10px; font-size: 12px; margin-right: 5px; }
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #f8f9fa; padding: 15px; text-align: left; font-weight: 600; border-bottom: 2px solid #eee; }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .live { background: #e6f4ea; color: #1e8e3e; }
+        .draft { background: #f1f3f4; color: #5f6368; }
+        .action-btn { background: #eee; padding: 6px 12px; margin-right: 5px; font-size: 13px; color: #333; }
+        .action-btn.del { color: var(--primary); border: 1px solid #ffcccb; }
 
-        /* Login Overlay */
-        #auth-overlay { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        /* Login Screen */
+        #auth-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="auth-overlay">
-    <h1 style="color: var(--primary); margin-bottom: 10px;">Education Nepal CMS</h1>
-    <p>ब्लग व्यवस्थापन गर्न आफ्नो गुगल एकाउन्ट लगइन गर्नुहोस्।</p>
-    <button onclick="initAuth()" style="background: var(--secondary); color: #fff; padding: 15px 40px; font-size: 18px; border-radius: 30px; margin-top: 20px;">Google सँग लगइन</button>
+<div id="auth-screen">
+    <div style="max-width: 400px; padding: 20px;">
+        <h1 style="color: var(--primary); font-size: 32px; margin-bottom: 10px;">Education Nepal</h1>
+        <p style="color: #666; margin-bottom: 30px;">आफ्नो ब्लग व्यवस्थापन गर्न सुरक्षित तरिकाले लगइन गर्नुहोस्।</p>
+        <button onclick="startGoogleAuth()" style="background: #4285F4; color: white; padding: 16px 40px; border-radius: 50px; font-size: 18px; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);">Google सँग लगइन गर्नुहोस्</button>
+    </div>
 </div>
 
 <div class="sidebar">
-    <div class="logo">ADMIN PANEL</div>
-    <div class="nav-link active" id="link-editor" onclick="switchTab('tab-editor')">✍️ नयाँ पोष्ट</div>
-    <div class="nav-link" id="link-posts" onclick="switchTab('tab-posts'); fetchAllPosts();">📄 सबै पोष्टहरू</div>
-    <div class="nav-link" id="link-stats" onclick="switchTab('tab-stats'); fetchBlogStats();">📊 तथ्याङ्क (Stats)</div>
+    <div class="logo">ADMIN CMS</div>
+    <div class="nav-link active" id="nav-editor" onclick="openTab('tab-editor')">✍️ नयाँ समाचार</div>
+    <div class="nav-link" id="nav-posts" onclick="openTab('tab-posts'); fetchPostsList();">📄 सबै पोष्टहरू</div>
+    <div class="nav-link" id="nav-stats" onclick="openTab('tab-stats'); fetchStats();">📊 तथ्याङ्क (Stats)</div>
     <div class="nav-link" onclick="location.reload()">🔄 रिफ्रेस</div>
 </div>
 
 <div class="main">
     
     <div id="tab-editor" class="tab-content card">
-        <h2 id="editor-title">नयाँ समाचार लेख्नुहोस्</h2>
-        <input type="text" id="post-title" placeholder="समाचारको शीर्षक यहाँ लेख्नुहोस्...">
-        <input type="text" id="post-labels" placeholder="Labels (जस्तै: शिक्षा, खेलकुद) - कमा (,) ले छुट्याउनुहोस्">
+        <h2 id="form-heading">नयाँ समाचार लेख्नुहोस्</h2>
+        <input type="text" id="p-title" placeholder="यहाँ समाचारको शीर्षक लेख्नुहोस्...">
+        <input type="text" id="p-labels" placeholder="Labels (जस्तै: शिक्षा, लोकसेवा) - अल्पविराम (,) प्रयोग गर्नुहोस्">
         
-        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
-            <label style="font-size: 14px;">Schedule (ऐच्छिक):</label>
-            <input type="datetime-local" id="post-schedule" style="width: auto;">
+        <div style="display: flex; gap: 20px; align-items: center; background: #f9f9f9; padding: 10px; border-radius: 6px;">
+            <label style="font-size: 14px; font-weight: bold;">समय मिलाउने (Scheduling):</label>
+            <input type="datetime-local" id="p-schedule" style="width: auto; margin: 0;">
         </div>
 
-        <div id="editor"></div>
+        <div id="editor-container"></div>
 
         <div class="btn-group">
-            <button class="btn-main" id="btn-save" onclick="handlePostSubmit('LIVE')">पब्लिश गर्नुहोस्</button>
-            <button class="btn-sec" id="btn-draft" onclick="handlePostSubmit('DRAFT')">ड्राफ्टमा सेभ गर्नुहोस्</button>
+            <button class="btn-pub" id="save-btn" onclick="processPost('LIVE')">पब्लिश गर्नुहोस्</button>
+            <button class="btn-draft" id="draft-btn" onclick="processPost('DRAFT')">ड्राफ्टमा राख्नुहोस्</button>
         </div>
     </div>
 
     <div id="tab-posts" class="tab-content card hidden">
-        <h2>सबै पोष्टहरू व्यवस्थापन गर्नुहोस्</h2>
+        <h2>पोष्ट व्यवस्थापन</h2>
         <table>
             <thead>
                 <tr>
@@ -93,15 +97,15 @@
                     <th>कार्य</th>
                 </tr>
             </thead>
-            <tbody id="posts-table-body">
+            <tbody id="posts-list-body">
                 <tr><td colspan="4">लोड हुँदैछ...</td></tr>
             </tbody>
         </table>
     </div>
 
     <div id="tab-stats" class="tab-content card hidden">
-        <h2>ब्लगको रिपोर्ट</h2>
-        <div id="stats-view" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+        <h2>ब्लग रिपोर्ट</h2>
+        <div id="stats-display" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
             </div>
     </div>
 
@@ -111,32 +115,32 @@
 <script>
     const CLIENT_ID = '749823606982-3o2tcrn6ne9ncni49l4nfskg5am25i60.apps.googleusercontent.com';
     const BLOG_ID = '4810240129416724295';
-    let accessToken = '';
-    let currentEditId = null;
+    let g_token = '';
+    let editingPostId = null;
 
-    // Quill Editor with Image Optimization
-    const quill = new Quill('#editor', {
+    // Rich Text Editor with Image Compression
+    const quill = new Quill('#editor-container', {
         theme: 'snow',
         modules: {
             toolbar: {
                 container: [
                     [{'header': [1, 2, 3, false]}],
-                    ['bold', 'italic', 'underline', 'strike'],
+                    ['bold', 'italic', 'underline'],
                     [{'color': []}, {'background': []}],
                     ['link', 'image', 'video'],
                     [{'list': 'ordered'}, {'list': 'bullet'}],
                     ['clean']
                 ],
-                handlers: { image: imageOptimizerHandler }
+                handlers: { image: optimizedImageHandler }
             }
         }
     });
 
-    // Image Optimizer Logic
-    function imageOptimizerHandler() {
+    // Image Optimization Logic (Resize to 800px & 70% Quality)
+    function optimizedImageHandler() {
         const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/*');
+        input.type = 'file';
+        input.accept = 'image/*';
         input.click();
         input.onchange = async () => {
             const file = input.files[0];
@@ -147,135 +151,146 @@
                 img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const maxWidth = 800;
-                    const scale = maxWidth / img.width;
-                    canvas.width = maxWidth;
+                    const scale = 800 / img.width;
+                    canvas.width = 800;
                     canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const optimizedUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.7);
                     const range = quill.getSelection();
-                    quill.insertEmbed(range.index, 'image', optimizedUrl);
+                    quill.insertEmbed(range.index, 'image', compressedData);
                 };
             };
         };
     }
 
-    function switchTab(tabId) {
+    function openTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         document.getElementById(tabId).classList.remove('hidden');
-        document.getElementById('link-' + tabId.split('-')[1]).classList.add('active');
+        document.getElementById('nav-' + tabId.split('-')[1]).classList.add('active');
     }
 
-    function initAuth() {
+    function startGoogleAuth() {
         const client = google.accounts.oauth2.initTokenClient({
             client_id: CLIENT_ID,
             scope: 'https://www.googleapis.com/auth/blogger',
             callback: (res) => {
-                accessToken = res.access_token;
-                document.getElementById('auth-overlay').classList.add('hidden');
+                if(res.access_token) {
+                    g_token = res.access_token;
+                    document.getElementById('auth-screen').classList.add('hidden');
+                }
             }
         });
         client.requestAccessToken();
     }
 
-    // Create or Update Post
-    async function handlePostSubmit(status) {
-        const title = document.getElementById('post-title').value;
-        const labels = document.getElementById('post-labels').value.split(',').map(l => l.trim());
+    // Save/Update Post Logic
+    async function processPost(status) {
+        const title = document.getElementById('p-title').value;
+        const labels = document.getElementById('p-labels').value.split(',').map(l => l.trim());
         const content = quill.root.innerHTML;
-        const schedule = document.getElementById('post-schedule').value;
+        const schedule = document.getElementById('p-schedule').value;
 
-        if(!title || quill.getText().trim().length < 2) return alert("शीर्षक र विवरण लेख्नुहोस्।");
+        if(!title) return alert("शीर्षक लेख्न नभुल्नुहोस्!");
 
-        const body = { kind: "blogger#post", title, content, labels };
-        if(schedule) body.published = new Date(schedule).toISOString();
+        const payload = { kind: "blogger#post", title, content, labels };
+        if(schedule) payload.published = new Date(schedule).toISOString();
 
-        let url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/`;
-        let method = 'POST';
+        let endpoint = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/`;
+        let verb = 'POST';
 
-        if(currentEditId) {
-            url += currentEditId;
-            method = 'PUT';
+        if(editingPostId) {
+            endpoint += editingPostId;
+            verb = 'PUT';
         } else if(status === 'DRAFT') {
-            url += '?isDraft=true';
+            endpoint += '?isDraft=true';
         }
 
-        const res = await fetch(url, {
-            method: method,
-            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+        const res = await fetch(endpoint, {
+            method: verb,
+            headers: { 'Authorization': `Bearer ${g_token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
 
         if(res.ok) {
-            alert(currentEditId ? "अपडेट सफल!" : "पब्लिश सफल!");
+            alert("कार्य सफल भयो!");
             location.reload();
         } else {
-            alert("त्रुटि भयो। फेरि प्रयास गर्नुहोस्।");
+            const err = await res.json();
+            alert("Error: " + err.error.message);
         }
     }
 
-    async function fetchAllPosts() {
-        const container = document.getElementById('posts-table-body');
-        container.innerHTML = '<tr><td colspan="4">लोड हुँदैछ...</td></tr>';
+    // Fetch All Posts (Live + Draft)
+    async function fetchPostsList() {
+        const body = document.getElementById('posts-list-body');
+        body.innerHTML = '<tr><td colspan="4">पोष्टहरू लोड हुँदैछन्...</td></tr>';
         
-        const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?status=all&maxResults=50`, {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        const data = await res.json();
-        
-        let html = '';
-        if(data.items) {
-            data.items.forEach(p => {
-                html += `
-                <tr>
-                    <td>${p.title}</td>
-                    <td><span class="badge ${p.status === 'DRAFT' ? 'badge-draft' : 'badge-live'}">${p.status}</span></td>
-                    <td>${new Date(p.published).toLocaleDateString()}</td>
-                    <td class="action-btns">
-                        <button onclick="loadPostToEdit('${p.id}')" style="background:#4285F4; color:#fff;">Edit</button>
-                        <button onclick="deletePost('${p.id}')" style="background:var(--primary); color:#fff;">Delete</button>
-                    </td>
-                </tr>`;
+        try {
+            const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?status=all&maxResults=50`, {
+                headers: { 'Authorization': `Bearer ${g_token}` }
             });
+            const data = await res.json();
+            
+            let rows = '';
+            if(data.items && data.items.length > 0) {
+                data.items.forEach(p => {
+                    rows += `
+                    <tr>
+                        <td><strong>${p.title}</strong></td>
+                        <td><span class="status-badge ${p.status === 'DRAFT' ? 'draft' : 'live'}">${p.status}</span></td>
+                        <td>${new Date(p.published).toLocaleDateString()}</td>
+                        <td>
+                            <button class="action-btn" onclick="setupEditMode('${p.id}')">Edit</button>
+                            <button class="action-btn del" onclick="confirmDelete('${p.id}')">Delete</button>
+                        </td>
+                    </tr>`;
+                });
+                body.innerHTML = rows;
+            } else {
+                body.innerHTML = '<tr><td colspan="4">कुनै पोष्ट भेटिएन। कृपया लगइन गर्दा सबै अनुमति दिनुहोस्।</td></tr>';
+            }
+        } catch (e) {
+            body.innerHTML = '<tr><td colspan="4" style="color:red;">API Error: डेटा तान्न सकिएन।</td></tr>';
         }
-        container.innerHTML = html || '<tr><td colspan="4">कुनै पोष्ट भेटिएन।</td></tr>';
     }
 
-    async function loadPostToEdit(id) {
+    async function setupEditMode(id) {
         const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/${id}`, {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
+            headers: { 'Authorization': `Bearer ${g_token}` }
         });
         const p = await res.json();
         
-        currentEditId = id;
-        document.getElementById('post-title').value = p.title;
-        document.getElementById('post-labels').value = p.labels ? p.labels.join(', ') : '';
+        editingPostId = id;
+        document.getElementById('p-title').value = p.title;
+        document.getElementById('p-labels').value = p.labels ? p.labels.join(', ') : '';
         quill.root.innerHTML = p.content;
-        document.getElementById('editor-title').innerText = "समाचार सम्पादन गर्नुहोस्";
-        document.getElementById('btn-save').innerText = "अपडेट गर्नुहोस्";
-        document.getElementById('btn-draft').classList.add('hidden');
-        switchTab('tab-editor');
+        document.getElementById('form-heading').innerText = "समाचार सम्पादन गर्नुहोस्";
+        document.getElementById('save-btn').innerText = "अपडेट गर्नुहोस्";
+        document.getElementById('draft-btn').classList.add('hidden');
+        openTab('tab-editor');
+        window.scrollTo(0,0);
     }
 
-    async function deletePost(id) {
-        if(!confirm("के तपाईं यो समाचार डिलिट गर्न चाहनुहुन्छ?")) return;
-        const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        if(res.ok) fetchAllPosts();
+    async function confirmDelete(id) {
+        if(confirm("के तपाईं यो समाचार सधैँका लागि हटाउन चाहनुहुन्छ?")) {
+            const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${g_token}` }
+            });
+            if(res.ok) fetchPostsList();
+        }
     }
 
-    async function fetchBlogStats() {
+    async function fetchStats() {
         const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}`, {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
+            headers: { 'Authorization': `Bearer ${g_token}` }
         });
         const d = await res.json();
-        document.getElementById('stats-view').innerHTML = `
-            <div class="card" style="text-align:center;"><h3>कुल पोष्ट</h3><h1>${d.posts.totalItems}</h1></div>
-            <div class="card" style="text-align:center;"><h3>कुल पेज</h3><h1>${d.pages.totalItems}</h1></div>
+        document.getElementById('stats-display').innerHTML = `
+            <div class="card" style="text-align:center;"><h3>कुल पोष्टहरू</h3><h1 style="color:var(--primary); font-size:48px;">${d.posts.totalItems}</h1></div>
+            <div class="card" style="text-align:center;"><h3>कुल पेजहरू</h3><h1 style="color:var(--secondary); font-size:48px;">${d.pages.totalItems}</h1></div>
         `;
     }
 </script>
