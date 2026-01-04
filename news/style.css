@@ -1,51 +1,54 @@
-/* बेसिक सेटिङ */
 body {
     font-family: 'Mukta', sans-serif;
-    background-color: #f9f9f9;
-    padding: 20px;
+    background-color: #f4f4f4;
+    padding: 15px;
 }
 
-/* ग्रिड कन्टेनर */
 .news-container {
     display: grid;
-    grid-template-columns: repeat(4, 1-fr); /* डेस्कटपमा ४ कोलम */
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
-/* समाचार कार्ड */
 .news-card {
     background: #fff;
-    border-radius: 8px;
+    border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.news-card a {
+    text-decoration: none; /* लिंकको अन्डरलाइन हटाउन */
+    color: inherit;
 }
 
 .news-card img {
     width: 100%;
-    height: auto;
+    height: 180px;
+    object-fit: cover;
     display: block;
 }
 
-/* हेडलाइन स्टाइल - २० पिक्सल बोल्ड */
 .headline {
     font-size: 20px;
     font-weight: 700;
     margin: 10px;
-    color: #333;
     line-height: 1.4;
-    
-    /* २ लाइन मात्र देखाउने र बाँकी लुकाउने (Truncate) */
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 2; /* २ लाइन मात्र */
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-/* मोबाइलको लागि रेस्पोन्सिभ (२ कोलम देखाउन) */
-@media (max-width: 768px) {
+/* मोबाइलको लागि २x२ कोलम */
+@media (max-width: 600px) {
     .news-container {
-        grid-template-columns: repeat(2, 1fr); /* २ कोलममा २-२ वटा समाचार */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .headline {
+        font-size: 16px; /* मोबाइलमा अलि सानो देखियोस् भनेर */
     }
 }
