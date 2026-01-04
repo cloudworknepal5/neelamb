@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <title>Blogger Admin - Post News</title>
+    <style>
+        body { font-family: sans-serif; padding: 30px; background: #f0f2f5; }
+        .admin-box { max-width: 600px; margin: auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;}
+        button { background: #e31e24; color: #fff; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
+        #auth-btn { background: #4285F4; margin-bottom: 20px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="admin-box">
+    <h2>Blogger Admin Panel</h2>
+    
+    <button id="auth-btn">Google मार्फत लगइन गर्नुहोस्</button>
+
+    <div id="post-form" class="hidden">
+        <p style="color: green;">✅ लगइन सफल! अब पोस्ट लेख्नुहोस्।</p>
+        <input type="text" id="title" placeholder="समाचारको शीर्षक...">
+        <textarea id="content" rows="8" placeholder="समाचारको विवरण (HTML प्रयोग गर्न सकिन्छ)..."></textarea>
+        <button id="submit-btn">ब्लगमा पब्लिश गर्नुहोस्</button>
+    </div>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" onload="initClient()"></script>
+<script>
+    let tokenClient;
+    let accessToken = null;
+
+    const CLIENT_ID = 'तपाईंको_CLIENT_ID_यहाँ_हाल्नुहोस्';
+    const BLOG_ID = '4810240129416724295';
+
+    function initClient() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/blogger',
+            callback: (response) => {
+                if (response.access_token) {
+                    accessToken = response.access_token;
+                    document.getElementById('auth-btn').classList.add('hidden');
+                    document.getElementById('post-form').classList.remove('hidden');
+                }
+            },
+        });
+    }
+
+    document.getElementById('auth-btn').onclick = () => {
+        tokenClient.requestAccessToken();
+    };
+
+    document.getElementById('submit-btn').onclick = async () => {
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('content').value;
+
+        if (!title || !content) {
+            alert("शीर्षक र विवरण दुवै भर्नुहोस्!");
+            return;
+        }
+
+        const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "kind": "blogger#post",
+                    "title": title,
+                    "content": content
+                })
+            });
+
+            if (response.ok) {
+                alert("बधाई छ! समाचार ब्लगमा पब्लिश भयो।");
+                document.getElementById('title').value = '';
+                document.getElementById('content').value = '';
+            } else {
+                const errorData = await response.json();
+                alert("त्रुटि: " + errorData.error.message);
+            }
+        } catch (err) {
+            alert("नेटवर्कमा समस्या आयो!");
+        }
+    };
+</script>
+
+</body>
+</html>
