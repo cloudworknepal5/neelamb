@@ -2,73 +2,81 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <title>Blogger Admin - Post News</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education Nepal - Admin Panel</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        body { font-family: sans-serif; padding: 30px; background: #f0f2f5; }
-        .admin-box { max-width: 600px; margin: auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;}
-        button { background: #e31e24; color: #fff; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
-        #auth-btn { background: #4285F4; margin-bottom: 20px; }
+        body { font-family: sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .admin-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        #login-btn { background: #4285F4; color: white; }
+        #post-btn { background: #e31e24; color: white; margin-top: 10px; }
         .hidden { display: none; }
+        .status { margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="admin-box">
-    <h2>Blogger Admin Panel</h2>
+<div class="admin-card">
+    <h2>Education Nepal Admin</h2>
     
-    <button id="auth-btn">Google मार्फत लगइन गर्नुहोस्</button>
-
-    <div id="post-form" class="hidden">
-        <p style="color: green;">✅ लगइन सफल! अब पोस्ट लेख्नुहोस्।</p>
-        <input type="text" id="title" placeholder="समाचारको शीर्षक...">
-        <textarea id="content" rows="8" placeholder="समाचारको विवरण (HTML प्रयोग गर्न सकिन्छ)..."></textarea>
-        <button id="submit-btn">ब्लगमा पब्लिश गर्नुहोस्</button>
+    <div id="login-section">
+        <p>ब्लगमा समाचार पोष्ट गर्न लगइन गर्नुहोस्।</p>
+        <button id="login-btn" onclick="handleAuth()">Google सँग लगइन गर्नुहोस्</button>
     </div>
+
+    <div id="post-section" class="hidden">
+        <p style="color: green;">✅ लगइन सफल!</p>
+        <input type="text" id="post-title" placeholder="समाचारको शीर्षक...">
+        <textarea id="post-content" rows="6" placeholder="समाचारको विवरण..."></textarea>
+        <button id="post-btn" onclick="createPost()">पब्लिश गर्नुहोस्</button>
+    </div>
+
+    <div id="status-msg" class="status"></div>
 </div>
 
-<script src="https://accounts.google.com/gsi/client" onload="initClient()"></script>
 <script>
-    let tokenClient;
-    let accessToken = null;
-
     const CLIENT_ID = '749823606982-3o2tcrn6ne9ncni49l4nfskg5am25i60.apps.googleusercontent.com';
     const BLOG_ID = '4810240129416724295';
+    let access_token = null;
 
-    function initClient() {
-        tokenClient = google.accounts.oauth2.initTokenClient({
+    // १. लगइन प्रक्रिया
+    function handleAuth() {
+        const client = google.accounts.oauth2.initTokenClient({
             client_id: CLIENT_ID,
             scope: 'https://www.googleapis.com/auth/blogger',
             callback: (response) => {
                 if (response.access_token) {
-                    accessToken = response.access_token;
-                    document.getElementById('auth-btn').classList.add('hidden');
-                    document.getElementById('post-form').classList.remove('hidden');
+                    access_token = response.access_token;
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('post-section').classList.remove('hidden');
+                    document.getElementById('status-msg').innerText = "";
                 }
             },
         });
+        client.requestAccessToken();
     }
 
-    document.getElementById('auth-btn').onclick = () => {
-        tokenClient.requestAccessToken();
-    };
-
-    document.getElementById('submit-btn').onclick = async () => {
-        const title = document.getElementById('title').value;
-        const content = document.getElementById('content').value;
+    // २. पोष्ट गर्ने प्रक्रिया
+    async function createPost() {
+        const title = document.getElementById('post-title').value;
+        const content = document.getElementById('post-content').value;
+        const statusMsg = document.getElementById('status-msg');
 
         if (!title || !content) {
-            alert("शीर्षक र विवरण दुवै भर्नुहोस्!");
+            alert("शीर्षक र विवरण खाली नछोड्नुहोस्।");
             return;
         }
 
-        const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/`;
-        
+        statusMsg.innerText = "पब्लिश हुँदैछ...";
+        statusMsg.style.color = "blue";
+
         try {
-            const response = await fetch(url, {
+            const response = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`,
+                    'Authorization': `Bearer ${access_token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -79,17 +87,20 @@
             });
 
             if (response.ok) {
-                alert("बधाई छ! समाचार ब्लगमा पब्लिश भयो।");
-                document.getElementById('title').value = '';
-                document.getElementById('content').value = '';
+                statusMsg.innerText = "✅ समाचार सफलतापूर्वक पब्लिश भयो!";
+                statusMsg.style.color = "green";
+                document.getElementById('post-title').value = "";
+                document.getElementById('post-content').value = "";
             } else {
-                const errorData = await response.json();
-                alert("त्रुटि: " + errorData.error.message);
+                const err = await response.json();
+                statusMsg.innerText = "❌ त्रुटि: " + err.error.message;
+                statusMsg.style.color = "red";
             }
-        } catch (err) {
-            alert("नेटवर्कमा समस्या आयो!");
+        } catch (error) {
+            statusMsg.innerText = "❌ नेटवर्कमा समस्या आयो।";
+            statusMsg.style.color = "red";
         }
-    };
+    }
 </script>
 
 </body>
