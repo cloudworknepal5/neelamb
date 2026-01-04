@@ -3,87 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Education Nepal - Professional Admin</title>
+    <title>Education Nepal - Optimized CMS</title>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        :root { --primary: #e31e24; --sidebar-bg: #202124; --bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; }
+        :root { --primary: #e31e24; --secondary: #1a73e8; --sidebar: #202124; --text: #3c4043; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; background: #f8f9fa; }
         
-        /* Sidebar Design */
-        .sidebar { width: 240px; height: 100vh; background: var(--sidebar-bg); color: white; position: fixed; }
-        .sidebar-header { padding: 20px; font-weight: bold; font-size: 20px; border-bottom: 1px solid #3c4043; }
-        .menu-item { padding: 15px 20px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; }
-        .menu-item:hover, .menu-item.active { background: #3c4043; color: var(--primary); }
-        
-        /* Main Content */
-        .main-content { margin-left: 240px; width: calc(100% - 240px); padding: 30px; }
-        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+        .sidebar { width: 260px; height: 100vh; background: var(--sidebar); color: #fff; position: fixed; }
+        .logo { padding: 25px; font-size: 22px; font-weight: bold; border-bottom: 1px solid #3c4043; color: var(--primary); }
+        .nav-link { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: #3c4043; border-left: 4px solid var(--primary); }
+
+        .main { margin-left: 260px; width: 100%; padding: 40px; }
+        .card { background: #fff; border-radius: 8px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .hidden { display: none; }
+
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #dadce0; border-radius: 4px; box-sizing: border-box; }
+        #editor { height: 350px; margin: 20px 0; }
         
-        /* Tables & UI */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
-        .del-btn { color: red; cursor: pointer; border: 1px solid red; padding: 5px 10px; border-radius: 4px; font-size: 12px; }
-        #editor-container { height: 350px; margin: 20px 0; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
-        .btn-pub { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; width: 100%; }
+        .action-bar { display: flex; gap: 10px; margin-top: 20px; }
+        button { padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn-pub { background: var(--primary); color: #fff; flex: 2; }
+        .btn-draft { background: #5f6368; color: #fff; flex: 1; }
         
-        #login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:1000; display:flex; justify-content:center; align-items:center; flex-direction:column; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f1f3f4; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .live { background: #e6f4ea; color: #1e8e3e; }
+        .draft { background: #f1f3f4; color: #5f6368; }
+
+        #overlay { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
 <body>
 
-<div id="login-overlay">
-    <h2>Education Nepal Admin</h2>
-    <button onclick="handleAuth()" style="padding:15px 30px; background:#4285F4; color:white; border:none; border-radius:5px; cursor:pointer;">Google मार्फत लगइन गर्नुहोस्</button>
+<div id="overlay">
+    <h1 style="color: var(--primary);">Education Nepal CMS</h1>
+    <button onclick="handleAuth()" style="padding:15px 40px; background:var(--secondary); color:#fff; border:none; border-radius:30px; font-size:18px; cursor:pointer;">गूगलबाट सुरु गर्नुहोस्</button>
 </div>
 
 <div class="sidebar">
-    <div class="sidebar-header">Blogger Admin</div>
-    <div class="menu-item active" onclick="showTab('new-post')">➕ नयाँ पोष्ट</div>
-    <div class="menu-item" onclick="showTab('all-posts'); loadAllPosts();">📄 सबै पोष्टहरू</div>
-    <div class="menu-item" onclick="showTab('stats'); loadStats();">📊 तथ्याङ्क (Stats)</div>
-    <div class="menu-item" onclick="showTab('settings')">⚙️ सेटिङ</div>
+    <div class="logo">Education Nepal</div>
+    <div class="nav-link active" onclick="switchTab('tab-editor')">✍️ नयाँ पोष्ट</div>
+    <div class="nav-link" onclick="switchTab('tab-posts'); fetchPosts();">📄 सबै पोष्टहरू</div>
+    <div class="nav-link" onclick="switchTab('tab-stats'); fetchStats();">📊 स्टाट</div>
 </div>
 
-<div class="main-content">
-    
-    <div id="new-post" class="tab-content card">
-        <h3>नयाँ समाचार लेख्नुहोस्</h3>
+<div class="main">
+    <div id="tab-editor" class="tab card">
+        <h2>नयाँ समाचार (Optimized)</h2>
         <input type="text" id="post-title" placeholder="शीर्षक...">
         <input type="text" id="post-labels" placeholder="Labels (कमाले छुट्याउनुहोस्)...">
-        <div id="editor-container"></div>
-        <button class="btn-pub" onclick="createPost()">पब्लिश गर्नुहोस्</button>
+        
+        <div id="editor"></div>
+        
+        <div class="action-bar">
+            <button class="btn-pub" onclick="savePost('LIVE')">पब्लिश गर्नुहोस्</button>
+            <button class="btn-draft" onclick="savePost('DRAFT')">ड्राफ्टमा राख्नुहोस्</button>
+        </div>
     </div>
 
-    <div id="all-posts" class="tab-content card hidden">
-        <h3>सबै पोष्टहरू</h3>
-        <table id="posts-table">
-            <thead><tr><th>शीर्षक</th><th>मिति</th><th>कार्य</th></tr></thead>
-            <tbody id="posts-list"></tbody>
+    <div id="tab-posts" class="tab card hidden">
+        <h2>सबै पोष्टहरू</h2>
+        <table>
+            <thead><tr><th>शीर्षक</th><th>अवस्था</th><th>कार्य</th></tr></thead>
+            <tbody id="list-container"></tbody>
         </table>
     </div>
 
-    <div id="stats" class="tab-content card hidden">
-        <h3>ब्लग तथ्याङ्क</h3>
-        <div id="stats-data">लोड हुँदैछ...</div>
+    <div id="tab-stats" class="tab card hidden">
+        <h2>रिपोर्ट</h2>
+        <div id="stats-content">लोड हुँदैछ...</div>
     </div>
-
 </div>
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
     const CLIENT_ID = '749823606982-3o2tcrn6ne9ncni49l4nfskg5am25i60.apps.googleusercontent.com';
     const BLOG_ID = '4810240129416724295';
-    let access_token = null;
+    let token = '';
 
-    var quill = new Quill('#editor-container', {
+    const quill = new Quill('#editor', {
         theme: 'snow',
-        modules: { toolbar: [[{'header': [1,2,false]}], ['bold', 'italic', 'underline'], ['image', 'code-block']] }
+        modules: {
+            toolbar: {
+                container: [[{'header': [1, 2, false]}], ['bold', 'italic', 'underline'], ['link', 'image', 'video']],
+                handlers: { image: imageHandler }
+            }
+        }
     });
 
-    function showTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-        document.getElementById(tabId).classList.remove('hidden');
-        document.querySelectorAll('.menu-item').forEach(m => m.classList
+    // १. इमेज अप्टिमाइज गर्ने फङ्सन
+    function imageHandler() {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = async () => {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // अधिकतम ८०० पिक्सेल चौडाइमा खुम्च्याउने
+                    const maxWidth = 800;
+                    const scale = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scale;
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // ७०% क्वालिटीमा कोम्प्रेस गर्ने
+                    const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    const range = quill.getSelection();
+                    quill.insertEmbed(range.index, 'image', optimizedDataUrl);
+                };
+            };
+        };
+    }
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function handleAuth() {
+        google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/blogger',
+            callback: (res) => { token = res.access_token; document.getElementById('overlay').style.display = 'none'; }
+        }).requestAccessToken();
+    }
+
+    async function savePost(status) {
+        const body = {
+            title: document.getElementById('post-title').value,
+            content: quill.root.innerHTML,
+            labels: document.getElementById('post-labels').value.split(',')
+        };
+        const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/${status === 'DRAFT' ? '?isDraft=true' : ''}`;
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if(res.ok) alert("सफल भयो!");
+    }
+
+    async function fetchPosts() {
+        const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?status=all`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        let html = '';
+        data.items.forEach(p => {
+            html += `<tr><td>${p.title}</td><td><span class="status-badge ${p.status === 'DRAFT' ? 'draft' : 'live'}">${p.status}</span></td><td><button onclick="deletePost('${p.id}')">🗑️</button></td></tr>`;
+        });
+        document.getElementById('list-container').innerHTML = html;
+    }
+
+    async function fetchStats() {
+        const res = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const d = await res.json();
+        document.getElementById('stats-content').innerHTML = `कुल पोष्ट: ${d.posts.totalItems} | कुल पेज: ${d.pages.totalItems}`;
+    }
+</script>
+</body>
+</html>
