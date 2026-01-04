@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>न्युज पोर्टल - ४ ग्रिड</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="news-container">
+        <div class="news-card">
+            <img src="https://via.placeholder.com/300x200" alt="News Image">
+            <h2 class="headline">यहाँ समाचारको मुख्य शीर्षक रहनेछ जुन दुई लाइनसम्म मात्र जान्छ।</h2>
+        </div>
+
+        <div class="news-card">
+            <img src="https://via.placeholder.com/300x200" alt="News Image">
+            <h2 class="headline">दोस्रो समाचारको हेडलाइन यहाँ लेख्नुहोस्, यो पनि संक्षिप्त हुनुपर्छ।</h2>
+        </div>
+
+        <div class="news-card">
+            <img src="https://via.placeholder.com/300x200" alt="News Image">
+            <h2 class="headline">तेस्रो समाचारको शीर्षक: नेपालको राजनीतिमा नयाँ मोड आउने संकेत।</h2>
+        </div>
+
+        <div class="news-card">
+            <img src="https://via.placeholder.com/300x200" alt="News Image">
+            <h2 class="headline">चौथो समाचार: खेलकुद क्षेत्रमा नेपाली खेलाडीको नयाँ रेकर्ड कायम।</h2>
+        </div>
+    </div>
+
+</body>
+</html>
