@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>मेरो टुलबक्स - Preeti to Unicode & More</title>
+    
+    <style>
+        /* मुख्य ब्याकग्राउन्ड र फन्ट */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* माथिको नेभिगेसन प्यानल */
+        .top-nav {
+            background: #2c3e50;
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .top-nav a {
+            background-color: #34495e;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 13px;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .top-nav a:hover {
+            background-color: #1abc9c;
+            transform: translateY(-2px);
+        }
+
+        /* कन्टेनर डिजाइन */
+        .main-wrapper {
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 350px;
+            max-width: 600px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #1abc9c;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: inherit;
+            margin-bottom: 10px;
+            transition: border 0.3s;
+        }
+
+        textarea:focus {
+            border-color: #1abc9c;
+            outline: none;
+        }
+
+        input[type="button"] {
+            background: #1abc9c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+            transition: 0.3s;
+        }
+
+        input[type="button"]:hover {
+            background: #16a085;
+        }
+
+        .iframe-container {
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-wrapper { flex-direction: column; }
+            .card { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <a href="https://firebasestorage.googleapis.com/...HIMALB.htm" target="_blank">Himalb to Unicode</a>
+        <a href="https://designers2077.github.io/PreetiToUnicodeAuto/" target="_blank">Preti to Unicode Auto</a>
+        <a href="https://designers2077.github.io/newseditor/" target="_blank">News Editor</a>
+        <a href="https://designers2077.github.io/pagemakeredit/" target="_blank">Pagemaker Edit</a>
+        <a href="https://designers2077.github.io/rssnewsedit" target="_blank">Rss News Edit</a>
+        <a href="https://drive.google.com/drive/folders/1P6dWo4xcB0YuLnND6Nom-PyauySe_4UQ" target="_blank">Uploads</a>
+        <a href="https://mail.google.com/mail/u/0/?ui=2&fs=1&tf=cm" target="_blank">Gmail Compose</a>
+        <a href="https://neelamb.com.np/files/Unicode-to-krutidev010%20converter05.htm" target="_blank">Unicode to Krutidev</a>
+        <a href="https://panel4.serv00.com/file_manager/" target="_blank">MyDrive</a>
+    </div>
+
+    <div class="main-wrapper">
+        
+        <div class="card">
+            <h2>Software 1 - Converter</h2>
+            <form>
+                <p><b>Nepali Plain Text (Preeti):</b></p>
+                <textarea name="legacy_text" id="legacy_text" rows="6" style="font-family: preeti; font-size: 21px;"></textarea>
+                <span id="counter-text"></span>
+                
+                <div>
+                    <input value=" Convert Unicode >> " onclick="convert_to_unicode();" type="button">
+                    <input value="Select All" onclick="javascript:this.form.legacy_text.focus();this.form.legacy_text.select();" type="button">
+                </div>
+
+                <p style="margin-top:20px;"><b>Unicode Text:</b></p>
+                <textarea name="unicode_text" id="unicode_text" rows="6"></textarea>
+                
+                <div>
+                    <input value=" Convert to Preeti >> " onclick="convert_to_Preeti();" type="button">
+                    <input value="Select All" onclick="javascript:this.form.unicode_text.focus();this.form.unicode_text.select();" type="button">
+                </div>
+            </form>
+
+            <div class="iframe-container">
+                <embed src="index_files/HIMALB.htm" style="height: 400px; width: 100%;">
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Software 2 - Kantipur & Tools</h2>
+            <div class="widget-content">
+                <textarea name="inputField" id="inputField" rows="5" placeholder="यहाँ टाइप गर्नुहोस्..."></textarea>
+                <input name="convertButton" id="convertButton" value="Convert Kantipur" type="button">
+                <br><br>
+                <textarea name="outputField" rows="5" id="outputField" placeholder="नतिजा यहाँ देखिनेछ..."></textarea>
+            </div>
+
+            <div class="iframe-container">
+                <p style="padding:10px; margin:0; background:#eee;">Preview Tool</p>
+                <embed src="index_files/a_002.htm" style="height: 400px; width: 100%;">
+            </div>
+        </div>
+
+    </div>
+
+    <script src="./preeti to unicode, kantipur to unicode, himalb to unicode converter_files/common.js"></script>
+    <script src="./preeti to unicode, kantipur to unicode, himalb to unicode converter_files/convert.js"></script>
+    <script src="./preeti to unicode, kantipur to unicode, himalb to unicode converter_files/jquery.js"></script>
+    <script src="./preeti to unicode, kantipur to unicode, himalb to unicode converter_files/kantipur.js"></script>
+    
+    <script type="text/javascript">
+        jQuery(function($){  
+            $("#convertButton").click(function(){    
+                $("#outputField").val( kantipurConfigToUnicode( $("#inputField").val() ) );  
+            });
+            $("textarea").textareaCounter();  
+        });
+    </script>
+</body>
+</html>
