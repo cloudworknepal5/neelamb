@@ -6,7 +6,7 @@
     <title>Nepali Converter & Tools Dashboard</title>
     <style>
         :root {
-            --sidebar-color: #1a1c23;
+            --nav-bg: #1a1c23;
             --bg-color: #f4f7f6;
             --accent: #4e73df;
             --card-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
@@ -14,54 +14,48 @@
 
         body {
             margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Sidebar Style */
-        .sidebar {
-            width: 250px;
-            background-color: var(--sidebar-color);
-            color: white;
-            display: flex;
             flex-direction: column;
-            padding: 20px 0;
-            flex-shrink: 0;
-            overflow-y: auto;
+            height: 100vh;
         }
 
-        .sidebar-brand {
-            font-size: 1.2rem;
-            text-align: center;
-            padding: 10px;
-            border-bottom: 1px solid #333;
-            margin-bottom: 20px;
-            font-weight: bold;
+        /* Top Navigation Style */
+        .top-nav {
+            background-color: var(--nav-bg);
+            padding: 10px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
         }
 
-        .sidebar a {
-            padding: 12px 20px;
+        .top-nav a {
             color: #adb5bd;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.05);
             transition: all 0.3s;
-            display: block;
+            white-space: nowrap;
         }
 
-        .sidebar a:hover {
-            background-color: #2d2f3b;
+        .top-nav a:hover {
+            background-color: var(--accent);
             color: white;
-            padding-left: 25px;
+            transform: translateY(-2px);
         }
 
         /* Main Content */
         .main-content {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 25px;
+            padding: 20px;
         }
 
         .header {
@@ -69,17 +63,17 @@
             justify-content: space-between;
             align-items: center;
             background: white;
-            padding: 15px 25px;
+            padding: 12px 25px;
             border-radius: 10px;
             box-shadow: var(--card-shadow);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
-        /* Tools Grid */
+        /* Layout Grid */
         .tools-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 20px;
         }
 
         .card {
@@ -87,49 +81,52 @@
             border-radius: 12px;
             box-shadow: var(--card-shadow);
             padding: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .card h2 {
             margin-top: 0;
-            color: #4e73df;
+            color: var(--accent);
             border-bottom: 2px solid #f8f9fc;
             padding-bottom: 10px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
-        /* Form Styling */
         textarea {
             width: 100%;
             border: 1px solid #d1d3e2;
             border-radius: 5px;
             padding: 10px;
-            font-family: inherit;
             margin-bottom: 10px;
             box-sizing: border-box;
+            font-family: inherit;
         }
 
         input[type="button"] {
             background-color: var(--accent);
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-right: 5px;
         }
 
-        input[type="button"]:hover {
-            background-color: #2e59d9;
-        }
-
+        /* Responsive Embed Boxes */
         .embed-box {
             width: 100%;
-            height: 500px;
+            height: 550px;
             border: 1px solid #eee;
             border-radius: 8px;
-            margin-top: 15px;
+            margin-top: 10px;
+            background: #fff;
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         @media (max-width: 1024px) {
@@ -139,10 +136,9 @@
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-brand">Nepali Tools</div>
-        <a href="https://firebasestorage.googleapis.com/v0/b/birgunj-debba.appspot.com/o/HIMALB.htm?alt=media&token=5892a863-f8de-46e1-80f7-391ae0f6fcce" target="_blank">Himalb to Unicode</a>
-        <a href="https://designers2077.github.io/PreetiToUnicodeAuto/" target="_blank">Preeti to Unicode Auto</a>
+    <nav class="top-nav">
+        <a href="https://firebasestorage.googleapis.com/v0/b/birgunj-debba.appspot.com/o/HIMALB.htm?alt=media&token=5892a863-f8de-46e1-80f7-391ae0f6fcce" target="_blank">Himalb Converter</a>
+        <a href="https://designers2077.github.io/PreetiToUnicodeAuto/" target="_blank">Preeti Auto</a>
         <a href="https://designers2077.github.io/newseditor/" target="_blank">News Editor</a>
         <a href="https://designers2077.github.io/pagemakeredit/" target="_blank">Pagemaker Edit</a>
         <a href="https://designers2077.github.io/rssnewsedit" target="_blank">Rss News Edit</a>
@@ -150,53 +146,61 @@
         <a href="https://mail.google.com/mail/u/0/h/" target="_blank">Gmail HTML</a>
         <a href="https://neelamb.com.np/files/Unicode-to-krutidev010%20converter05.htm" target="_blank">Unicode to Krutidev</a>
         <a href="https://panel4.serv00.com/file_manager/" target="_blank">MyDrive</a>
-    </div>
+    </nav>
 
     <div class="main-content">
         <div class="header">
-            <h1 style="font-size: 1.5rem; margin: 0; color: #333;">Master Converter Panel</h1>
+            <h1 style="font-size: 1.3rem; margin: 0; color: #333;">Nepali Converter Dashboard</h1>
             <iframe scrolling="no" src="./index_files/linknepali-time.html" width="300" height="25" frameborder="0"></iframe>
         </div>
 
         <div class="tools-container">
             
-            <div class="card">
-                <h2>Software 1 - Multi Converter</h2>
-                
-                <form id="convForm">
-                    <p><b>Nepali Plain Text:</b><br>
-                    <textarea name="legacy_text" id="legacy_text" rows="6" style="font-family: preeti; font-size: 20px;"></textarea>
-                    <input onclick="convert_to_unicode();" type="button" value="Convert Unicode >>">
-                    <input onclick="document.getElementById('legacy_text').select();" type="button" value="Select All"></p>
+            <div class="left-column">
+                <div class="card">
+                    <h2>Software 1 - Multi Converter</h2>
+                    <form id="convForm">
+                        <b>Nepali Plain Text:</b>
+                        <textarea name="legacy_text" id="legacy_text" rows="7" style="font-family: preeti; font-size: 21px;"></textarea>
+                        <input onclick="convert_to_unicode();" type="button" value="Convert Unicode >>">
+                        <input onclick="document.getElementById('legacy_text').select();" type="button" value="Select All">
 
-                    <p><b>Unicode Text:</b><br>
-                    <textarea name="unicode_text" id="unicode_text" rows="6"></textarea>
-                    <input onclick="convert_to_Preeti();" type="button" value="Convert Text >>">
-                    <input onclick="document.getElementById('unicode_text').select();" type="button" value="Select All"></p>
-                </form>
+                        <p><b>Unicode Text:</b></p>
+                        <textarea name="unicode_text" id="unicode_text" rows="7"></textarea>
+                        <input onclick="convert_to_Preeti();" type="button" value="Convert Text >>">
+                        <input onclick="document.getElementById('unicode_text').select();" type="button" value="Select All">
+                    </form>
 
-                <div class="card" style="margin-top:20px; background:#f8f9fc;">
-                    <h3>Kantipur Tool</h3>
-                    <textarea id="inputField" rows="4" placeholder="Input Kantipur..."></textarea>
-                    <input id="convertButton" type="button" value="Convert">
-                    <textarea id="outputField" rows="4" placeholder="Unicode Output..."></textarea>
-                </div>
+                    <div class="card" style="margin-top:20px; background:#f8f9fc; padding: 15px;">
+                        <h3>Kantipur Tool</h3>
+                        <textarea id="inputField" rows="3" placeholder="Input Kantipur..."></textarea>
+                        <input id="convertButton" type="button" value="Convert">
+                        <textarea id="outputField" rows="3" placeholder="Unicode Output..."></textarea>
+                    </div>
 
-                <div class="embed-box">
-                    <embed src="https://designers2077.github.io/newseditor/" width="100%" height="100%">
+                    <h3 style="margin-top:20px;">News Editor</h3>
+                    <div class="embed-box">
+                        <embed src="https://designers2077.github.io/newseditor/" width="100%" height="100%">
+                    </div>
                 </div>
             </div>
 
-            <div class="card">
-                <h2>Software 2 - External Modules</h2>
+            <div class="right-column">
                 
-                <div class="embed-box">
-                    <embed src="https://firebasestorage.googleapis.com/v0/b/birgunj-debba.appspot.com/o/HIMALB.htm?alt=media&token=5892a863-f8de-46e1-80f7-391ae0f6fcce" width="100%" height="100%">
+                <div class="card">
+                    <h2>Preeti to Unicode Auto</h2>
+                    <div class="embed-box">
+                        <embed src="https://designers2077.github.io/PreetiToUnicodeAuto/" width="100%" height="100%">
+                    </div>
                 </div>
 
-                <div class="embed-box" style="margin-top: 25px;">
-                    <embed src="https://designers2077.github.io/PreetiToUnicodeAuto/" width="100%" height="100%">
+                <div class="card">
+                    <h2>Himalb Converter</h2>
+                    <div class="embed-box">
+                        <embed src="https://firebasestorage.googleapis.com/v0/b/birgunj-debba.appspot.com/o/HIMALB.htm?alt=media&token=5892a863-f8de-46e1-80f7-391ae0f6fcce" width="100%" height="100%">
+                    </div>
                 </div>
+
             </div>
 
         </div>
