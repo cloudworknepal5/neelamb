@@ -3,114 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nepali Smart Converter Dashboard</title>
+    <title>Nepali Converter Master Dashboard</title>
     <style>
         :root {
-            --sidebar-color: #1e272e;
-            --bg-color: #f1f2f6;
-            --accent-color: #3742fa;
-            --text-light: #ced4da;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 280px;
         }
 
         body {
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
             display: flex;
             height: 100vh;
-            background: var(--bg-color);
+            color: white;
+            overflow: hidden;
         }
 
-        /* Sidebar Design */
+        /* Sidebar Glassmorphism */
         .sidebar {
-            width: 240px;
-            background: var(--sidebar-color);
-            color: white;
+            width: var(--sidebar-width);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
-            flex-shrink: 0;
+            padding: 20px;
             overflow-y: auto;
         }
 
-        .sidebar h2 {
-            font-size: 18px;
+        .profile-section {
             text-align: center;
-            padding: 20px;
-            border-bottom: 1px solid #3d3d3d;
-            margin: 0;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .profile-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid white;
+            margin-bottom: 10px;
         }
 
         .sidebar a {
-            padding: 12px 20px;
-            color: var(--text-light);
+            color: #ecf0f1;
             text-decoration: none;
-            font-size: 14px;
-            border-left: 4px solid transparent;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
             transition: 0.3s;
+            font-size: 14px;
         }
 
         .sidebar a:hover {
-            background: #2f3542;
-            color: white;
-            border-left: 4px solid var(--accent-color);
+            background: white;
+            color: #764ba2;
+            transform: translateX(5px);
         }
 
-        /* Main Content Area */
+        /* Main Dashboard Area */
         .main-content {
             flex-grow: 1;
-            padding: 20px;
+            padding: 30px;
             overflow-y: auto;
         }
 
-        .header-box {
-            background: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .top-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
         }
 
-        /* Grid Layout for Tools */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 20px;
+            gap: 25px;
         }
 
-        .tool-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .tool-title {
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
             padding: 15px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #eee;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            font-size: 18px;
             font-weight: bold;
-            color: #2f3542;
-            display: flex;
-            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .iframe-container {
+        .iframe-wrapper {
             width: 100%;
-            height: 550px;
+            height: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white; /* Iframe load हुँदा आँखालाई सजिलो हुन्छ */
         }
 
-        iframe {
+        iframe, embed {
             width: 100%;
             height: 100%;
             border: none;
         }
 
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
+        /* Custom Stats in Sidebar */
+        .mini-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        @media (max-width: 900px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; height: auto; }
             .tools-grid { grid-template-columns: 1fr; }
@@ -120,47 +144,51 @@
 <body>
 
     <div class="sidebar">
-        <h2>मेरो मेनु</h2>
-        <a href="https://designers2077.github.io/newseditor/" target="_blank">News Editor</a>
-        <a href="https://designers2077.github.io/pagemakeredit/" target="_blank">Pagemaker Edit</a>
-        <a href="https://designers2077.github.io/rssnewsedit" target="_blank">Rss News Edit</a>
-        <a href="https://drive.google.com/drive/folders/1P6dWo4xcB0YuLnND6Nom-PyauySe_4UQ" target="_blank">Google Drive Uploads</a>
-        <a href="https://mail.google.com/mail/u/0/h/" target="_blank">Gmail HTML</a>
-        <a href="https://panel4.serv00.com/file_manager/" target="_blank">Serv00 MyDrive</a>
-        <a href="https://neelamb.com.np/files/new-text-software.html" target="_blank">Advance Text Editor</a>
+        <div class="profile-section">
+            <img src="https://via.placeholder.com/80" alt="Profile" class="profile-img">
+            <h3 style="margin: 5px 0;">[तपाईंको नाम]</h3>
+            <p style="font-size: 12px; opacity: 0.8;">Web Developer</p>
+        </div>
+
+        <nav style="display: flex; flex-direction: column;">
+            <a href="https://designers2077.github.io/newseditor/" target="_blank">📰 News Editor</a>
+            <a href="https://designers2077.github.io/pagemakeredit/" target="_blank">📄 Pagemaker Edit</a>
+            <a href="https://designers2077.github.io/rssnewsedit" target="_blank">📻 RSS News Edit</a>
+            <a href="https://panel4.serv00.com/file_manager/" target="_blank">📁 Serv00 MyDrive</a>
+            <a href="https://mail.google.com/mail/u/0/h/" target="_blank">📧 Gmail HTML</a>
+            <a href="https://github.com/your-username" style="background: white; color: #764ba2; font-weight: bold;">Follow on GitHub</a>
+        </nav>
+
+        <div class="mini-stats">
+            <div class="stat-item"><strong>50+</strong><br>Projects</div>
+            <div class="stat-item"><strong>1.2k</strong><br>Commits</div>
+        </div>
     </div>
 
     <div class="main-content">
-        <div class="header-box">
-            <span style="font-weight: bold; color: #555;">नेपाली युनिकोड र कन्भर्टर ड्यासबोर्ड</span>
+        <div class="top-header">
+            <h1 style="margin: 0; font-size: 24px;">नेपाली टुल ड्यासबोर्ड</h1>
             <iframe scrolling="no" src="./index_files/linknepali-time.html" width="300" height="25" frameborder="0"></iframe>
         </div>
 
         <div class="tools-grid">
             
-            <div class="tool-card">
-                <div class="tool-title">१. Preeti to Unicode Auto</div>
-                <div class="iframe-container">
+            <div class="glass-card">
+                <div class="card-header">१. Preeti to Unicode (Auto)</div>
+                <div class="iframe-wrapper">
                     <iframe src="https://designers2077.github.io/PreetiToUnicodeAuto/"></iframe>
                 </div>
             </div>
 
-            <div class="tool-card">
-                <div class="tool-title">२. Unicode to All Converter</div>
-                <div class="iframe-container">
+            <div class="glass-card">
+                <div class="card-header">२. Unicode to Krutidev / All</div>
+                <div class="iframe-wrapper">
                     <iframe src="https://educationnepal.eu.org/unicodeto/"></iframe>
                 </div>
             </div>
 
-            <div class="tool-card">
-                <div class="tool-title">३. Himalb Converter</div>
-                <div class="iframe-container">
+            <div class="glass-card">
+                <div class="card-header">३. Himalb to Unicode (Firebase)</div>
+                <div class="iframe-wrapper">
                     <iframe src="https://firebasestorage.googleapis.com/v0/b/birgunj-debba.appspot.com/o/HIMALB.htm?alt=media&token=5892a863-f8de-46e1-80f7-391ae0f6fcce"></iframe>
                 </div>
-            </div>
-
-        </div>
-    </div>
-
-</body>
-</html>
