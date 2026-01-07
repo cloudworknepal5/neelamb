@@ -3,192 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nepali Converter Master Dashboard</title>
+    <title>मेरो गिटहब प्यानल</title>
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --sidebar-width: 280px;
-        }
-
+        /* Modern Glassmorphism Design */
         body {
             margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            display: flex;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
-            color: white;
-            overflow: hidden;
-        }
-
-        /* Sidebar Glassmorphism */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(15px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
-            flex-direction: column;
-            padding: 20px;
-            overflow-y: auto;
+            justify-content: center;
+            align-items: center;
+            color: white;
         }
 
-        .profile-section {
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 80%;
+            max-width: 500px;
             text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         .profile-img {
-            width: 80px;
-            height: 80px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            border: 3px solid white;
-            margin-bottom: 10px;
+            border: 4px solid #fff;
+            margin-bottom: 20px;
         }
 
-        .sidebar a {
-            color: #ecf0f1;
-            text-decoration: none;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            transition: 0.3s;
-            font-size: 14px;
+        h1 {
+            margin: 10px 0;
+            font-size: 24px;
         }
 
-        .sidebar a:hover {
-            background: white;
-            color: #764ba2;
-            transform: translateX(5px);
+        p {
+            font-size: 16px;
+            opacity: 0.9;
         }
 
-        /* Main Dashboard Area */
-        .main-content {
-            flex-grow: 1;
-            padding: 30px;
-            overflow-y: auto;
-        }
-
-        .top-header {
+        .stats-panel {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 25px;
-        }
-
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
+            justify-content: space-around;
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
             padding: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
         }
 
-        .card-header {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .stat-box h3 {
+            margin: 0;
+            font-size: 20px;
         }
 
-        .iframe-wrapper {
-            width: 100%;
-            height: 500px;
-            border-radius: 10px;
-            overflow: hidden;
-            background: white; /* Iframe load हुँदा आँखालाई सजिलो हुन्छ */
-        }
-
-        iframe, embed {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Custom Stats in Sidebar */
-        .mini-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: auto;
-            padding-top: 20px;
-        }
-
-        .stat-item {
-            background: rgba(0,0,0,0.2);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
+        .stat-box span {
             font-size: 12px;
+            text-transform: uppercase;
         }
 
-        @media (max-width: 900px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; }
-            .tools-grid { grid-template-columns: 1fr; }
+        .btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 25px;
+            background: #fff;
+            color: #764ba2;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background: #f0f0f0;
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="profile-section">
-            <img src="https://via.placeholder.com/80" alt="Profile" class="profile-img">
-            <h3 style="margin: 5px 0;">[तपाईंको नाम]</h3>
-            <p style="font-size: 12px; opacity: 0.8;">Web Developer</p>
+    <div class="container">
+        <img src="https://via.placeholder.com/120" alt="Profile Picture" class="profile-img">
+        
+        <h1>नमस्ते, म [तपाईंको नाम]</h1>
+        <p>म एक उत्साहित वेब डेभलपर र सफ्टवेयर इन्जिनियर हुँ। मलाई नयाँ प्रविधिहरूसँग खेल्न मनपर्छ।</p>
+
+        <div class="stats-panel">
+            <div class="stat-box">
+                <h3>50+</h3>
+                <span>प्रोजेक्टहरू</span>
+            </div>
+            <div class="stat-box">
+                <h3>1.2k</h3>
+                <span>कमिटहरू</span>
+            </div>
+            <div class="stat-box">
+                <h3>200</h3>
+                <span>फलोअर्स</span>
+            </div>
         </div>
 
-        <nav style="display: flex; flex-direction: column;">
-            <a href="https://designers2077.github.io/newseditor/" target="_blank">📰 News Editor</a>
-            <a href="https://designers2077.github.io/pagemakeredit/" target="_blank">📄 Pagemaker Edit</a>
-            <a href="https://designers2077.github.io/rssnewsedit" target="_blank">📻 RSS News Edit</a>
-            <a href="https://panel4.serv00.com/file_manager/" target="_blank">📁 Serv00 MyDrive</a>
-            <a href="https://mail.google.com/mail/u/0/h/" target="_blank">📧 Gmail HTML</a>
-            <a href="https://github.com/your-username" style="background: white; color: #764ba2; font-weight: bold;">Follow on GitHub</a>
-        </nav>
-
-        <div class="mini-stats">
-            <div class="stat-item"><strong>50+</strong><br>Projects</div>
-            <div class="stat-item"><strong>1.2k</strong><br>Commits</div>
-        </div>
+        <a href="https://github.com/your-username" class="btn">मलाई गिटहबमा फलो गर्नुहोस्</a>
     </div>
 
-    <div class="main-content">
-        <div class="top-header">
-            <h1 style="margin: 0; font-size: 24px;">नेपाली टुल ड्यासबोर्ड</h1>
-            <iframe scrolling="no" src="./index_files/linknepali-time.html" width="300" height="25" frameborder="0"></iframe>
-        </div>
-
-        <div class="tools-grid">
-            
-            <div class="glass-card">
-                <div class="card-header">१. Preeti to Unicode (Auto)</div>
-                <div class="iframe-wrapper">
-                    <iframe src="https://designers2077.github.io/PreetiToUnicodeAuto/"></iframe>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <div class="card-header">२. Unicode to Krutidev / All</div>
-                <div class="iframe-wrapper">
-                    <iframe src="https://educationnepal.eu.org/unicodeto/"></iframe>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <div class="card-header">३. Himalb to Unicode (Firebase)</div>
-                <div class="iframe-wrapper">
-                    <iframe src="https://firebasestorage.googleapis.com/v0/b/birgunj-debba.appspot.com/o/HIMALB.htm?alt=media&token=5892a863-f8de-46e1-80f7-391ae0f6fcce"></iframe>
-                </div>
+</body>
+</html>
