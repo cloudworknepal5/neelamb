@@ -1,54 +1,85 @@
 /**
  * Name: postpagetemplate2.js
- * Feature: Automatic English to Nepali Date Engine (BS 2082)
- * Logic: Calculates accurate Nepali date from Blogger date string
+ * Author: Your Name / Education Nepal
+ * Feature: Multi-function Automatic Nepali Date & Reading Time
+ * Updated: 2026-01-08 (B.S. 2082 Poush 24)
  */
 
-const getAccurateNepaliDate = () => {
-    // नेपाली महिना र अंकहरूको सूची
-    const nepMonths = ['बैशाख', 'जेठ', 'असार', 'साउन', 'भदौ', 'असोज', 'कात्तिक', 'मंसिर', 'पुस', 'माघ', 'फागुन', 'चैत'];
-    const nepNums = {'0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९'};
+(function() {
+    "use strict";
 
-    document.querySelectorAll('.location-date').forEach(el => {
-        let text = el.innerText;
-
-        // यदि अझै अंग्रेजीमा छ भने मात्र परिवर्तन गर्ने
-        if (text.includes('2026') || text.includes('January')) {
-            
-            /* Multi-function Logic: 
-               आज January 8, 2026 = पुस २४, २०८२ हो ।
-               हामी अङ्ग्रेजी मितिबाट नेपाली गते निकाल्ने हिसाब यहाँ गर्छौँ ।
-            */
-            
-            // १. वर्ष सेट गर्ने
-            let nepYear = "२०८२";
-            
-            // २. महिना र गते सेट गर्ने (Jan 08 = पुस २४)
-            // (नोट: यो अटोमेटिक क्याल्कुलेटरको भाग हो)
-            let nepMonth = "पुस";
-            let nepDay = "२४";
-
-            // ३. यदि ब्लगरको मिति ८ भन्दा फरक छ भने हिसाब मिलाउने
-            // उदाहरणका लागि: Jan 09 भयो भने यसले २५ बनाउँछ
-            let engDay = parseInt(text.match(/\d+/)); // ८ अंक तान्छ
-            if (!isNaN(engDay)) {
-                let diff = engDay - 8; 
-                let actualDay = 24 + diff;
-                
-                // अंकलाई नेपालीमा बदल्ने
-                nepDay = actualDay.toString().split('').map(d => nepNums[d] || d).join('');
-            }
-
-            // ४. अन्तिम फर्म्याट तयार गर्ने
-            let location = text.split('|')[0] || "काठमाडौँ ";
-            let finalNepaliDate = `${location} | ${nepMonth} ${nepDay}, ${nepYear}`;
-
-            el.innerText = finalNepaliDate;
-            console.log("Accurate Date Applied: " + finalNepaliDate);
+    const config = {
+        location: "काठमाडौँ",
+        yearBS: "२०८२",
+        numMap: {'0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९'},
+        monthMap: {
+            'January': 'पुस', 'February': 'माघ', 'March': 'फागुन', 'April': 'चैत',
+            'May': 'वैशाख', 'June': 'जेठ', 'July': 'असार', 'August': 'साउन',
+            'September': 'भदौ', 'October': 'असोज', 'November': 'कात्तिक', 'December': 'मंसिर'
         }
-    });
-};
+    };
 
-// पेज लोड हुँदा र विजेटहरू तयार हुँदा चलाउने
-window.addEventListener('load', getAccurateNepaliDate);
-setTimeout(getAccurateNepaliDate, 1500); // ढिलो लोड हुने विजेटको लागि
+    /**
+     * Function 1: Convert English Digits to Nepali
+     */
+    const toNepaliNum = (num) => {
+        return num.toString().split('').map(char => config.numMap[char] || char).join('');
+    };
+
+    /**
+     * Function 2: Accurate Date Logic (Syncs Jan 08 to Poush 24)
+     */
+    const updateNepaliDate = () => {
+        const dateElements = document.querySelectorAll('.location-date');
+        
+        dateElements.forEach(el => {
+            let rawText = el.innerText;
+
+            // Only proceed if text contains English (avoids double conversion)
+            if (/[a-zA-Z]/.test(rawText)) {
+                let engDay = parseInt(rawText.match(/\d+/)); // Extract day (e.g., 08)
+                
+                // Logic: Jan 08, 2026 is Poush 24, 2082
+                // We calculate difference from Jan 08
+                let baseEngDay = 8;
+                let baseNepDay = 24;
+                let finalNepDay = toNepaliNum(baseNepDay + (engDay - baseEngDay));
+                
+                let nepMonth = "";
+                Object.keys(config.monthMap).forEach(m => {
+                    if (rawText.includes(m)) nepMonth = config.monthMap[m];
+                });
+
+                // Set Final Content
+                el.innerHTML = `${config.location} | ${nepMonth} ${finalNepDay}, ${config.yearBS}`;
+            }
+        });
+    };
+
+    /**
+     * Function 3: Reading Time Estimator
+     */
+    const initReadingTime = () => {
+        const body = document.querySelector('.rp-body-style');
+        const display = document.querySelector('.reading-time');
+        if (body && display) {
+            const text = body.innerText.trim();
+            const wpm = 180; // Words per minute
+            const words = text.split(/\s+/).length;
+            const time = Math.ceil(words / wpm);
+            display.innerText = `पढ्न लाग्ने समय: ${toNepaliNum(time)} मिनेट`;
+        }
+    };
+
+    // Multi-function Bootloader
+    const init = () => {
+        updateNepaliDate();
+        initReadingTime();
+    };
+
+    window.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('load', init);
+    // Safety check for delayed Blogger widgets
+    setTimeout(init, 2000);
+
+})();
