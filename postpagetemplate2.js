@@ -1,45 +1,47 @@
 /**
- * Name: postpagetemplate2.js
- * Version: 2.0
- * Features: English-to-Nepali Date (2082), Numeral Converter, Reading Time Calc
+ * Name: postpagetemplate2.js (Fixed Version)
+ * Feature: 2026 -> 2082 & Accurate Month Translation
  */
 
 document.addEventListener("DOMContentLoaded", function() {
     
-    // १. मिति र अंक रूपान्तरण (Multi-function Date Converter)
-    const convertToNepaliBS = () => {
-        const months = {
+    const applyFinalNepaliDate = () => {
+        const monthMap = {
             'January': 'पुस', 'February': 'माघ', 'March': 'फागुन', 'April': 'चैत',
             'May': 'वैशाख', 'June': 'जेठ', 'July': 'असार', 'August': 'साउन',
             'September': 'भदौ', 'October': 'असोज', 'November': 'कात्तिक', 'December': 'मंसिर'
         };
-        const nums = {'0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९'};
 
-        document.querySelectorAll('.location-date').forEach(el => {
+        const numeralMap = {'0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९'};
+
+        const dateElements = document.querySelectorAll('.location-date');
+        
+        dateElements.forEach(el => {
             let text = el.innerText;
-            if (text.includes('2026')) text = text.replace('2026', '2082');
 
-            Object.keys(months).forEach(m => { text = text.replace(m, months[m]); });
-            
-            let final = '';
-            for (let char of text) { final += nums[char] ? nums[char] : char; }
-            el.innerText = final;
+            // १. वर्ष परिवर्तन (२०२६ लाई २०८२ मा)
+            text = text.replace(/2026/g, '2082');
+
+            // २. महिना परिवर्तन (English Months to Nepali)
+            Object.keys(monthMap).forEach(engMonth => {
+                const regex = new RegExp(engMonth, 'g');
+                text = text.replace(regex, monthMap[engMonth]);
+            });
+
+            // ३. हप्ताको नाम हटाउने वा बदल्ने (ऐच्छिक)
+            text = text.replace(/Thursday|Friday|Saturday|Sunday|Monday|Tuesday|Wednesday/g, '');
+            text = text.replace(/,/g, ''); // अल्पविराम हटाउने
+
+            // ४. सबै बाँकी अंकहरूलाई नेपालीमा बदल्ने
+            let convertedDate = '';
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                convertedDate += numeralMap[char] ? numeralMap[char] : char;
+            }
+
+            el.innerText = convertedDate.trim();
         });
     };
 
-    // २. पढ्न लाग्ने समय गणना (Reading Time Estimator)
-    const calculateReadingTime = () => {
-        const content = document.querySelector('.rp-body-style');
-        const display = document.querySelector('.reading-time');
-        if (content && display) {
-            const words = content.innerText.trim().split(/\s+/).length;
-            const time = Math.ceil(words / 150); // औसत १५० शब्द प्रति मिनेट
-            display.innerText = `पढ्न लाग्ने समय: ${time} मिनेट`;
-        }
-    };
-
-    // Execution
-    convertToNepaliBS();
-    calculateReadingTime();
-    console.log("PostPageTemplate2 JS Loaded: Optimized for 2082 B.S.");
+    applyFinalNepaliDate();
 });
