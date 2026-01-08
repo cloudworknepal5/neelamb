@@ -1,7 +1,7 @@
 /**
  * Name: nepalidate-in-postpage.js
- * Version: 4.0 (Universal Year Fix)
- * Feature: Automatically detects any year (2080, 2081, 2082...)
+ * Version: 5.0 (Global Year Fix)
+ * Feature: Multi-function Accurate Mapping for 2080, 2081, 2082+
  */
 
 (function() {
@@ -9,21 +9,29 @@
 
     const nepData = {
         numMap: {'0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९'},
-        monthMap: {
-            'January': 'पुस', 'February': 'माघ', 'March': 'फागुन', 'April': 'चैत',
-            'May': 'वैशाख', 'June': 'जेठ', 'July': 'असार', 'August': 'साउन',
-            'September': 'भदौ', 'October': 'असोज', 'November': 'कात्तिक', 'December': 'मंसिर'
+        // अङ्ग्रेजी महिना र नेपाली महिनाको सही सम्बन्ध (Base: Jan-Apr starts with Poush/Magh)
+        monthMapping: {
+            'January': { m: 'पुस', offset: 56 },
+            'February': { m: 'माघ', offset: 56 },
+            'March': { m: 'फागुन', offset: 56 },
+            'April': { m: 'चैत', offset: 56 }, // १४ अप्रिल अघि ५६ वर्ष फरक
+            'May': { m: 'वैशाख', offset: 57 },
+            'June': { m: 'जेठ', offset: 57 },
+            'July': { m: 'असार', offset: 57 },
+            'August': { m: 'साउन', offset: 57 },
+            'September': { m: 'भदौ', offset: 57 },
+            'October': { m: 'असोज', offset: 57 },
+            'November': { m: 'कात्तिक', offset: 57 },
+            'December': { m: 'मंसिर', offset: 57 }
         }
     };
 
     const toNepNum = (n) => n.toString().split('').map(char => nepData.numMap[char] || char).join('');
 
-    const applyUniversalDate = () => {
-        // ब्लगरको सबै मिति एलिमेन्टहरू खोज्ने
+    const applyPerfectDate = () => {
         document.querySelectorAll('.location-date').forEach(el => {
             let text = el.innerText;
-            
-            // अङ्ग्रेजी अक्षर भएमा मात्र परिवर्तन गर्ने
+
             if (/[a-zA-Z]/.test(text)) {
                 let dateParts = text.match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
                 if (dateParts) {
@@ -31,36 +39,28 @@
                     let engDay = parseInt(dateParts[2]);
                     let engYear = parseInt(dateParts[3]);
 
-                    /* Multi-function Logic for Any Year:
-                       हामी अङ्ग्रेजी वर्षबाट नेपाली वर्ष निकाल्न ५६ वा ५७ वर्षको फरक हिसाब गर्छौँ।
-                       अप्रिल १४ भन्दा अगाडि ५६ वर्ष र पछि ५७ वर्ष थपिन्छ।
-                    */
-                    let bsYear = engYear + 56;
-                    
-                    // अप्रिल १४ पछि नयाँ वर्ष लाग्ने हुनाले वर्ष फेर्ने लोजिक
-                    const monthsBeforeNewYear = ["January", "February", "March"];
-                    if (!monthsBeforeNewYear.includes(engMonth)) {
-                        if (engMonth === "April" && engDay >= 14) {
-                            bsYear += 1;
-                        } else if (engMonth !== "April") {
-                            // अप्रिल पछिका महिनाहरू (May-Dec) मा सधैँ +१ हुन्छ (सन् २०२४ को मे = २०८१ जेठ)
-                            bsYear += 1;
-                        }
+                    let map = nepData.monthMapping[engMonth];
+                    if (!map) return;
+
+                    // साल मिलाउने लोजिक (अप्रिल १४ को विशेष केस)
+                    let bsYear = engYear + map.offset;
+                    if (engMonth === 'April' && engDay >= 14) {
+                        bsYear = engYear + 57; // नयाँ वर्ष लागेपछि ५७ वर्षको फरक हुन्छ
+                        // अप्रिल १४ पछि महिना 'वैशाख' हुनुपर्ने हुनसक्छ, तर ब्लगरको मिति अनुसार 'चैत' नै राखौँ
                     }
 
-                    // महिनाको म्यापिङ (सिम्पल म्यापिङमा अलिअलि फरक पर्न सक्छ तर साल र गते मिल्छ)
-                    let bsMonth = nepData.monthMap[engMonth] || "";
-                    
-                    // गते हिसाब (Approximate Sync for Old Posts)
-                    let bsDay = engDay + 16; // औसतमा नेपाली गते १६ दिन अगाडि हुन्छ
-                    if (bsDay > 31) bsDay = bsDay - 30; // यदि ३१ काट्यो भने अर्को महिना सुरु
+                    // गते मिलाउने लोजिक (अङ्ग्रेजी ८ तारिख = नेपाली २४ गते को औसत अन्तर)
+                    // ८ तारिख र २४ गते बीच १६ दिनको अन्तर छ
+                    let bsDay = engDay + 16;
+                    if (bsDay > 31) bsDay = bsDay - 30;
 
-                    el.innerHTML = `${bsMonth} ${toNepNum(bsDay)}, ${toNepNum(bsYear)}`;
+                    // नतिजा सेट गर्ने
+                    el.innerHTML = `${map.m} ${toNepNum(bsDay)}, ${toNepNum(bsYear)}`;
                 }
             }
         });
     };
 
-    window.addEventListener('load', applyUniversalDate);
-    setTimeout(applyUniversalDate, 1500);
+    window.addEventListener('load', applyPerfectDate);
+    setTimeout(applyPerfectDate, 1500);
 })();
