@@ -22,7 +22,7 @@
 
 /* Headline Multi-function */
 .post-title-main {
-    font-size: clamp(28px, 5vw, 42px);
+    font-size: clamp(45px, 5vw, 42px);
     line-height: 1.25;
     font-weight: 800;
     color: var(--rp-text);
