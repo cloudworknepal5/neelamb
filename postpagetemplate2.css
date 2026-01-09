@@ -1,16 +1,41 @@
 /**
  * Name: postpagetemplate2.css
- * Version: 2.0
- * Feature: Clean Typography, Responsive Author Box, Reading Time UI
+ * Version: 2.5 (Ultimate Multi-function Edition)
+ * Feature: Responsive Design, Auto-Image Scaling, Dark Mode, Modern UI
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;800&display=swap');
 
+/* Multi-function Variables: एकै ठाउँबाट डिजाइन कन्ट्रोल गर्ने */
+:root {
+    --primary-red: #ce1212;
+    --bg-light: #fdf2f2;
+    --text-dark: #1a1a1a;
+    --text-body: #333;
+    --text-muted: #666;
+    --border-color: #eee;
+    --font-main: 'Mukta', sans-serif;
+    --max-width: 800px;
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Dark Mode support: प्रयोगकर्ताको सिस्टम अनुसार रङ बदलिने */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-dark: #f1f1f1;
+        --text-body: #ddd;
+        --border-color: #333;
+        --bg-light: #2a1010;
+    }
+}
+
+/* Main Wrapper */
 .post-page-wrapper {
-    max-width: 800px;
+    max-width: var(--max-width);
     margin: 0 auto;
-    font-family: 'Mukta', sans-serif;
+    font-family: var(--font-main);
     padding: 20px;
+    line-height: 1.6;
 }
 
 /* हेडलाइन स्टाइल */
@@ -18,68 +43,112 @@
     font-size: 42px;
     font-weight: 800;
     line-height: 1.2;
-    color: #1a1a1a;
-    margin-bottom: 15px;
+    color: var(--text-dark);
+    margin-bottom: 20px;
 }
 
-/* लेखक र जानकारी बक्स */
+/* लेखक र जानकारी बक्स (Meta Box) */
 .post-meta-v2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 2px solid #ce1212;
-    border-bottom: 1px solid #eee;
-    padding: 12px 0;
-    margin-bottom: 30px;
+    border-top: 2px solid var(--primary-red);
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 0;
+    margin-bottom: 35px;
 }
 
 .author-info {
     display: flex;
     align-items: center;
+    gap: 12px;
 }
 
 .author-thumb {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    margin-right: 12px;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
 }
 
 .author-name {
     font-weight: 700;
-    color: #ce1212;
-    font-size: 17px;
+    color: var(--primary-red);
+    font-size: 18px;
+    text-decoration: none;
 }
 
 .location-date {
-    font-family: 'Mukta', sans-serif;
     font-weight: 600;
-    color: #ce1212; /* रातोपाटीको जस्तै रातो रङ */
-    background: #fdf2f2;
-    padding: 2px 8px;
-    border-radius: 4px;
-    display: inline-block;
+    color: var(--primary-red);
+    background: var(--bg-light);
+    padding: 3px 12px;
+    border-radius: 6px;
+    font-size: 14px;
 }
 
-/* Reading Time Badge */
+/* Reading Time UI */
 .reading-time {
-    background: #f1f1f1;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #444;
+    background: var(--border-color);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 600;
 }
 
-/* मुख्य सामग्री */
+/* मुख्य सामग्री (Body Content) */
 .rp-body-style {
-    font-size: 20px;
-    line-height: 1.9;
-    color: #333;
-    letter-spacing: 0.2px;
+    font-size: 21px;
+    line-height: 1.8;
+    color: var(--text-body);
+    letter-spacing: 0.1px;
+    word-wrap: break-word;
 }
 
-/* Responsive */
-@media screen and (max-width: 600px) {
-    .post-title-main { font-size: 30px; }
-    .post-meta-v2 { flex-direction: column; align-items: flex-start; gap: 10px; }
+/* --- Multi-function Image Control --- */
+.rp-body-style img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 30px auto;
+    display: block;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: var(--transition);
+}
+
+.rp-body-style img:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* क्याप्सन स्टाइल (फोटोको मुनिको विवरण) */
+.rp-body-style .tr-caption-container {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: -20px;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+/* Responsive Design (Mobile Optimization) */
+@media screen and (max-width: 768px) {
+    .post-title-main {
+        font-size: 30px;
+    }
+    .post-meta-v2 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .rp-body-style {
+        font-size: 19px;
+        line-height: 1.7;
+    }
+    .author-thumb {
+        width: 40px;
+        height: 40px;
+    }
 }
