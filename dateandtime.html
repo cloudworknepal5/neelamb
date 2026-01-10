@@ -1,21 +1,19 @@
-<div id="mini-widget-row" style="display: flex !important; align-items: center !important; gap: 10px; flex-wrap: nowrap; background: #f9f9f9; padding: 5px; border-radius: 5px; max-width: fit-content;">
+<div id="status-bar" style="display: flex !important; align-items: center; gap: 8px; flex-wrap: nowrap; background: #fff; padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd; max-width: fit-content;">
 
-    <div style="transform: scale(0.85); transform-origin: left center; flex: 0 0 auto;">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/designers2077/code/weather.css" />
-        <div id="weather-widget" style="margin: 0 !important; display: flex !important; align-items: center; border: none !important; background: transparent !important; box-shadow: none !important; padding: 0 !important;">
-            <div id="icon" style="width: 30px; height: 30px;"></div>
-            <div style="margin-left: 5px; line-height: 1;">
-                <span id="temp" style="font-weight: bold; font-size: 14px; color: #333;">--°C</span>
-                <span class="city" style="font-size: 10px; display: block; color: #666;">Birgunj</span>
-            </div>
-        </div>
+  <div id="weather-part" style="display: flex; align-items: center; scale: 0.8; transform-origin: left;">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/designers2077/code/weather.css" />
+    <div id="icon" style="width: 32px; height: 32px; min-width: 32px; display: block !important; background-size: contain; background-repeat: no-repeat;"></div>
+    <div style="margin-left: 4px; line-height: 1.1;">
+      <span id="temp" style="font-weight: bold; font-size: 15px;">--°C</span>
+      <small style="display: block; font-size: 9px; color: #777;">Birgunj</small>
     </div>
+  </div>
 
-    <div style="width: 1px; height: 25px; background: #ddd;"></div>
+  <div style="width: 1px; height: 20px; background: #eee;"></div>
 
-    <div style="transform: scale(0.85); transform-origin: left center; flex: 0 0 auto; margin-left: -40px;">
-        <div id="np_widget_wiz1" widget="day-sm" style="width: 250px !important;"></div>
-    </div>
+  <div id="patro-part" style="scale: 0.8; transform-origin: left; margin-left: -35px;">
+    <div id="np_widget_wiz1" widget="day-sm" style="width: 260px !important;"></div>
+  </div>
 
 </div>
 
@@ -24,26 +22,35 @@
 
 <script>
 /**
- * Multi-function logic for size and UI control
+ * Multi-function Logic to fix Icon and Size
  */
-const CompactController = {
-    // Function 1: Handle element scaling
-    adjustScale: function() {
-        console.log("Size adjusted to: Small");
+const UIXHandler = {
+    // १. आइकन लोड नभएमा फिक्स गर्ने फङ्सन
+    forceIconLoad: function() {
+        const iconBox = document.getElementById('icon');
+        if (iconBox && iconBox.innerHTML === "") {
+            // यदि आइकन खाली देखिएमा एउटा इमोजी वा डिफल्ट आइकन राख्ने
+            iconBox.style.fontSize = "24px";
+            iconBox.style.display = "flex";
+            iconBox.style.alignItems = "center";
+            iconBox.innerHTML = "⛅"; 
+        }
     },
 
-    // Function 2: Cleanup weather text
-    cleanWeatherUI: function() {
+    // २. अनावश्यक टेक्स्ट हटाउने फङ्सन
+    hideExtraLabels: function() {
         const desc = document.getElementById('description');
-        if(desc) desc.style.display = 'none'; // ठाउँ बचाउन डिस्क्रिप्सन हटाइएको
+        if(desc) desc.style.display = 'none';
     },
 
-    // Function 3: Main runner
-    run: function() {
-        this.adjustScale();
-        this.cleanWeatherUI();
+    // ३. सबैलाई मिलाउने मुख्य फङ्सन
+    init: function() {
+        setTimeout(() => {
+            this.forceIconLoad();
+            this.hideExtraLabels();
+        }, 1500); // स्क्रिप्ट लोड हुन समय लाग्ने हुनाले ढिलो गरि चलाइएको
     }
 };
 
-window.addEventListener('load', () => CompactController.run());
+window.onload = () => UIXHandler.init();
 </script>
