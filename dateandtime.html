@@ -1,0 +1,51 @@
+<div id="integrated-widget-row" style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 15px; flex-wrap: nowrap; overflow-x: auto; padding: 10px; border: 1px solid #eee; border-radius: 8px;">
+
+    <div class="item-weather" style="flex: 0 0 auto;">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/designers2077/code/weather.css" />
+        <div id="weather-widget" style="margin: 0 !important; display: inline-flex !important; align-items: center;">
+            <div class="weather-icon" id="icon" style="width: 40px; height: 40px;"></div>
+            <div class="weather-info" style="margin-left: 10px;">
+                <span class="city" style="display: block; font-size: 12px;">Birgunj</span>
+                <span class="temp" id="temp" style="font-weight: bold;">--°C</span>
+                <span class="desc" id="description" style="font-size: 11px;">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="width: 1px; height: 40px; background: #ddd;"></div>
+
+    <div class="item-patro" style="flex: 0 0 auto;">
+        <div id="np_widget_wiz1" widget="day-sm" style="width: 280px !important;"></div>
+    </div>
+
+</div>
+
+<script async src="https://nepalipatro.com.np/np-widgets/nepalipatro.js" id="wiz1"></script>
+<script src="https://cdn.jsdelivr.net/gh/designers2077/code/weather.js"></script>
+
+<script>
+/**
+ * Multi-function Logic to ensure proper loading
+ */
+const WidgetManager = {
+    // Function 1: Fix Style Conflicts
+    applyLayoutFix: function() {
+        const container = document.getElementById('integrated-widget-row');
+        if(container) {
+            container.style.display = 'flex';
+            console.log("Layout multi-function: Flex applied.");
+        }
+    },
+
+    // Function 2: Initialize Scripts
+    initAll: function() {
+        this.applyLayoutFix();
+        // Additional initialization if needed
+    }
+};
+
+// Run when window loads
+window.addEventListener('load', function() {
+    WidgetManager.initAll();
+});
+</script>
