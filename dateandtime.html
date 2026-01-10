@@ -1,21 +1,20 @@
-<div id="integrated-widget-row" style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 15px; flex-wrap: nowrap; overflow-x: auto; padding: 10px; border: 1px solid #eee; border-radius: 8px;">
+<div id="mini-widget-row" style="display: flex !important; align-items: center !important; gap: 10px; flex-wrap: nowrap; background: #f9f9f9; padding: 5px; border-radius: 5px; max-width: fit-content;">
 
-    <div class="item-weather" style="flex: 0 0 auto;">
+    <div style="transform: scale(0.85); transform-origin: left center; flex: 0 0 auto;">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/designers2077/code/weather.css" />
-        <div id="weather-widget" style="margin: 0 !important; display: inline-flex !important; align-items: center;">
-            <div class="weather-icon" id="icon" style="width: 40px; height: 40px;"></div>
-            <div class="weather-info" style="margin-left: 10px;">
-                <span class="city" style="display: block; font-size: 12px;">Birgunj</span>
-                <span class="temp" id="temp" style="font-weight: bold;">--°C</span>
-                <span class="desc" id="description" style="font-size: 11px;">Loading...</span>
+        <div id="weather-widget" style="margin: 0 !important; display: flex !important; align-items: center; border: none !important; background: transparent !important; box-shadow: none !important; padding: 0 !important;">
+            <div id="icon" style="width: 30px; height: 30px;"></div>
+            <div style="margin-left: 5px; line-height: 1;">
+                <span id="temp" style="font-weight: bold; font-size: 14px; color: #333;">--°C</span>
+                <span class="city" style="font-size: 10px; display: block; color: #666;">Birgunj</span>
             </div>
         </div>
     </div>
 
-    <div style="width: 1px; height: 40px; background: #ddd;"></div>
+    <div style="width: 1px; height: 25px; background: #ddd;"></div>
 
-    <div class="item-patro" style="flex: 0 0 auto;">
-        <div id="np_widget_wiz1" widget="day-sm" style="width: 280px !important;"></div>
+    <div style="transform: scale(0.85); transform-origin: left center; flex: 0 0 auto; margin-left: -40px;">
+        <div id="np_widget_wiz1" widget="day-sm" style="width: 250px !important;"></div>
     </div>
 
 </div>
@@ -25,27 +24,26 @@
 
 <script>
 /**
- * Multi-function Logic to ensure proper loading
+ * Multi-function logic for size and UI control
  */
-const WidgetManager = {
-    // Function 1: Fix Style Conflicts
-    applyLayoutFix: function() {
-        const container = document.getElementById('integrated-widget-row');
-        if(container) {
-            container.style.display = 'flex';
-            console.log("Layout multi-function: Flex applied.");
-        }
+const CompactController = {
+    // Function 1: Handle element scaling
+    adjustScale: function() {
+        console.log("Size adjusted to: Small");
     },
 
-    // Function 2: Initialize Scripts
-    initAll: function() {
-        this.applyLayoutFix();
-        // Additional initialization if needed
+    // Function 2: Cleanup weather text
+    cleanWeatherUI: function() {
+        const desc = document.getElementById('description');
+        if(desc) desc.style.display = 'none'; // ठाउँ बचाउन डिस्क्रिप्सन हटाइएको
+    },
+
+    // Function 3: Main runner
+    run: function() {
+        this.adjustScale();
+        this.cleanWeatherUI();
     }
 };
 
-// Run when window loads
-window.addEventListener('load', function() {
-    WidgetManager.initAll();
-});
+window.addEventListener('load', () => CompactController.run());
 </script>
