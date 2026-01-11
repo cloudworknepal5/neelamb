@@ -28,10 +28,14 @@ function renderProLayout(jsonH, jsonF) {
         </div>
         <div class="mn-sub-grid">`;
 
+
+  
     for (var i = 1; i < Math.min(fPosts.length, 3); i++) {
         var sub = fPosts[i];
-        var sImg = sub.media$thumbnail ? sub.media$thumbnail.url.replace('s320-c', 's1600') : 'https://via.placeholder.com/400x250';
-        var sLink = sub.link.find(l => l.rel === 'alternate').href;
+
+    var mImg = main.media$thumbnail ? main.media$thumbnail.url.replace('s72-c', 's800') : 'https://via.placeholder.com/800x400';
+    var mLink = main.link.find(l => l.rel === 'alternate').href;
+
         fHtml += `
             <div class="mn-sub-card">
                 <a href="${sLink}"><img src="${sImg}"></a>
