@@ -1,6 +1,6 @@
 /**
- * Name: counter.js (Force Start & Fix)
- * Version: 10.0
+ * Name: counter.js (Ultimate Refresh Fix)
+ * Version: 11.0
  */
 
 const BloggerCounter = {
@@ -19,14 +19,14 @@ const BloggerCounter = {
         const postId = window.location.pathname.replace(/[/.]/g, "_");
         const url = `${this.config.databaseURL}/views/${postId}.json`;
         
-        // सेसन चेक
+        // सेसन चेक (केवल 'Update' रोक्नका लागि, 'Fetch' रोक्न होइन)
         const hasVisited = sessionStorage.getItem("v_" + postId);
 
         try {
+            // १. पहिले डेटाबेसबाट डाटा तान्ने (रिफ्रेस गर्दा पनि यो चल्छ)
             const response = await fetch(url);
-            const data = await response.json();
+            let data = await response.json();
             
-            // डेटाको अवस्था जाँच गर्ने
             let count = 0;
             if (data !== null) {
                 if (typeof data === 'number') count = data;
@@ -34,23 +34,25 @@ const BloggerCounter = {
                 else count = parseInt(data) || 0;
             }
 
-            // यदि पहिलो पटक आएको हो भने र संख्या ० छ भने १ बनाउने
+            // २. यदि यो नयाँ सेसन हो भने मात्र १ थप्ने र डेटाबेसमा पठाउने
             if (!hasVisited) {
-                count = (count === 0) ? 1 : count + 1;
-                
+                count = count + 1;
                 await fetch(url, {
                     method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(count)
                 });
                 sessionStorage.setItem("v_" + postId, "true");
             }
 
+            // ३. डिस्प्ले गर्ने (यो जहिले पनि चल्छ)
             if (el) {
                 const eyeIcon = `<svg style="width:16px; height:16px; margin-right:6px; fill:#ce1212; vertical-align:middle;" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4 142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.4 78.1-95.4 92.9-131.1 3.3-7.9 3.3-16.7 0-24.6C558.7 208 527.4 156 480.6 112.6 433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64a64 64 0 1 0 0 128 64 64 0 1 0 0-128z"/></svg>`;
-                el.innerHTML = `${eyeIcon} <span style="font-weight:700;">${this.toNepali(count)} पटक हेरियो</span>`;
+                el.innerHTML = `${eyeIcon} <span style="font-weight:700; color:#333;">${this.toNepali(count)} पटक हेरियो</span>`;
             }
         } catch (error) {
-            console.error("Fetch Error:", error);
+            console.error("Firebase Error:", error);
+            if(el) el.innerHTML = "० पटक हेरियो";
         }
     }
 };
