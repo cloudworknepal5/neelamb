@@ -4,7 +4,7 @@
  */
 const BloggerCounter = {
     config: {
-        databaseURL: "https://counter-3ff08-default-rtdb.firebaseio.com",
+        databaseURL: "https://counter-3ff08-default-rtdb.asia-southeast1.firebasedatabase.app",
         numMap: {'0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९'}
     },
 
