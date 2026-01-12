@@ -7,7 +7,7 @@
   border-radius: 6px;
   box-shadow: 0 1px 5px rgba(0,0,0,0.1);
   font-family: 'Segoe UI', sans-serif;
-  max-width: 100px; /* Compact width */
+  max-width: 90px; /* Compact width */
   border: 1px solid #eee;
   transition: transform 0.2s ease; /* Function: Hover Scale */
 }
