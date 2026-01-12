@@ -1,7 +1,9 @@
 /**
- * Advanced Multi-function Visitor Counter (v6.0)
- * Fix: [object Object] Error & Real-time Digit Conversion
+ * Name: counter.js
+ * Version: 7.0 (Ultimate Fix)
+ * Features: Multi-function Digit Converter, Object-to-Number Parser, Refresh Guard
  */
+
 const BloggerCounter = {
     config: {
         databaseURL: "https://counter-3ff08-default-rtdb.firebaseio.com",
@@ -10,49 +12,52 @@ const BloggerCounter = {
 
     // १. नेपाली अंकमा बदल्ने फङ्सन
     toNepali: function(num) {
-        if (isNaN(num)) return '०';
-        return num.toString().split('').map(char => this.config.numMap[char] || char).join('');
+        let n = parseInt(num);
+        if (isNaN(n)) return '०';
+        return n.toString().split('').map(char => this.config.numMap[char] || char).join('');
     },
 
-    // २. मुख्य फङ्सन
+    // २. मुख्य फङ्सन (Update & Fetch)
     updateAndFetch: async function(elementId) {
         const el = document.getElementById(elementId);
         const postId = window.location.pathname.replace(/[/.]/g, "_");
         const url = `${this.config.databaseURL}/views/${postId}.json`;
         
+        // लोकल स्टोरेज (रिफ्रेस रोक्नका लागि)
         const lastVisit = localStorage.getItem("visited_" + postId);
         const currentTime = new Date().getTime();
 
         try {
             const response = await fetch(url);
-            const rawData = await response.json();
+            const data = await response.json();
             
-            // डेटालाई शुद्ध नम्बरमा बदल्ने (Fix for [object Object])
+            // डेटा 'Object' भए पनि 'Number' निकाल्ने विशेष सुरक्षा
             let count = 0;
-            if (rawData !== null) {
-                if (typeof rawData === 'number') {
-                    count = rawData;
-                } else if (typeof rawData === 'object') {
-                    // यदि भूलवश अब्जेक्ट सेभ भएको छ भने त्यसको भ्यालु खोज्ने
-                    count = parseInt(rawData.value) || 0;
+            if (data !== null) {
+                if (typeof data === 'number') {
+                    count = data;
+                } else if (typeof data === 'object') {
+                    count = parseInt(data.value) || 0;
                 } else {
-                    count = parseInt(rawData) || 0;
+                    count = parseInt(data) || 0;
                 }
             }
 
-            // रिफ्रेस प्रोटेक्सन (२४ घण्टा लक)
+            // २४ घण्टामा एक पटक मात्र गणना गर्ने
             if (!lastVisit || (currentTime - lastVisit > 86400000)) {
                 count += 1;
                 await fetch(url, {
                     method: 'PUT',
-                    body: JSON.stringify(count)
+                    body: JSON.stringify(count) // शुद्ध नम्बर मात्र पठाउने
                 });
                 localStorage.setItem("visited_" + postId, currentTime);
             }
 
+            // डिस्प्ले गर्ने
             if (el) {
+                const nepNum = this.toNepali(count);
                 const eyeIcon = `<svg style="width:16px; height:16px; margin-right:6px; fill:#ce1212; vertical-align:middle;" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4 142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.4 78.1-95.4 92.9-131.1 3.3-7.9 3.3-16.7 0-24.6C558.7 208 527.4 156 480.6 112.6 433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64a64 64 0 1 0 0 128 64 64 0 1 0 0-128z"/></svg>`;
-                el.innerHTML = `${eyeIcon} <span>${this.toNepali(count)} पटक हेरियो</span>`;
+                el.innerHTML = `${eyeIcon} <span style="font-weight:700; color:#333;">${nepNum} पटक हेरियो</span>`;
             }
         } catch (error) {
             console.error("Counter Error:", error);
