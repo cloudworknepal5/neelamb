@@ -1,15 +1,9 @@
-/**
- * Advanced Multi-function Visitor Counter
- * Fix: [object Object] error resolved & Nepali Digit integration
- */
-
 const BloggerCounter = {
     config: {
         databaseURL: "https://counter-3ff08-default-rtdb.firebaseio.com",
         numMap: {'0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९'}
     },
 
-    // १. नेपाली अंकमा बदल्ने Function
     toNepali: function(num) {
         return num.toString().split('').map(char => this.config.numMap[char] || char).join('');
     },
@@ -26,37 +20,22 @@ const BloggerCounter = {
             const response = await fetch(url);
             const data = await response.json();
             
-            // डेटा 'Object' छ कि छैन चेक गर्ने र संख्या निकाल्ने
-            let currentCount = 0;
-            if (data !== null) {
-                currentCount = (typeof data === 'object') ? (data.value || 0) : parseInt(data);
-            }
-
+            let currentCount = (data === null) ? 0 : (typeof data === 'object' ? (data.value || 0) : parseInt(data));
             let newCount = currentCount + 1;
 
-            // Firebase मा संख्या मात्र पठाउने (Object होइन)
-            await fetch(url, {
-                method: 'PUT',
-                body: JSON.stringify(newCount)
-            });
-
+            await fetch(url, { method: 'PUT', body: JSON.stringify(newCount) });
             this.display(elementId, newCount);
-        } catch (error) {
-            console.error("Counter Error:", error);
-        }
+        } catch (error) { console.error("Counter Error:", error); }
     },
 
     display: function(id, value) {
         const el = document.getElementById(id);
         if (el) {
-            // नेपाली अंकमा कन्भर्ट गरेर देखाउने
             const nepaliValue = this.toNepali(value);
-            el.innerHTML = `<span>${nepaliValue} पटक हेरियो</span>`;
+            const eyeIcon = `<svg style="width:18px; height:18px; vertical-align:middle; margin-right:5px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+            el.innerHTML = `${eyeIcon} <span>${nepaliValue} पटक हेरियो</span>`;
         }
     }
 };
 
-// पेज लोड हुँदा रन गर्ने
-document.addEventListener("DOMContentLoaded", function() {
-    BloggerCounter.updateAndFetch("post-view-count");
-});
+document.addEventListener("DOMContentLoaded", () => BloggerCounter.updateAndFetch("post-view-count"));
