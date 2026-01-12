@@ -1,50 +1,62 @@
 /**
  * Advanced Multi-function Visitor Counter
- * Developed for Blogger & Hosted on GitHub
+ * Fix: [object Object] error resolved & Nepali Digit integration
  */
 
 const BloggerCounter = {
-    // १. कन्फिगरेशन सेट गर्ने (तपाईँको Firebase Details यहाँ राख्नुहोस्)
     config: {
-        databaseURL: "https://counter-3ff08-default-rtdb.firebaseio.com"
+        databaseURL: "https://counter-3ff08-default-rtdb.firebaseio.com",
+        numMap: {'0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९'}
     },
 
-    // २. युनिक आईडी बनाउने फङ्सन (Post URL बाट)
+    // १. नेपाली अंकमा बदल्ने Function
+    toNepali: function(num) {
+        return num.toString().split('').map(char => this.config.numMap[char] || char).join('');
+    },
+
     getPostId: function() {
         return window.location.pathname.replace(/[/.]/g, "_");
     },
 
-    // ३. भिजिटर संख्या बढाउने र ल्याउने (Main Function)
     updateAndFetch: async function(elementId) {
         const postId = this.getPostId();
         const url = `${this.config.databaseURL}/views/${postId}.json`;
 
         try {
-            // कति भ्युज छ भनेर हेर्ने
             const response = await fetch(url);
-            let count = await response.json();
+            const data = await response.json();
             
-            // यदि नयाँ पोस्ट हो भने ० बाट सुरु गर्ने, नत्र १ थप्ने
-            count = (count === null) ? 1 : count + 1;
+            // डेटा 'Object' छ कि छैन चेक गर्ने र संख्या निकाल्ने
+            let currentCount = 0;
+            if (data !== null) {
+                currentCount = (typeof data === 'object') ? (data.value || 0) : parseInt(data);
+            }
 
-            // नयाँ संख्या डेटाबेसमा अपडेट गर्ने
+            let newCount = currentCount + 1;
+
+            // Firebase मा संख्या मात्र पठाउने (Object होइन)
             await fetch(url, {
                 method: 'PUT',
-                body: JSON.stringify(count)
+                body: JSON.stringify(newCount)
             });
 
-            // स्क्रिनमा देखाउने
-            this.display(elementId, count);
+            this.display(elementId, newCount);
         } catch (error) {
             console.error("Counter Error:", error);
         }
     },
 
-    // ४. डिस्प्ले गर्ने फङ्सन
     display: function(id, value) {
         const el = document.getElementById(id);
         if (el) {
-            el.innerHTML = `<span>${value} पटक हेरियो</span>`;
+            // नेपाली अंकमा कन्भर्ट गरेर देखाउने
+            const nepaliValue = this.toNepali(value);
+            el.innerHTML = `<span>${nepaliValue} पटक हेरियो</span>`;
         }
     }
 };
+
+// पेज लोड हुँदा रन गर्ने
+document.addEventListener("DOMContentLoaded", function() {
+    BloggerCounter.updateAndFetch("post-view-count");
+});
