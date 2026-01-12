@@ -1,13 +1,12 @@
 /**
- * Name: counter.js (Asia-Southeast1 Version)
- * Features: 
- * 1. Multi-function (Nepali Converter + Refresh Guard)
- * 2. URL Fix for Asia-Southeast1 Region
+ * Name: counter.js (Asia-Southeast1 Universal Fix)
+ * Version: 14.0
+ * Features: Multi-function (Nepali Converter + Refresh Guard)
  */
 
 const BloggerCounter = {
     config: {
-        // तपाईँले दिनुभएको नयाँ URL यहाँ अपडेट गरिएको छ
+        // तपाईँको नयाँ र सही URL यहाँ छ
         databaseURL: "https://counter-3ff08-default-rtdb.asia-southeast1.firebasedatabase.app",
         numMap: {'0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९'}
     },
@@ -25,29 +24,31 @@ const BloggerCounter = {
         const postId = window.location.pathname.replace(/[/.]/g, "_");
         const url = `${this.config.databaseURL}/views/${postId}.json`;
         
+        // सेसन चेक (रिफ्रेस रोक्न)
         const hasVisited = sessionStorage.getItem("v_" + postId);
 
         try {
-            // डेटाबेसबाट डेटा तान्ने
+            // क) डेटाबेसबाट डेटा तान्ने
             const response = await fetch(url);
             let count = await response.json();
             
-            // डेटा शुद्धिकरण
+            // डेटा शुद्धिकरण (null वा object भएमा ० मान्ने)
             count = (count === null || typeof count !== 'number') ? 0 : count;
 
+            // ख) यदि यो नयाँ सेसन हो भने मात्र १ थप्ने
             if (!hasVisited) {
-                // नयाँ भिजिटर भएमा १ थप्ने
                 count += 1;
                 await fetch(url, {
                     method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(count)
                 });
                 sessionStorage.setItem("v_" + postId, "true");
             }
 
-            // नतिजा प्रदर्शन गर्ने
+            // ग) नतिजा प्रदर्शन गर्ने
             if (el) {
-                const eyeIcon = `<svg style="width:16px; height:16px; margin-right:6px; fill:#ce1212; vertical-align:middle;" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4 142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.4 78.1-95.4 92.9-131.1 3.3-7.9 3.3-16.7 0-24.6C558.7 208 527.4 156 480.6 112.6 433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64a64 64 0 1 0 0 128 64 64 0 1 0 0-128z"/></svg>`;
+                const eyeIcon = `<svg style="width:18px; height:18px; margin-right:6px; fill:#ce1212; vertical-align:middle;" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4 142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.4 78.1-95.4 92.9-131.1 3.3-7.9 3.3-16.7 0-24.6C558.7 208 527.4 156 480.6 112.6 433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64a64 64 0 1 0 0 128 64 64 0 1 0 0-128z"/></svg>`;
                 el.innerHTML = `${eyeIcon} <span style="font-weight:700;">${this.toNepali(count)} पटक हेरियो</span>`;
             }
         } catch (error) {
