@@ -1,0 +1,105 @@
+/* 1. Mukta Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;700;800&display=swap');
+
+/* 2. Container Utility Function: Layout & Typography */
+.vertical-recent-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Mukta', sans-serif;
+    padding: 10px;
+    text-align: center;
+    overflow: hidden; /* Clearfix functionality */
+}
+
+/* 3. Post Wrapper: Structure & Divider */
+.vr-post {
+    margin-bottom: 30px; 
+    padding-bottom: 30px;
+    border-bottom: 5px solid #ff0000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease; /* Hover Function */
+}
+
+.vr-post:last-child { border-bottom: none; }
+
+/* 4. Headline: Responsive Scale */
+.vr-title {
+    font-size: clamp(32px, 5vw, 60px); /* Multi-function: Auto-resizes for mobile/desktop */
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0 0 15px 0;
+    color: #111;
+}
+.vr-title a { text-decoration: none; color: inherit; transition: color 0.2s; }
+.vr-title a:hover { color: #e74c3c; }
+
+/* 5. Meta Info: Layout & Author */
+.vr-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+.vr-author-img { 
+    width: 44px; 
+    height: 44px; 
+    border-radius: 50%; 
+    object-fit: cover;
+    border: 2px solid #eee;
+}
+.vr-meta-info { font-size: 16px; color: #555; display: flex; align-items: center; gap: 15px; }
+
+/* 6. Image Function: Sharpness & Responsiveness */
+.vr-image {
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 25px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #f9f9f9; /* Placeholder function */
+}
+
+.vr-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    /* Function: Sharpening and Scaling */
+    object-fit: cover; 
+    image-rendering: -webkit-optimize-contrast; 
+    transition: transform 0.5s ease; /* Function: Interactive Zoom */
+}
+
+.vr-image:hover img {
+    transform: scale(1.02); /* Subtle zoom functionality */
+}
+
+/* 7. Snippet & Navigation Button */
+.vr-snippet {
+    font-size: 19px;
+    line-height: 1.6;
+    color: #444;
+    max-width: 900px; /* Improved readability width */
+    margin: 0 auto 25px auto; 
+}
+
+.vr-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #ffffff !important;
+    padding: 16px 35px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 50px; /* Modern pill-shape */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.vr-btn:hover { 
+    background: #111; 
+    transform: translateY(-3px) scale(1.05); 
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
