@@ -1,6 +1,6 @@
 /**
- * Advanced Multi-Function News Loop
- * Optimized for: High-Resolution Images, Nepali Date Formatting, and Error Recovery
+ * Advanced Multi-Function News Loop v2.0
+ * Optimized for: Content Snippets, High-Resolution Images, and Nepali Localization
  */
 const BloggerEngine = {
     
@@ -9,10 +9,8 @@ const BloggerEngine = {
         let imgUrl = "https://via.placeholder.com/1200x630?text=No+Featured+Image";
         
         if (entry.media$thumbnail) {
-            // Replace any Blogger sizing (s72-c, s320, etc) with high-res s1600
             imgUrl = entry.media$thumbnail.url.replace(/\/s[0-9]+(-[cp])?/, "/s1600");
         } else if (entry.content && entry.content.$t.includes("<img")) {
-            // Fallback: Scraping image from content if thumbnail is missing
             const regex = /<img.*?src="(.*?)"/;
             const match = regex.exec(entry.content.$t);
             if (match) imgUrl = match[1];
@@ -27,7 +25,15 @@ const BloggerEngine = {
         });
     },
 
-    /* Function 3: Main UI Renderer */
+    /* Function 3: Text Truncator (New Function) */
+    truncateSnippet: function(text, limit) {
+        if (!text) return "";
+        // Strip HTML tags
+        const plainText = text.replace(/<\/?[^>]+(>|$)/g, "");
+        return plainText.length > limit ? plainText.substring(0, limit) + "..." : plainText;
+    },
+
+    /* Function 4: Main UI Renderer */
     render: function(json) {
         const entries = json.feed.entry;
         let html = '';
@@ -45,6 +51,9 @@ const BloggerEngine = {
             const author = entry.author[0];
             const authorImg = author.gd$image.src.replace('s113', 's200');
             const date = this.formatNepaliDate(entry.published.$t);
+            
+            // Using Function 3 for short description
+            const summary = this.truncateSnippet(entry.content ? entry.content.$t : entry.summary.$t, 120);
 
             html += `
                 <div class="featured-loop-item">
@@ -63,12 +72,17 @@ const BloggerEngine = {
                             <img src="${imgUrl}" alt="${title}" class="high-res-img" loading="lazy">
                         </a>
                     </div>
+
+                    <div class="featured-summary">
+                        <p>${summary}</p>
+                        <a href="${link}" class="read-more-btn">थप पढ्नुहोस्</a>
+                    </div>
                 </div>`;
         }
         if (target) target.innerHTML = html;
     },
 
-    /* Function 4: Feed Fetcher */
+    /* Function 5: Feed Fetcher */
     fetch: function(label, count) {
         const script = document.createElement('script');
         let feedUrl = `${window.location.origin}/feeds/posts/default`;
@@ -78,6 +92,3 @@ const BloggerEngine = {
         document.body.appendChild(script);
     }
 };
-
-// Usage: Call this to load 5 recent posts
-// BloggerEngine.fetch('recent', 5);
