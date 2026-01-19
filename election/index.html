@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>निर्वाचन २०८२ - हेडर विजेट</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+
+        /* हेडर विजेटको मुख्य कन्टेनर */
+        .election-header-widget {
+            background-color: #ffffff;
+            padding: 8px 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap; /* सानो स्क्रिनमा तल नझर्ने */
+            overflow-x: auto; /* धेरै दल भएमा स्क्रोल हुने */
+            -webkit-overflow-scrolling: touch; /* iOS मा स्मूथ स्क्रोल */
+            gap: 15px; /* दलका आइकनहरू बीचको ग्याप */
+            font-size: 0.85rem;
+            color: #333;
+            white-space: nowrap; /* सामग्रीलाई एकै लाइनमा राख्ने */
+        }
+
+        /* प्रत्येक दलको आइटम */
+        .party-item {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* आइकन र टेक्स्ट बीचको ग्याप */
+            padding: 5px 0;
+        }
+
+        .party-item:hover {
+            opacity: 0.8;
+            cursor: pointer;
+        }
+
+        /* चुनाव चिह्न/फोटो */
+        .party-symbol, .party-photo {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%; /* गोलो बनाउन */
+            object-fit: cover; /* इमेजलाई भित्रै फिट गर्न */
+            border: 1px solid #eee;
+            flex-shrink: 0; /* सानो स्क्रिनमा साइज नघटाउन */
+        }
+
+        /* दलको नाम र सिट */
+        .party-info span {
+            display: block;
+            line-height: 1.2;
+        }
+
+        .party-info .party-name {
+            font-weight: bold;
+            color: #222;
+        }
+
+        .party-info .party-seats {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        /* मोबाइल रेस्पोन्सिभनेस - सानो स्क्रिनमा केही समायोजन */
+        @media (max-width: 600px) {
+            .election-header-widget {
+                padding: 5px 10px;
+                gap: 10px;
+                font-size: 0.8rem;
+            }
+            .party-symbol, .party-photo {
+                width: 25px;
+                height: 25px;
+            }
+            .party-info .party-name {
+                font-size: 0.8rem;
+            }
+            .party-info .party-seats {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="election-header-widget" id="electionWidget">
+    <div style="color: #888; margin: auto;">नतिजा लोड हुँदैछ...</div>
+</div>
+
+<script>
+    let parties = []; // डाटा लोड गर्नका लागि खाली एरे
+
+    // डाटा तान्ने मुख्य फङ्सन
+    async function loadElectionData() {
+        try {
+            const response = await fetch('data.json'); // data.json बाट डाटा तान्छ
+            parties = await response.json();
+            renderWidget(); // डाटा आएपछि विजेट रेन्डर गर्ने
+        } catch (error) {
+            console.error("निर्वाचन डाटा लोड गर्न सकेन:", error);
+            document.getElementById('electionWidget').innerHTML = '<div style="color: #d32f2f; margin: auto;">डाटा लोड गर्न समस्या भयो।</div>';
+        }
+    }
+
+    // विजेट रेन्डर गर्ने फङ्सन
+    function renderWidget() {
+        const widgetContainer = document.getElementById('electionWidget');
+        widgetContainer.innerHTML = ''; // पुरानो सामग्री हटाउने
+
+        // कुल सिटका आधारमा क्रमबद्ध गर्ने (उच्चतम सिट माथि)
+        parties.sort((a, b) => (b.fptp + b.pr) - (a.fptp + a.pr));
+
+        parties.forEach(party => {
+            const totalSeats = party.fptp + party.pr;
+            const partyItem = document.createElement('div');
+            partyItem.className = 'party-item';
+
+            // चुनाव चिह्न वा फोटो प्रयोग गर्ने
+            const imageSrc = party.photo || party.symbol; // यदि फोटो छैन भने सिम्बल प्रयोग गर्ने
+            const imgElement = document.createElement('img');
+            imgElement.className = 'party-photo'; // वा 'party-symbol'
+            imgElement.src = imageSrc;
+            imgElement.alt = party.name + ' चिन्ह';
+            imgElement.title = party.name + ' (' + totalSeats + ' सिट)'; // होभर गर्दा देखिने टेक्स्ट
+
+            const infoElement = document.createElement('div');
+            infoElement.className = 'party-info';
+            infoElement.innerHTML = `
+                <span class="party-name">${party.name}</span>
+                <span class="party-seats">${totalSeats} सिट</span>
+            `;
+
+            partyItem.appendChild(imgElement);
+            partyItem.appendChild(infoElement);
+            widgetContainer.appendChild(partyItem);
+        });
+
+        // अन्तिम अपडेट समय देखाउनको लागि
+        // widgetContainer.innerHTML += `<span style="margin-left:auto; font-size:0.7rem; color:#999;">अ.अपडेट: ${new Date().toLocaleTimeString('ne-NP')}</span>`;
+    }
+
+    // हरेक १ मिनेटमा स्वतः अपडेट गर्ने (60000 मिलिसेकेन्ड = १ मिनेट)
+    setInterval(loadElectionData, 60000); 
+
+    // पेज लोड हुँदा पहिलो पटक डाटा तान्ने
+    window.onload = loadElectionData;
+</script>
+
+</body>
+</html>
