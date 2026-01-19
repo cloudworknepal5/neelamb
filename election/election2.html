@@ -1,0 +1,133 @@
+<div class="election-dashboard-final">
+    <div class="main-header">
+        <div class="dist-info">पर्सा जिल्ला - प्रतिनिधि सभा</div>
+        <div class="live-label"><span class="dot"></span> प्रत्यक्ष नतिजा: जारी</div>
+    </div>
+
+    <div class="constituency-grid">
+        <div class="const-col" id="area-1"><div class="area-title">क्षेत्र नं. १</div><div class="content"></div></div>
+        <div class="const-col" id="area-2"><div class="area-title">क्षेत्र नं. २</div><div class="content"></div></div>
+        <div class="const-col" id="area-3"><div class="area-title">क्षेत्र नं. ३</div><div class="content"></div></div>
+        <div class="const-col" id="area-4"><div class="area-title">क्षेत्र नं. ४</div><div class="content"></div></div>
+    </div>
+</div>
+
+<style>
+    :root { --red: #d32f2f; --green: #108a00; --bg: #f8f9fa; }
+    .election-dashboard-final { max-width: 1400px; margin: auto; border: 1px solid #ddd; background: #fff; font-family: sans-serif; }
+    
+    .main-header { display: flex; justify-content: space-between; padding: 15px; background: var(--bg); border-bottom: 2px solid var(--red); }
+    .dist-info { font-weight: bold; font-size: 18px; }
+    .live-label { color: var(--red); font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 5px; }
+    .dot { width: 8px; height: 8px; background: var(--red); border-radius: 50%; animation: blink 1s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .constituency-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .const-col { border-right: 1px solid #eee; }
+    .const-col:last-child { border-right: none; }
+    .area-title { background: #eee; padding: 10px; font-weight: bold; text-align: center; font-size: 14px; }
+
+    /* दलको ग्रुप स्टाइल */
+    .party-group { border-bottom: 1px solid #eee; margin-bottom: 5px; }
+    .party-header { background: #fdfdfd; padding: 5px 15px; font-size: 11px; color: #777; font-weight: bold; border-bottom: 1px solid #f0f0f0; }
+
+    /* उम्मेदवार कार्ड */
+    .cand-card { padding: 12px 15px; position: relative; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .profile { display: flex; gap: 10px; }
+    .img-box { position: relative; width: 42px; height: 42px; }
+    .img-box img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; }
+    .win-tick { position: absolute; bottom: 0; right: 0; background: var(--green); color: #fff; width: 14px; height: 14px; border-radius: 50%; font-size: 9px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #fff; }
+
+    .details .name { font-weight: bold; font-size: 14px; display: block; color: #222; }
+    .elected-badge { background: var(--green); color: white; font-size: 10px; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-top: 3px; }
+
+    .votes { text-align: right; }
+    .v-count { font-size: 18px; font-weight: 800; display: block; }
+    .v-sym { width: 28px; height: 28px; margin-top: 4px; border: 1px solid #eee; padding: 2px; }
+
+    .prog-bar { width: 100%; height: 4px; background: #eee; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+    .prog-fill { height: 100%; transition: width 1s ease; }
+
+    @media (max-width: 1100px) { .constituency-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .constituency-grid { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+    // दल अनुसार रङ्गहरूको म्यापिङ
+    const partyColors = {
+        "नेपाली कांग्रेस": "#0078FF", // निलो
+        "नेकपा (एमाले)": "#DE211C", // रातो
+        "नेकपा (माओवादी केन्द्र)": "#FF5722", // सुन्तला
+        "राष्ट्रिय स्वतन्त्र पार्टी": "#00BCD4", // फिरोजी
+        "राष्ट्रिय प्रजातन्त्र पार्टी": "#FBC02D", // पहेँलो
+        "जनता समाजवादी पार्टी": "#689F38", // हल्का हरियो
+        "नेपाल कम्युनिष्ट पार्टी": "#4CAF50", // हरियो
+        "लोकतान्त्रिक समाजवादी पार्टी": "#FFC107", // सुन्तला पहेँलो
+        "अन्य": "#9E9E9E", // खैरो
+        "स्वतन्त्र": "#607D8B" // गाढा खैरो
+    };
+
+    async function loadElectionResults() {
+        try {
+            const response = await fetch('https://educationnepal.eu.org/election/data2.json');
+            const data = await response.json();
+            
+            for(let i=1; i<=4; i++) document.querySelector(`#area-${i} .content`).innerHTML = '';
+
+            const groupedByArea = {};
+            data.forEach(item => {
+                const area = item.area || 1; 
+                if(!groupedByArea[area]) groupedByArea[area] = {};
+                
+                const party = item.party || "अन्य";
+                if(!groupedByArea[area][party]) groupedByArea[area][party] = [];
+                
+                groupedByArea[area][party].push(item);
+            });
+
+            Object.keys(groupedByArea).forEach(area => {
+                const areaDiv = document.querySelector(`#area-${area} .content`);
+                if(!areaDiv) return;
+
+                const partiesInArea = groupedByArea[area];
+                Object.keys(partiesInArea).forEach(partyName => {
+                    let partyHtml = `<div class="party-group"><div class="party-header">${partyName}</div>`;
+                    
+                    partiesInArea[partyName].forEach((cand, index) => {
+                        const total = cand.fptp + cand.pr;
+                        const isWin = index === 0; // नमुनाका लागि
+                        const mainPartyColor = partyColors[partyName] || partyColors['अन्य']; // दल अनुसार रङ्ग
+
+                        partyHtml += `
+                            <div class="cand-card">
+                                <div class="card-top">
+                                    <div class="profile">
+                                        <div class="img-box">
+                                            <img src="${cand.photo}" alt="U">
+                                            ${isWin ? '<div class="win-tick">✓</div>' : ''}
+                                        </div>
+                                        <div class="details">
+                                            <span class="name">${cand.name}</span>
+                                            ${isWin ? '<div class="elected-badge">निर्वाचित</div>' : ''}
+                                        </div>
+                                    </div>
+                                    <div class="votes">
+                                        <span class="v-count">${total.toLocaleString('ne-NP')}</span>
+                                        <img src="${cand.symbol}" class="v-sym" alt="S">
+                                    </div>
+                                </div>
+                                <div class="prog-bar"><div class="prog-fill" style="width:${isWin ? 85 : 45}%; background:${mainPartyColor}"></div></div>
+                            </div>
+                        `;
+                    });
+                    partyHtml += `</div>`;
+                    areaDiv.innerHTML += partyHtml;
+                });
+            });
+        } catch (e) { console.error("Error loading election data:", e); }
+    }
+
+    loadElectionResults();
+    setInterval(loadElectionResults, 60000); // हरेक १ मिनेटमा अपडेट
+</script>
