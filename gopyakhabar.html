@@ -115,7 +115,7 @@ function updateGKDisplay() {
                 </div>
             </div>
             <div class="gk-headline">${p.title.rendered}</div>
-            <div class="gk-footer-black">विस्तृत विवरणका लागि gopyakhabar.com लगअन गर्नुहोस् ।</div>
+            <div class="gk-footer-black">पूरा विवरण कमेन्टमा लिंक गरिएको छ ।</div>
         </div>
         <div class="gk-nav-row">
             <button class="gk-nav-btn" onclick="moveGK(-1)" ${gk_idx === 0 ? 'disabled' : ''}>← अघिल्लो</button>
@@ -137,3 +137,4 @@ async function fetchGK() {
 window.moveGK = (n) => { gk_idx += n; updateGKDisplay(); };
 fetchGK();
 </script>
+
