@@ -12,8 +12,22 @@
         border: 5px solid #ed1c24; padding: 20px; background: #fff; box-sizing: border-box;
     }
 
-    .gh-img-frame { position: relative; width: 100%; height: 500px; background: #f4f4f4; overflow: hidden; }
-    .gh-img-frame img { width: 100%; height: 100%; object-fit: cover; }
+    /* फोटो फ्रेम र वाटरमार्क सेटिङ */
+    .gh-img-frame { 
+        position: relative; width: 100%; height: 500px; background: #f4f4f4; 
+        overflow: hidden; display: flex; align-items: center; justify-content: center; 
+    }
+    .gh-img-frame img.gh-main-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+
+    /* हल्का वाटरमार्क (Center) */
+    .gh-watermark {
+        position: relative;
+        width: 250px; /* लोगोको साइज */
+        opacity: 0.2; /* हल्का देखाउनका लागि */
+        z-index: 10;
+        pointer-events: none;
+        filter: grayscale(100%); /* वाटरमार्क लुकका लागि */
+    }
 
     .gh-red-overlay { 
         position: absolute; top: 12px; left: 12px; right: 12px; bottom: 12px; 
@@ -37,12 +51,17 @@
     .gh-nav-btn { background: #ed1c24; color: #fff !important; padding: 10px 25px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 14px; }
     .gh-nav-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-    @media (max-width: 768px) { .gh-headline { font-size: 24px; } .gh-img-frame { height: 320px; } }
+    @media (max-width: 768px) { 
+        .gh-headline { font-size: 24px; } 
+        .gh-img-frame { height: 320px; } 
+        .gh-watermark { width: 150px; }
+    }
 </style>
 
 <script>
 let gh_posts_data = [];
 let gh_current_idx = 0;
+const ghLogo = "https://ghantaghartv.com/wp-content/uploads/2022/10/Ghantaghar-TV-banner-png-300.png";
 
 function getSecureImg(url) {
     if(!url) return 'https://via.placeholder.com/1000x600?text=No+Image';
@@ -56,7 +75,7 @@ async function capturePNG() {
     
     html2canvas(target, {
         useCORS: true, 
-        scale: 3, // अझै प्रस्ट फोटोका लागि scale ३ राखिएको छ
+        scale: 3,
         backgroundColor: "#ffffff"
     }).then(canvas => {
         const a = document.createElement('a');
@@ -78,7 +97,6 @@ function updateDisplay() {
         const match = p.content.rendered.match(/<img[^>]+src="([^">]+)"/);
         rawUrl = match ? match[1] : '';
     }
-    const image = getSecureImg(rawUrl);
 
     box.innerHTML = `
         <div class="gh-download-area">
@@ -86,7 +104,10 @@ function updateDisplay() {
         </div>
         <div class="gh-master-wrap">
             <div class="gh-img-frame">
-                <img src="${image}" crossorigin="anonymous">
+                <img src="${getSecureImg(rawUrl)}" class="gh-main-img" crossorigin="anonymous">
+                
+                <img src="${getSecureImg(ghLogo)}" class="gh-watermark" crossorigin="anonymous">
+
                 <div class="gh-red-overlay">
                     <div class="gh-small-ribbon">ghantaghartv.com</div>
                     <div class="gh-social-icons">
