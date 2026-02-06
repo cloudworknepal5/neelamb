@@ -1,6 +1,6 @@
 /**
  * Name: nepalidate-in-postpage.js
- * Version: 8.5 (Removed Font Controls, Kept PNG Export)
+ * Version: 9.3 (Fix: Force Download PNG)
  * Today's Check: Feb 6, 2026 = Magh 23, 2082
  */
 
@@ -29,26 +29,43 @@
     /** Function 1: Convert Numbers */
     const toNepNum = (n) => n.toString().split('').map(c => config.numMap[c] || c).join('');
 
-    /** Function 2: Generate PNG (Multi-function Addition) */
+    /** Function 2: Force Download PNG (Fixed Logic) */
     const saveAsPNG = (text) => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = 500;
-        canvas.height = 100;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 26px Arial"; 
-        ctx.textAlign = "center";
-        ctx.fillText(text, canvas.width / 2, 60);
-        
-        const link = document.createElement('a');
-        link.download = 'nepali-date.png';
-        link.href = canvas.toDataURL("image/png");
-        link.click();
+        try {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            
+            // क्यानभासको साइज मिलाउने
+            canvas.width = 600;
+            canvas.height = 120;
+            
+            // पृष्ठभूमि (Background)
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // फन्ट र टेक्स्ट सेटिङ
+            ctx.fillStyle = "#000000";
+            ctx.font = "bold 32px Arial, sans-serif"; 
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+            
+            // डाउनलोड ट्रिगर गर्ने सुरक्षित तरिका
+            const imgData = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.setAttribute('href', imgData);
+            link.setAttribute('download', 'nepali-date-' + Date.now() + '.png');
+            document.body.appendChild(link); // केही ब्राउजरका लागि अनिवार्य
+            link.click();
+            document.body.removeChild(link); // काम सकिएपछि हटाउने
+            
+        } catch (err) {
+            console.error("PNG Download failed: ", err);
+            alert("PNG डाउनलोड हुन सकेन। कृपया फेरि प्रयास गर्नुहोस्।");
+        }
     };
 
-    /** Function 3: Core Date Logic (Correction Fixed) */
+    /** Function 3: BS Date Calculation Logic */
     const getBSDateDetails = (engDay, engMonth) => {
         const data = config.monthData[engMonth];
         let bsDay, bsMonth = data.m;
@@ -66,7 +83,7 @@
     /** Function 4: UI Renderer */
     const renderNepaliDate = () => {
         document.querySelectorAll('.location-date').forEach(el => {
-            const match = el.innerText.match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
+            const match = el.innerText.trim().match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
             if (match) {
                 const [_, eMonth, eDay, eYear] = match;
                 const dInt = parseInt(eDay);
@@ -82,12 +99,21 @@
                 el.style.cursor = "pointer";
                 el.title = "Click to download as PNG";
                 
-                // मितिमा क्लिक गर्दा मात्र PNG डाउनलोड हुने
-                el.onclick = () => saveAsPNG(finalDate);
+                // इभेन्ट अलि सुरक्षित तरिकाले थप्ने
+                el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    saveAsPNG(finalDate);
+                });
             }
         });
     };
 
-    window.addEventListener('load', renderNepaliDate);
-    setTimeout(renderNepaliDate, 1500);
+    // DOM तयार भएपछि मात्र चलाउने
+    if (document.readyState === 'loading') {
+        window.addEventListener('load', renderNepaliDate);
+    } else {
+        renderNepaliDate();
+    }
+    // Dynamic content का लागि fallback
+    setTimeout(renderNepaliDate, 2000);
 })();
