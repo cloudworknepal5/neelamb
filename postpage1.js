@@ -1,7 +1,7 @@
 /**
  * Name: nepalidate-in-postpage.js
- * Version: 8.4 (Added PNG Export & Font Styling)
- * Feature: Multi-function logic with Print to PNG option
+ * Version: 8.5 (Removed Font Controls, Kept PNG Export)
+ * Today's Check: Feb 6, 2026 = Magh 23, 2082
  */
 
 (function() {
@@ -23,27 +23,32 @@
             'October':   { m: 'कात्तिक', offset: 57, start: 18, prevDays: 14 },
             'November':  { m: 'मंसिर', offset: 57, start: 17, prevDays: 14 },
             'December':  { m: 'पुस', offset: 57, start: 16, prevDays: 15 }
-        },
-        // फन्ट साइज सेटिङ
-        fontSize: "22px" 
+        }
     };
 
     /** Function 1: Convert Numbers */
     const toNepNum = (n) => n.toString().split('').map(c => config.numMap[c] || c).join('');
 
-    /** Function 2: Get Weekday Name */
-    const getNepWeekday = (year, month, day) => {
-        const d = new Date(`${month} ${day}, ${year}`);
-        return config.weekdays[d.getDay()];
+    /** Function 2: Generate PNG (Multi-function Addition) */
+    const saveAsPNG = (text) => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 500;
+        canvas.height = 100;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 26px Arial"; 
+        ctx.textAlign = "center";
+        ctx.fillText(text, canvas.width / 2, 60);
+        
+        const link = document.createElement('a');
+        link.download = 'nepali-date.png';
+        link.href = canvas.toDataURL("image/png");
+        link.click();
     };
 
-    /** Function 3: Calculate BS Year */
-    const getBSYear = (engYear, engMonth, engDay, baseOffset) => {
-        if (engMonth === 'April' && engDay < 14) return engYear + 56;
-        return engYear + baseOffset;
-    };
-
-    /** Function 4: Calculate BS Day and Month */
+    /** Function 3: Core Date Logic (Correction Fixed) */
     const getBSDateDetails = (engDay, engMonth) => {
         const data = config.monthData[engMonth];
         let bsDay, bsMonth = data.m;
@@ -58,26 +63,7 @@
         return { bsDay, bsMonth };
     };
 
-    /** Function 5: Print to PNG (Canvas Renderer) */
-    const saveAsPNG = (text) => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = 400;
-        canvas.height = 80;
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "black";
-        ctx.font = "bold 24px Arial"; // नेपाली फन्टको लागि युनिकोड सपोर्ट
-        ctx.textAlign = "center";
-        ctx.fillText(text, canvas.width / 2, 50);
-        
-        const link = document.createElement('a');
-        link.download = 'nepali-date.png';
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-    };
-
-    /** Function 6: UI Renderer with Styling */
+    /** Function 4: UI Renderer */
     const renderNepaliDate = () => {
         document.querySelectorAll('.location-date').forEach(el => {
             const match = el.innerText.match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
@@ -87,19 +73,16 @@
                 const yInt = parseInt(eYear);
 
                 const { bsDay, bsMonth } = getBSDateDetails(dInt, eMonth);
-                const bsYear = getBSYear(yInt, eMonth, dInt, config.monthData[eMonth].offset);
-                const weekday = getNepWeekday(yInt, eMonth, dInt);
+                const bsYear = (eMonth === 'April' && dInt < 14) ? yInt + 56 : yInt + config.monthData[eMonth].offset;
+                const weekday = config.weekdays[new Date(`${eMonth} ${eDay}, ${eYear}`).getDay()];
 
                 const finalDate = `${weekday}, ${bsMonth} ${toNepNum(bsDay)}, ${toNepNum(bsYear)}`;
                 
-                // स्टाइल र क्लिक इभेन्ट थप
-                el.style.fontSize = config.fontSize;
-                el.style.fontWeight = "bold";
-                el.style.cursor = "pointer";
-                el.title = "Click to save as PNG";
                 el.innerHTML = finalDate;
-
-                // क्लिक गर्दा PNG डाउनलोड हुने
+                el.style.cursor = "pointer";
+                el.title = "Click to download as PNG";
+                
+                // मितिमा क्लिक गर्दा मात्र PNG डाउनलोड हुने
                 el.onclick = () => saveAsPNG(finalDate);
             }
         });
