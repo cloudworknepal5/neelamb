@@ -1,7 +1,8 @@
 /**
  * Name: nepalidate-in-postpage.js
- * Version: 9.3 (Fix: Force Download PNG)
- * Today's Check: Feb 6, 2026 = Magh 23, 2082
+ * Version: 9.4 (Download Icon Only - Fixed)
+ * Feature: Multi-function logic with Force PNG Download
+ * Date: Feb 6, 2026 = Magh 23, 2082
  */
 
 (function() {
@@ -26,46 +27,37 @@
         }
     };
 
-    /** Function 1: Convert Numbers */
+    /** Function 1: Unicode Number Converter */
     const toNepNum = (n) => n.toString().split('').map(c => config.numMap[c] || c).join('');
 
-    /** Function 2: Force Download PNG (Fixed Logic) */
+    /** Function 2: Force PNG Download (Improved) */
     const saveAsPNG = (text) => {
-        try {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            
-            // क्यानभासको साइज मिलाउने
-            canvas.width = 600;
-            canvas.height = 120;
-            
-            // पृष्ठभूमि (Background)
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // फन्ट र टेक्स्ट सेटिङ
-            ctx.fillStyle = "#000000";
-            ctx.font = "bold 32px Arial, sans-serif"; 
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-            
-            // डाउनलोड ट्रिगर गर्ने सुरक्षित तरिका
-            const imgData = canvas.toDataURL("image/png");
-            const link = document.createElement('a');
-            link.setAttribute('href', imgData);
-            link.setAttribute('download', 'nepali-date-' + Date.now() + '.png');
-            document.body.appendChild(link); // केही ब्राउजरका लागि अनिवार्य
-            link.click();
-            document.body.removeChild(link); // काम सकिएपछि हटाउने
-            
-        } catch (err) {
-            console.error("PNG Download failed: ", err);
-            alert("PNG डाउनलोड हुन सकेन। कृपया फेरि प्रयास गर्नुहोस्।");
-        }
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 600;
+        canvas.height = 120;
+
+        // Background
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Text Styling
+        ctx.fillStyle = "#2c3e50";
+        ctx.font = "bold 32px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+        // Secure Trigger Download
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL("image/png");
+        link.download = 'nepali-date-' + Date.now() + '.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
-    /** Function 3: BS Date Calculation Logic */
+    /** Function 3: Precise Date Calculation */
     const getBSDateDetails = (engDay, engMonth) => {
         const data = config.monthData[engMonth];
         let bsDay, bsMonth = data.m;
@@ -80,7 +72,7 @@
         return { bsDay, bsMonth };
     };
 
-    /** Function 4: UI Renderer */
+    /** Function 4: UI Renderer with Icon */
     const renderNepaliDate = () => {
         document.querySelectorAll('.location-date').forEach(el => {
             const match = el.innerText.trim().match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
@@ -95,25 +87,30 @@
 
                 const finalDate = `${weekday}, ${bsMonth} ${toNepNum(bsDay)}, ${toNepNum(bsYear)}`;
                 
-                el.innerHTML = finalDate;
-                el.style.cursor = "pointer";
-                el.title = "Click to download as PNG";
-                
-                // इभेन्ट अलि सुरक्षित तरिकाले थप्ने
-                el.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    saveAsPNG(finalDate);
-                });
+                // केवल आइकन थप्ने (No Text)
+                el.innerHTML = `
+                    <span style="vertical-align: middle;">${finalDate}</span>
+                    <span id="dl-icon" style="margin-left: 10px; cursor: pointer; display: inline-flex; vertical-align: middle;" title="Download PNG">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </span>
+                `;
+
+                // आइकन क्लिक इभेन्ट
+                const icon = el.querySelector('#dl-icon');
+                if(icon) {
+                    icon.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        saveAsPNG(finalDate);
+                    });
+                }
             }
         });
     };
 
-    // DOM तयार भएपछि मात्र चलाउने
-    if (document.readyState === 'loading') {
-        window.addEventListener('load', renderNepaliDate);
-    } else {
-        renderNepaliDate();
-    }
-    // Dynamic content का लागि fallback
-    setTimeout(renderNepaliDate, 2000);
+    window.addEventListener('load', renderNepaliDate);
+    setTimeout(renderNepaliDate, 1500);
 })();
