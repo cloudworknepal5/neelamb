@@ -1,8 +1,7 @@
 /**
  * Name: nepalidate-in-postpage.js
- * Version: 9.4 (Download Icon Only - Fixed)
- * Feature: Multi-function logic with Force PNG Download
- * Date: Feb 6, 2026 = Magh 23, 2082
+ * Version: 9.5 (Blob Download Fix)
+ * Today's Check: Feb 6, 2026 = Magh 23, 2082
  */
 
 (function() {
@@ -27,37 +26,37 @@
         }
     };
 
-    /** Function 1: Unicode Number Converter */
     const toNepNum = (n) => n.toString().split('').map(c => config.numMap[c] || c).join('');
 
-    /** Function 2: Force PNG Download (Improved) */
+    /** Function 1: Secure Blob-based Download (Fix for 'Not Working') */
     const saveAsPNG = (text) => {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         canvas.width = 600;
         canvas.height = 120;
 
-        // Background
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Text Styling
         ctx.fillStyle = "#2c3e50";
         ctx.font = "bold 32px Arial, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
-        // Secure Trigger Download
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL("image/png");
-        link.download = 'nepali-date-' + Date.now() + '.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Blob Method for compatibility
+        canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'nepali-date-' + Date.now() + '.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url); // Memory clean up
+        }, 'image/png');
     };
 
-    /** Function 3: Precise Date Calculation */
+    /** Function 2: Date Calculation */
     const getBSDateDetails = (engDay, engMonth) => {
         const data = config.monthData[engMonth];
         let bsDay, bsMonth = data.m;
@@ -72,10 +71,11 @@
         return { bsDay, bsMonth };
     };
 
-    /** Function 4: UI Renderer with Icon */
+    /** Function 3: UI Renderer with Only Icon */
     const renderNepaliDate = () => {
         document.querySelectorAll('.location-date').forEach(el => {
-            const match = el.innerText.trim().match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
+            const rawText = el.innerText.trim();
+            const match = rawText.match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
             if (match) {
                 const [_, eMonth, eDay, eYear] = match;
                 const dInt = parseInt(eDay);
@@ -87,11 +87,11 @@
 
                 const finalDate = `${weekday}, ${bsMonth} ${toNepNum(bsDay)}, ${toNepNum(bsYear)}`;
                 
-                // केवल आइकन थप्ने (No Text)
+                // केवल आइकन थप्ने
                 el.innerHTML = `
                     <span style="vertical-align: middle;">${finalDate}</span>
-                    <span id="dl-icon" style="margin-left: 10px; cursor: pointer; display: inline-flex; vertical-align: middle;" title="Download PNG">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <span id="dl-icon-btn" style="margin-left: 10px; cursor: pointer; display: inline-flex; vertical-align: middle;" title="Download Image">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
                             <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -99,10 +99,10 @@
                     </span>
                 `;
 
-                // आइकन क्लिक इभेन्ट
-                const icon = el.querySelector('#dl-icon');
+                const icon = el.querySelector('#dl-icon-btn');
                 if(icon) {
                     icon.addEventListener('click', (e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         saveAsPNG(finalDate);
                     });
@@ -112,5 +112,5 @@
     };
 
     window.addEventListener('load', renderNepaliDate);
-    setTimeout(renderNepaliDate, 1500);
+    setTimeout(renderNepaliDate, 2000);
 })();
