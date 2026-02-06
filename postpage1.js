@@ -1,7 +1,7 @@
 /**
  * Name: nepalidate-in-postpage.js
- * Version: 8.3 (Correction Only)
- * Target: Feb 6, 2026 = Magh 23, 2082
+ * Version: 8.4 (Added PNG Export & Font Styling)
+ * Feature: Multi-function logic with Print to PNG option
  */
 
 (function() {
@@ -23,7 +23,9 @@
             'October':   { m: 'कात्तिक', offset: 57, start: 18, prevDays: 14 },
             'November':  { m: 'मंसिर', offset: 57, start: 17, prevDays: 14 },
             'December':  { m: 'पुस', offset: 57, start: 16, prevDays: 15 }
-        }
+        },
+        // फन्ट साइज सेटिङ
+        fontSize: "22px" 
     };
 
     /** Function 1: Convert Numbers */
@@ -41,24 +43,41 @@
         return engYear + baseOffset;
     };
 
-    /** Function 4: Calculate BS Day and Month (Corrected Calculation) */
+    /** Function 4: Calculate BS Day and Month */
     const getBSDateDetails = (engDay, engMonth) => {
         const data = config.monthData[engMonth];
         let bsDay, bsMonth = data.m;
-
         if (engDay >= data.start) {
             bsDay = (engDay - data.start) + 1;
         } else {
             const months = ['पुस','माघ','फागुन','चैत','वैशाख','जेठ','असार','साउन','भदौ','असोज','कात्तिक','मंसिर'];
             let idx = months.indexOf(data.m);
             bsMonth = idx === 0 ? months[11] : months[idx - 1];
-            // Correction applied here
             bsDay = data.prevDays + engDay; 
         }
         return { bsDay, bsMonth };
     };
 
-    /** Function 5: UI Renderer */
+    /** Function 5: Print to PNG (Canvas Renderer) */
+    const saveAsPNG = (text) => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 400;
+        canvas.height = 80;
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "black";
+        ctx.font = "bold 24px Arial"; // नेपाली फन्टको लागि युनिकोड सपोर्ट
+        ctx.textAlign = "center";
+        ctx.fillText(text, canvas.width / 2, 50);
+        
+        const link = document.createElement('a');
+        link.download = 'nepali-date.png';
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    };
+
+    /** Function 6: UI Renderer with Styling */
     const renderNepaliDate = () => {
         document.querySelectorAll('.location-date').forEach(el => {
             const match = el.innerText.match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
@@ -71,12 +90,21 @@
                 const bsYear = getBSYear(yInt, eMonth, dInt, config.monthData[eMonth].offset);
                 const weekday = getNepWeekday(yInt, eMonth, dInt);
 
-                el.innerHTML = `${weekday}, ${bsMonth} ${toNepNum(bsDay)}, ${toNepNum(bsYear)}`;
+                const finalDate = `${weekday}, ${bsMonth} ${toNepNum(bsDay)}, ${toNepNum(bsYear)}`;
+                
+                // स्टाइल र क्लिक इभेन्ट थप
+                el.style.fontSize = config.fontSize;
+                el.style.fontWeight = "bold";
+                el.style.cursor = "pointer";
+                el.title = "Click to save as PNG";
+                el.innerHTML = finalDate;
+
+                // क्लिक गर्दा PNG डाउनलोड हुने
+                el.onclick = () => saveAsPNG(finalDate);
             }
         });
     };
 
-    // Initialize
     window.addEventListener('load', renderNepaliDate);
     setTimeout(renderNepaliDate, 1500);
 })();
