@@ -1,6 +1,7 @@
 /**
- * Blogger Toolbox v12.5 - Final Inline Edition
- * [Date Converter + View Counter + Printer Logo]
+ * Blogger Toolbox v14.0 - Clean Inline Edition
+ * Features: 1. English to Nepali Date | 2. Firebase View Counter
+ * Removed: All download/print/canvas functions
  */
 const BloggerToolbox = {
     config: {
@@ -23,54 +24,59 @@ const BloggerToolbox = {
         }
     },
 
+    // नम्बरलाई नेपालीमा बदल्ने साझा फङ्सन
     toNep: function(n) {
         return n.toString().split('').map(c => this.config.numMap[c] || c).join('');
     },
 
-    // १. भ्यु काउन्टर मोड्युल
+    // फङ्सन १: भ्यु काउन्टर अपडेट गर्ने
     initCounter: async function() {
         const el = document.getElementById("visitor-count");
         if (!el) return;
         const pId = window.location.pathname.replace(/[\/\.#\$\[\]]/g, "_") || "home";
-        const url = `${this.config.databaseURL}/views/${pId}.json`;
         
         try {
+            const url = `${this.config.databaseURL}/views/${pId}.json`;
             let res = await fetch(url);
             let count = await res.json() || 0;
+
             if (!sessionStorage.getItem("v_" + pId)) {
                 count++;
                 await fetch(url, { method: 'PUT', body: JSON.stringify(count) });
                 sessionStorage.setItem("v_" + pId, "true");
             }
+            
             const eyeIcon = `<svg style="width:16px;height:16px;margin-right:5px;fill:#ce1212;vertical-align:middle;" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4 142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.4 78.1-95.4 92.9-131.1 3.3-7.9 3.3-16.7 0-24.6C558.7 208 527.4 156 480.6 112.6 433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64a64 64 0 1 0 0 128 64 64 0 1 0 0-128z"/></svg>`;
-            el.innerHTML = `${eyeIcon} <span style="color:#ce1212;font-weight:bold;margin-left:2px;">${this.toNep(count)}</span>`;
+            el.innerHTML = `${eyeIcon} <span style="color:#ce1212;font-weight:bold;">${this.toNep(count)}</span>`;
         } catch (e) { console.warn("Counter sync failed."); }
     },
 
-    // २. मिति कन्भर्टर मोड्युल
+    // फङ्सन २: मिति कन्भर्ट गर्ने
     initDateTool: function() {
-        document.querySelectorAll(".location-date").forEach(el => {
-            const match = el.innerText.trim().match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
-            if (match) {
-                const [_, eM, eD, eY] = match;
-                const data = this.config.monthData[eM];
-                const dInt = parseInt(eD);
-                const yInt = parseInt(eY);
+        const el = document.querySelector(".location-date");
+        if (!el) return;
 
-                let bsDay, bsMonth = data.m;
-                if (dInt >= data.start) {
-                    bsDay = (dInt - data.start) + 1;
-                } else {
-                    const months = ['पुस','माघ','फागुन','चैत','वैशाख','जेठ','असार','साउन','भदौ','असोज','कात्तिक','मंसिर'];
-                    let idx = months.indexOf(data.m);
-                    bsMonth = idx === 0 ? months[11] : months[idx - 1];
-                    bsDay = data.prevDays + dInt;
-                }
-                const bsYear = (eM === 'April' && dInt < 14) ? yInt + 56 : yInt + data.offset;
-                const dayName = this.config.weekdays[new Date(`${eM} ${eD}, ${eY}`).getDay()];
-                el.innerText = `${dayName}, ${bsMonth} ${this.toNep(bsDay)}, ${this.toNep(bsYear)}`;
+        const match = el.innerText.trim().match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
+        if (match) {
+            const [_, eM, eD, eY] = match;
+            const data = this.config.monthData[eM];
+            const dInt = parseInt(eD);
+            const yInt = parseInt(eY);
+
+            let bsDay, bsMonth = data.m;
+            if (dInt >= data.start) {
+                bsDay = (dInt - data.start) + 1;
+            } else {
+                const months = ['पुस','माघ','फागुन','चैत','वैशाख','जेठ','असार','साउन','भदौ','असोज','कात्तिक','मंसिर'];
+                let idx = months.indexOf(data.m);
+                bsMonth = idx === 0 ? months[11] : months[idx - 1];
+                bsDay = data.prevDays + dInt;
             }
-        });
+            const bsYear = (eM === 'April' && dInt < 14) ? yInt + 56 : yInt + data.offset;
+            const dayName = this.config.weekdays[new Date(`${eM} ${eD}, ${eY}`).getDay()];
+            
+            el.innerText = `${dayName}, ${bsMonth} ${this.toNep(bsDay)}, ${this.toNep(bsYear)}`;
+        }
     },
 
     init: function() {
@@ -79,6 +85,5 @@ const BloggerToolbox = {
     }
 };
 
-// लोड हुँदा कार्यान्वयन
+// पेज लोड हुँदा सुरु गर्ने
 window.addEventListener('load', () => BloggerToolbox.init());
-setTimeout(() => BloggerToolbox.init(), 2500);
