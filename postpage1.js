@@ -1,7 +1,7 @@
 /**
  * Name: nepalidate-in-postpage.js
- * Version: 8.6 (Added Print Icon, Removed Font Controls)
- * Feature: Click Icon to Save as PNG
+ * Version: 8.5 (Removed Font Controls, Kept PNG Export)
+ * Today's Check: Feb 6, 2026 = Magh 23, 2082
  */
 
 (function() {
@@ -26,19 +26,19 @@
         }
     };
 
-    /** Function 1: Number Converter */
+    /** Function 1: Convert Numbers */
     const toNepNum = (n) => n.toString().split('').map(c => config.numMap[c] || c).join('');
 
-    /** Function 2: PNG Exporter */
+    /** Function 2: Generate PNG (Multi-function Addition) */
     const saveAsPNG = (text) => {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        canvas.width = 550;
+        canvas.width = 500;
         canvas.height = 100;
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#2c3e50";
-        ctx.font = "bold 28px Arial"; 
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 26px Arial"; 
         ctx.textAlign = "center";
         ctx.fillText(text, canvas.width / 2, 60);
         
@@ -48,7 +48,7 @@
         link.click();
     };
 
-    /** Function 3: Date Detail Calculator */
+    /** Function 3: Core Date Logic (Correction Fixed) */
     const getBSDateDetails = (engDay, engMonth) => {
         const data = config.monthData[engMonth];
         let bsDay, bsMonth = data.m;
@@ -63,7 +63,7 @@
         return { bsDay, bsMonth };
     };
 
-    /** Function 4: UI Renderer with Icon */
+    /** Function 4: UI Renderer */
     const renderNepaliDate = () => {
         document.querySelectorAll('.location-date').forEach(el => {
             const match = el.innerText.match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
@@ -78,26 +78,12 @@
 
                 const finalDate = `${weekday}, ${bsMonth} ${toNepNum(bsDay)}, ${toNepNum(bsYear)}`;
                 
-                // HTML structure with Icon
-                el.innerHTML = `
-                    <span style="vertical-align: middle;">${finalDate}</span>
-                    <span id="print-date-icon" style="margin-left: 10px; cursor: pointer; display: inline-flex; vertical-align: middle;" title="Save as PNG">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                    </span>
-                `;
-
-                // आइकनमा क्लिक इभेन्ट थप
-                const icon = el.querySelector('#print-date-icon');
-                if(icon) {
-                    icon.onclick = (e) => {
-                        e.stopPropagation();
-                        saveAsPNG(finalDate);
-                    };
-                }
+                el.innerHTML = finalDate;
+                el.style.cursor = "pointer";
+                el.title = "Click to download as PNG";
+                
+                // मितिमा क्लिक गर्दा मात्र PNG डाउनलोड हुने
+                el.onclick = () => saveAsPNG(finalDate);
             }
         });
     };
