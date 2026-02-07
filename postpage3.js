@@ -1,8 +1,8 @@
 /**
- * Blogger Toolbox v14.0 - Clean Inline Edition
+ * Blogger Toolbox v14.0 - Birgunj.eu.org Edition
  * Features: 
- * 1. English to Nepali Date 
- * 2. Firebase View Counter 
+ * 1. English to Nepali Date
+ * 2. Firebase View Counter
  * 3. Sticky News Headline (Ratopati Style)
  */
 
@@ -32,7 +32,7 @@ const BloggerToolbox = {
         return n.toString().split('').map(c => this.config.numMap[c] || c).join('');
     },
 
-    // फङ्सन १: भ्यु काउन्टर अपडेट गर्ने
+    // फङ्सन १: भ्यु काउन्टर (Firebase)
     initCounter: async function() {
         const el = document.getElementById("visitor-count");
         if (!el) return;
@@ -54,7 +54,7 @@ const BloggerToolbox = {
         } catch (e) { console.warn("Counter sync failed."); }
     },
 
-    // फङ्सन २: मिति कन्भर्ट गर्ने
+    // फङ्सन २: मिति कन्भर्टर
     initDateTool: function() {
         const el = document.querySelector(".location-date");
         if (!el) return;
@@ -63,8 +63,7 @@ const BloggerToolbox = {
         if (match) {
             const [_, eM, eD, eY] = match;
             const data = this.config.monthData[eM];
-            const dInt = parseInt(eD);
-            const yInt = parseInt(eY);
+            const dInt = parseInt(eD), yInt = parseInt(eY);
 
             let bsDay, bsMonth = data.m;
             if (dInt >= data.start) {
@@ -82,25 +81,30 @@ const BloggerToolbox = {
         }
     },
 
-    // फङ्सन ३: स्टिकी हेडलाइन (रातोपाटी स्टाईल)
+    // फङ्सन ३: स्टिकी हेडलाइन (Birgunj.eu.org को लागि विशेष क्लास)
     initStickyHeadline: function() {
         const header = document.getElementById("stickyHeadline");
-        const mainTitle = document.querySelector(".post-title") || document.querySelector(".entry-title");
         const contentField = document.getElementById("headlineContent");
+        // तपाईंको थिमको हेडलाइन क्लास यहाँ छ
+        const mainTitle = document.querySelector(".post-title.entry-title") || document.querySelector("h1.post-title");
 
-        if (!header || !mainTitle || !contentField) return;
+        if (!header || !contentField) return;
 
-        // पेज लोड हुँदा हेडलाइन कपी गर्ने
-        contentField.innerText = mainTitle.innerText;
+        if (!mainTitle) {
+            // यदि टाइटल फेला परेन भने आधा सेकेन्ड पछि फेरि खोज्ने
+            setTimeout(() => this.initStickyHeadline(), 500);
+            return;
+        }
 
-        // स्क्रोलिङ लजिक
-        window.addEventListener("scroll", () => {
-            if (window.pageYOffset > 300) {
+        contentField.innerText = mainTitle.innerText.trim();
+
+        window.addEventListener("scroll", function() {
+            if (window.pageYOffset > 250) {
                 header.classList.add("visible");
             } else {
                 header.classList.remove("visible");
             }
-        });
+        }, { passive: true });
     },
 
     init: function() {
@@ -110,5 +114,9 @@ const BloggerToolbox = {
     }
 };
 
-// सबै फङ्सन एकैसाथ सुचारु गर्ने
-window.addEventListener('DOMContentLoaded', () => BloggerToolbox.init());
+// पेज लोड भएपछि सबै फङ्सन सुचारु गर्ने
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => BloggerToolbox.init());
+} else {
+    BloggerToolbox.init();
+}
