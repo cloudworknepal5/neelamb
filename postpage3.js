@@ -83,7 +83,7 @@ const BloggerToolbox = {
 
         window.addEventListener("scroll", function() {
             // ३०० पिक्सेल तल पुगेपछि मात्र हेडलाइन देखिने
-            if (window.pageYOffset > 300) {
+            if (window.pageYOffset > 800) {
                 header.classList.add("visible");
             } else {
                 header.classList.remove("visible");
