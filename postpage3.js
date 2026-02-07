@@ -1,6 +1,6 @@
 /**
- * Blogger Toolbox v14.4 - Mobile Fixed Edition
- * Features: 1. Nepali Date | 2. View Counter | 3. Responsive Sticky Headline
+ * Blogger Toolbox v14.5 - Ultra Responsive Edition
+ * Features: 1. Nepali Date | 2. View Counter | 3. Smart Sticky Headline
  */
 
 const BloggerToolbox = {
@@ -68,32 +68,29 @@ const BloggerToolbox = {
         }
     },
 
-    // सुधारेको फङ्सन ३: मोबाइलको लागि अझ भरपर्दो लजिक
+    // सुधारेको फङ्सन ३: Intersection Observer लजिक (सबैभन्दा भरपर्दो)
     initStickyHeadline: function() {
         const header = document.getElementById("stickyHeadline");
         const contentField = document.getElementById("headlineContent");
         const mainTitle = document.querySelector(".post-title.entry-title") || document.querySelector("h1.post-title");
         const postBody = document.querySelector(".post-body");
 
-        if (!header || !contentField || !mainTitle || !postBody) {
-             if(header) header.classList.remove("visible");
-             return;
-        }
+        if (!header || !contentField || !mainTitle || !postBody) return;
 
         contentField.innerText = mainTitle.innerText.trim();
 
-        // मोबाइलमा बढी प्रभावकारी हुने 'Scroll Listener'
-        window.addEventListener("scroll", function() {
-            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-            const triggerPoint = postBody.getBoundingClientRect().top + currentScroll;
+        // नयाँ लजिक: जब मुख्य टाइटल स्क्रिनबाट हराउँछ, तब मात्र स्टिकी देखाउने
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting && window.scrollY > entry.boundingClientRect.top) {
+                    header.classList.add("visible");
+                } else {
+                    header.classList.remove("visible");
+                }
+            });
+        }, { threshold: 0 });
 
-            // कन्टेन्ट सुरु भएपछि मात्र देखाउने (Trigger Point भन्दा ५०px तल)
-            if (currentScroll > (triggerPoint - 50)) {
-                header.classList.add("visible");
-            } else {
-                header.classList.remove("visible");
-            }
-        }, { passive: true });
+        observer.observe(mainTitle);
     },
 
     init: function() {
@@ -103,4 +100,5 @@ const BloggerToolbox = {
     }
 };
 
+// तत्काल रन गर्ने
 BloggerToolbox.init();
