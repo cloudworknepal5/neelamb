@@ -1,6 +1,6 @@
 /**
- * Blogger Toolbox v14.3 - Content Trigger Edition
- * Features: 1. Nepali Date | 2. View Counter | 3. Sticky Headline (Trigger after Title)
+ * Blogger Toolbox v14.4 - Mobile Fixed Edition
+ * Features: 1. Nepali Date | 2. View Counter | 3. Responsive Sticky Headline
  */
 
 const BloggerToolbox = {
@@ -68,26 +68,27 @@ const BloggerToolbox = {
         }
     },
 
-    // सुधारेको फङ्सन ३: कन्टेन्ट सुरु भएपछि मात्र ट्रिगर हुने
+    // सुधारेको फङ्सन ३: मोबाइलको लागि अझ भरपर्दो लजिक
     initStickyHeadline: function() {
         const header = document.getElementById("stickyHeadline");
         const contentField = document.getElementById("headlineContent");
-        const mainTitle = document.querySelector(".post-title.entry-title") || document.querySelector(".post h1");
-        const postBody = document.querySelector(".post-body"); // कन्टेन्टको मुख्य भाग
+        const mainTitle = document.querySelector(".post-title.entry-title") || document.querySelector("h1.post-title");
+        const postBody = document.querySelector(".post-body");
 
         if (!header || !contentField || !mainTitle || !postBody) {
-             // होम पेजमा लुकाउने
-             if(header) header.style.display = "none";
+             if(header) header.classList.remove("visible");
              return;
         }
 
         contentField.innerText = mainTitle.innerText.trim();
 
+        // मोबाइलमा बढी प्रभावकारी हुने 'Scroll Listener'
         window.addEventListener("scroll", function() {
-            // कन्टेन्ट सुरु हुने स्थान (Offset) पत्ता लगाउने
-            let triggerPoint = postBody.offsetTop;
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            const triggerPoint = postBody.getBoundingClientRect().top + currentScroll;
 
-            if (window.pageYOffset > triggerPoint) {
+            // कन्टेन्ट सुरु भएपछि मात्र देखाउने (Trigger Point भन्दा ५०px तल)
+            if (currentScroll > (triggerPoint - 50)) {
                 header.classList.add("visible");
             } else {
                 header.classList.remove("visible");
