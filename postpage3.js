@@ -1,6 +1,6 @@
 /**
- * Blogger Toolbox v14.3 - Content Trigger Edition
- * Features: 1. Nepali Date | 2. View Counter | 3. Sticky Headline (Trigger after Title)
+ * Blogger Toolbox v14.2 - Headline Focus Edition
+ * Features: 1. Nepali Date | 2. View Counter | 3. Post Headline Sticky (35px/25px)
  */
 
 const BloggerToolbox = {
@@ -68,26 +68,26 @@ const BloggerToolbox = {
         }
     },
 
-    // सुधारेको फङ्सन ३: कन्टेन्ट सुरु भएपछि मात्र ट्रिगर हुने
+    // सुधारेको फङ्सन ३: केवल पोस्ट हेडलाइनका लागि
     initStickyHeadline: function() {
         const header = document.getElementById("stickyHeadline");
         const contentField = document.getElementById("headlineContent");
-        const mainTitle = document.querySelector(".post-title.entry-title") || document.querySelector(".post h1");
-        const postBody = document.querySelector(".post-body"); // कन्टेन्टको मुख्य भाग
+        
+        // केवल पोस्ट पेजको मुख्य टाइटल खोज्ने
+        const mainTitle = document.querySelector(".post-title.entry-title") || document.querySelector(".post-header h1");
 
-        if (!header || !contentField || !mainTitle || !postBody) {
-             // होम पेजमा लुकाउने
-             if(header) header.style.display = "none";
-             return;
+        if (!header || !contentField) return;
+
+        // यदि टाइटल छैन (अर्थात् होम पेज हो) भने हेडलाइन बार हटाउने
+        if (!mainTitle) {
+            header.style.display = "none";
+            return;
         }
 
         contentField.innerText = mainTitle.innerText.trim();
 
         window.addEventListener("scroll", function() {
-            // कन्टेन्ट सुरु हुने स्थान (Offset) पत्ता लगाउने
-            let triggerPoint = postBody.offsetTop;
-
-            if (window.pageYOffset > triggerPoint) {
+            if (window.pageYOffset > 350) {
                 header.classList.add("visible");
             } else {
                 header.classList.remove("visible");
