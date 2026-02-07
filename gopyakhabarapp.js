@@ -10,7 +10,7 @@ const PWA_MANAGER = {
         name: "Gopyakhabar",
         shortName: "Gopyakhabar",
         themeColor: "#2196f3",
-        icon: "https://blogger.googleusercontent.com/img/a/AVvXsEiBnC4hcDiMC18QrERnMrE8HTsMkzJDQqBmgeGvMpw_MA8NcKTPX3jUdY-byqu7K7iXUR9uByo0VBeiYdx5UXPJQHoslvzt6z-EprS-I-bg-L-w9hC_n2AUfIXuq5Nr5R1jZF5txT9r3_g5zq6FE1O8KcpaTVzrrhTWEIFv2PsjwJTSuLyHWRcjtzKRLnI"
+        icon: "https://www.gopyakhabar.com/wp-content/uploads/2025/08/gopyakhabar-logo.png"
     },
 
     init: function() {
