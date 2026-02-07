@@ -1,6 +1,6 @@
 /**
- * Blogger Toolbox v14.5 - Ultra Responsive Edition
- * Features: 1. Nepali Date | 2. View Counter | 3. Smart Sticky Headline
+ * Blogger Toolbox v14.3 - Content Trigger Edition
+ * Features: 1. Nepali Date | 2. View Counter | 3. Sticky Headline (Trigger after Title)
  */
 
 const BloggerToolbox = {
@@ -68,29 +68,31 @@ const BloggerToolbox = {
         }
     },
 
-    // सुधारेको फङ्सन ३: Intersection Observer लजिक (सबैभन्दा भरपर्दो)
+    // सुधारेको फङ्सन ३: कन्टेन्ट सुरु भएपछि मात्र ट्रिगर हुने
     initStickyHeadline: function() {
         const header = document.getElementById("stickyHeadline");
         const contentField = document.getElementById("headlineContent");
-        const mainTitle = document.querySelector(".post-title.entry-title") || document.querySelector("h1.post-title");
-        const postBody = document.querySelector(".post-body");
+        const mainTitle = document.querySelector(".post-title.entry-title") || document.querySelector(".post h1");
+        const postBody = document.querySelector(".post-body"); // कन्टेन्टको मुख्य भाग
 
-        if (!header || !contentField || !mainTitle || !postBody) return;
+        if (!header || !contentField || !mainTitle || !postBody) {
+             // होम पेजमा लुकाउने
+             if(header) header.style.display = "none";
+             return;
+        }
 
         contentField.innerText = mainTitle.innerText.trim();
 
-        // नयाँ लजिक: जब मुख्य टाइटल स्क्रिनबाट हराउँछ, तब मात्र स्टिकी देखाउने
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting && window.scrollY > entry.boundingClientRect.top) {
-                    header.classList.add("visible");
-                } else {
-                    header.classList.remove("visible");
-                }
-            });
-        }, { threshold: 0 });
+        window.addEventListener("scroll", function() {
+            // कन्टेन्ट सुरु हुने स्थान (Offset) पत्ता लगाउने
+            let triggerPoint = postBody.offsetTop;
 
-        observer.observe(mainTitle);
+            if (window.pageYOffset > triggerPoint) {
+                header.classList.add("visible");
+            } else {
+                header.classList.remove("visible");
+            }
+        }, { passive: true });
     },
 
     init: function() {
@@ -100,5 +102,4 @@ const BloggerToolbox = {
     }
 };
 
-// तत्काल रन गर्ने
 BloggerToolbox.init();
