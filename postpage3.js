@@ -1,7 +1,11 @@
 /**
  * Blogger Toolbox v14.0 - Clean Inline Edition
- * Features: 1. English to Nepali Date | 2. Firebase View Counter | 3. Sticky News Headline
+ * Features: 
+ * 1. English to Nepali Date 
+ * 2. Firebase View Counter 
+ * 3. Sticky News Headline (Ratopati Style)
  */
+
 const BloggerToolbox = {
     config: {
         databaseURL: "https://counter-3ff08-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -81,15 +85,15 @@ const BloggerToolbox = {
     // फङ्सन ३: स्टिकी हेडलाइन (रातोपाटी स्टाईल)
     initStickyHeadline: function() {
         const header = document.getElementById("stickyHeadline");
-        const mainTitle = document.querySelector(".post-title"); // तपाईंको थिमको हेडलाइन क्लास
+        const mainTitle = document.querySelector(".post-title") || document.querySelector(".entry-title");
         const contentField = document.getElementById("headlineContent");
 
         if (!header || !mainTitle || !contentField) return;
 
-        // हेडलाइन कपी गर्ने
+        // पेज लोड हुँदा हेडलाइन कपी गर्ने
         contentField.innerText = mainTitle.innerText;
 
-        // स्क्रोल इभेन्ट
+        // स्क्रोलिङ लजिक
         window.addEventListener("scroll", () => {
             if (window.pageYOffset > 300) {
                 header.classList.add("visible");
@@ -102,9 +106,9 @@ const BloggerToolbox = {
     init: function() {
         this.initCounter();
         this.initDateTool();
-        this.initStickyHeadline(); // नयाँ फङ्सन यहाँ सुचारु गरियो
+        this.initStickyHeadline();
     }
 };
 
-// पेज लोड हुँदा सुरु गर्ने
-window.addEventListener('load', () => BloggerToolbox.init());
+// सबै फङ्सन एकैसाथ सुचारु गर्ने
+window.addEventListener('DOMContentLoaded', () => BloggerToolbox.init());
