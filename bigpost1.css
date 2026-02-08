@@ -7,7 +7,7 @@
     padding: 0 15px; 
 }
 
-/* Extra Large Bold Headline (75px Desktop, 42px Mobile) */
+/* Headline Styling: Desktop 75px, 900 Bold */
 .gh-headline-top { 
     display: block; 
     font-size: 75px; 
@@ -19,7 +19,7 @@
 }
 .gh-headline-top:hover { color: #111; }
 
-/* Meta Info with Location-Date */
+/* Meta Info Container */
 .gh-meta-info { 
     display: flex; 
     align-items: center; 
@@ -34,16 +34,13 @@
 
 .gh-author-img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #ed1c24; }
 
-/* Location and Date Styling */
+/* तपाईंको सुरुको लोकेशन डेट क्लास */
 .location-date { 
     color: #ed1c24; 
     font-weight: 800; 
-    text-transform: uppercase;
 }
 
-.gh-pub-date { color: #666; font-weight: 400; }
-
-/* Image Frame */
+/* Image Frame and Overlays */
 .gh-img-frame { 
     position: relative; 
     width: 100%; 
@@ -62,9 +59,16 @@
     z-index: 5; pointer-events: none; border-radius: 8px;
 }
 
-/* Mobile Adjustments */
+/* MOBILE OPTIMIZATION: 42px Headline & Smaller Icons */
 @media (max-width: 768px) {
     .gh-headline-top { font-size: 42px !important; font-weight: 900 !important; }
     .gh-meta-info { font-size: 14px; gap: 8px; }
     .gh-overlay-border { top: 8px; left: 8px; right: 8px; bottom: 8px; border-width: 2px; }
+    
+    /* Social Icons small in mobile as requested earlier */
+    .gh-social-overlay-center img { 
+        width: 22px !important; 
+        height: 22px !important; 
+        padding: 5px !important; 
+    }
 }
