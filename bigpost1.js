@@ -45,7 +45,7 @@ function createPostHTML(post) {
                 <span style="color:#ddd">|</span>
                 <span class="location-date">${APP_CONFIG.location}</span>
                 <span style="color:#ddd">|</span>
-                <span class=".location-date">${formatDate(post.published.$t)}</span>
+                <span class="location-date">${formatDate(post.published.$t)}</span>
             </div>
             <div class="gh-img-frame">
                 <div class="gh-overlay-border"></div>
