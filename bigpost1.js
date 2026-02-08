@@ -1,4 +1,18 @@
-// Multi-function: HD Image Processor
+/**
+ * Multi-function logic: 
+ * 1. HD Image Filter
+ * 2. Nepali Date Formatter
+ * 3. Dynamic Card Builder
+ * 4. Automatic 3-Post Fetch
+ */
+
+const APP_CONFIG = {
+    blogUrl: "https://www.birgunj.eu.org",
+    maxResults: 3,
+    location: "वीरगञ्ज"
+};
+
+// Function 1: HD Image Processor
 function getClearHDImage(url) {
     if (!url) return 'https://via.placeholder.com/1300x700?text=No+Image';
     let hd = url.replace(/\/s[0-9]+(-[a-z0-9-]+)?\//, '/s1600/');
@@ -7,12 +21,12 @@ function getClearHDImage(url) {
     return hd;
 }
 
-// Multi-function: Nepali Date Formatter
+// Function 2: Nepali Date Converter
 function formatDate(iso) { 
     return new Date(iso).toLocaleDateString('ne-NP', {year:'numeric', month:'long', day:'numeric'}); 
 }
 
-// Multi-function: Card Builder HTML
+// Function 3: Card Builder (Using original .location-date class)
 function createPostHTML(post) {
     const title = post.title.$t;
     const link = post.link.find(l => l.rel === 'alternate').href;
@@ -22,7 +36,6 @@ function createPostHTML(post) {
     
     let contentStr = post.content ? post.content.$t : (post.summary ? post.summary.$t : "");
     const snip = contentStr.replace(/<[^>]*>?/gm, '').trim().split(/\s+/).slice(0, 25).join(" ") + "...";
-    const label = post.category ? post.category[0].term : "ताजा समाचार";
 
     return `
         <article class="gh-master-wrap">
@@ -31,15 +44,11 @@ function createPostHTML(post) {
                 <img src="${authorPic}" class="gh-author-img" alt="${authorName}">
                 <span><b>${authorName}</b></span>
                 <span style="color:#ddd">|</span>
+                <span class="location-date">${APP_CONFIG.location}</span>
+                <span style="color:#ddd">|</span>
                 <span class="gh-pub-date">${formatDate(post.published.$t)}</span>
             </div>
             <div class="gh-img-frame">
-                <div class="gh-label-ribbon">${label}</div>
-                <div class="gh-social-overlay-center">
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=${link}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="FB"></a>
-                    <a href="https://api.whatsapp.com/send?text=${title}%20${link}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA"></a>
-                    <a href="https://twitter.com/intent/tweet?text=${title}&url=${link}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/3256/3256013.png" alt="TW"></a>
-                </div>
                 <div class="gh-overlay-border"></div>
                 <a href="${link}"><img src="${thumb}" alt="${title}" loading="lazy"></a>
             </div>
@@ -50,7 +59,7 @@ function createPostHTML(post) {
     `;
 }
 
-// Multi-function: Feed Callback
+// Function 4: JSON Callback
 window.ghFeedCallback = function(json) { 
     const container = document.getElementById('gh-final-master-widget');
     const posts = json.feed.entry || []; 
@@ -61,9 +70,9 @@ window.ghFeedCallback = function(json) {
     }
 };
 
-// Function: Script Injector (Loads 3 posts)
+// Function 5: Execution
 (function() {
     const script = document.createElement('script');
-    script.src = `https://www.birgunj.eu.org/feeds/posts/default?alt=json-in-script&callback=ghFeedCallback&max-results=3`;
+    script.src = `${APP_CONFIG.blogUrl}/feeds/posts/default?alt=json-in-script&callback=ghFeedCallback&max-results=${APP_CONFIG.maxResults}`;
     document.body.appendChild(script);
 })();
