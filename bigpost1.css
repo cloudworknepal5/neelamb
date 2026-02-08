@@ -33,7 +33,12 @@
 }
 
 .gh-author-img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #ed1c24; }
-
+.location-date { 
+    color: #ed1c24;       /* रातो रङ */
+    font-weight: 800;    /* धेरै बोल्ड */
+    font-size: 18px;     /* फन्टको साइज */
+    text-transform: uppercase; /* सबै अक्षर ठूला (ABC) बनाउन */
+}
 /* Image Frame */
 .gh-img-frame { 
     position: relative; 
