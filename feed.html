@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghantaghar TV - GitHub Live Feed</title>
+    <style>
+        /* डिजाइन सेटिङ्स */
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .wrapper { max-width: 850px; margin: auto; }
+        
+        .news-card { 
+            background: #fff; 
+            margin-bottom: 50px; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        }
+
+        /* फिचर इमेज ७०० पिक्सेलमा सीमित */
+        .feature-img { 
+            width: 100%; 
+            max-width: 700px; 
+            height: auto; 
+            display: block; 
+            margin: 20px auto; 
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .title { font-size: 2.2rem; color: #b71c1c; text-decoration: none; font-weight: bold; line-height: 1.2; }
+        .meta { font-size: 0.9rem; color: #777; margin: 15px 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        
+        /* पूर्ण कन्टेन्टको स्टाइल */
+        .entry-content { font-size: 1.2rem; line-height: 1.9; }
+        .entry-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 15px 0; }
+        
+        .loader { text-align: center; font-size: 1.5rem; padding: 100px; color: #b71c1c; }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div id="news-feed">
+        <div class="loader">सर्भरबाट समाचार तानिँदैछ...</div>
+    </div>
+</div>
+
+<script>
+/**
+ * Multi-function: 
+ * १. AllOrigins Proxy प्रयोग गरेर फिड तान्ने
+ * २. Content:encoded बाट पूर्ण सामग्री निकाल्ने
+ * ३. इमेजलाई ७०० पिक्सेलमा फिल्टर गर्ने
+ */
+async function startGhantagharFeed() {
+    const rss = "https://ghantaghartv.com/feed/";
+    const proxy = "https://api.allorigins.win/get?url=" + encodeURIComponent(rss);
+
+    try {
+        const res = await fetch(proxy);
+        const json = await res.json();
+        
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(json.contents, "text/xml");
+        const posts = doc.querySelectorAll("item");
+
+        const output = document.getElementById("news-feed");
+        output.innerHTML = ""; 
+
+        posts.forEach(item => {
+            const title = item.querySelector("title").textContent;
+            const link = item.querySelector("link").textContent;
+            const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString('ne-NP');
+            
+            // पूर्ण कन्टेन्ट निकाल्ने
+            const fullBody = item.getElementsByTagName("content:encoded")[0]?.textContent || item.querySelector("description").textContent;
+
+            // फिचर इमेज निकाल्ने (सामग्रीको पहिलो इमेज)
+            let imageTag = "";
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = fullBody;
+            const firstImg = tempDiv.querySelector("img");
+            
+            if (firstImg) {
+                imageTag = `<img src="${firstImg.src}" class="feature-img" alt="News Image">`;
+            }
+
+            output.innerHTML += `
+                <article class="news-card">
+                    <a href="${link}" target="_blank" class="title">${title}</a>
+                    <div class="meta">📅 प्रकाशित: ${pubDate}</div>
+                    ${imageTag}
+                    <div class="entry-content">
+                        ${fullBody}
+                    </div>
+                </article>
+            `;
+        });
+
+    } catch (e) {
+        document.getElementById("news-feed").innerHTML = "<h3 style='text-align:center;'>फिड लोड भएन। कृपया रिफ्रेस गर्नुहोस्।</h3>";
+    }
+}
+
+startGhantagharFeed();
+</script>
+
+</body>
+</html>
