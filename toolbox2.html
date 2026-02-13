@@ -49,7 +49,7 @@
     </style>
 </head>
 <body>
-<div id="copy-status">Himalb Auto Copied! ✅</div>
+<div id="copy-status">Copied! ✅</div>
 <div class="top-editor">
     <div class="converter-grid">
         <div class="card">
@@ -71,7 +71,7 @@
             </div>
         </div>
         <div class="card">
-            <h3>३. Himalb (Auto Copy)</h3>
+            <h3>३. Himalb (Auto)</h3>
             <textarea id="himalb_output" style="font-family:'himalb';"></textarea>
             <div class="btn-row">
                 <button class="btn-tool btn-conv" onclick="autoProcess()">Convert</button>
@@ -81,7 +81,7 @@
         </div>
         <div class="card">
             <h3>४. Word Correction (Final)</h3>
-            <textarea id="corrected_output" placeholder="सुधारिएको टेक्स्ट यहाँ..."></textarea>
+            <textarea id="corrected_output" style="font-family:'himalb';" placeholder="सुधारिएको फन्ट यहाँ..."></textarea>
             <div class="btn-row">
                 <button class="btn-tool btn-correct" onclick="applyFinalCorrection()">Convert</button>
                 <button class="btn-tool btn-rtf" onclick="downloadRTF()">RTF</button>
@@ -134,7 +134,7 @@ function clearAllTools() {
 
 function downloadRTF() {
     const text = document.getElementById('corrected_output').value || document.getElementById('himalb_output').value;
-    if(!text) return alert("कन्भर्ट गरिएको टेक्स्ट छैन।");
+    if(!text) return alert("टेक्स्ट छैन।");
     const rtfHeader = "{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Himalb;}}\n{\\f0\n";
     const rtfFooter = "\n}}";
     const blob = new Blob([rtfHeader + text + rtfFooter], {type: 'application/rtf'});
@@ -156,6 +156,7 @@ function copyTool(id) {
     }
 }
 
+// Multi-function: सुधार्ने तर अटो-कपी नगर्ने
 function applyFinalCorrection() {
     const himalbVal = document.getElementById('himalb_output').value;
     const unicodeVal = document.getElementById('unicode_text').value;
@@ -166,7 +167,7 @@ function applyFinalCorrection() {
         result = result.split(wrong).join(right);
     });
     document.getElementById('corrected_output').value = result;
-    copyTool('corrected_output');
+    // Auto Copy हटाउन यहाँ कपी गर्ने लजिक राखिएको छैन
 }
 
 function autoProcess() {
@@ -175,7 +176,7 @@ function autoProcess() {
         const preetiVal = document.getElementById('legacy_text').value;
         if (typeof kantipurConfigToUnicode === "function" && preetiVal) {
             document.getElementById('himalb_output').value = kantipurConfigToUnicode(preetiVal);
-            applyFinalCorrection();
+            applyFinalCorrection(); // सुधार्ने काम अटो हुन्छ, कपी हुँदैन
         }
     }, 450);
 }
