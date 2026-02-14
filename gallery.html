@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <title>Deepmani Font Fixed Editor</title>
+    <title>Deepmani Font Fixed Editor - Border Update</title>
     <style>
         /* दिपमनी फन्ट लोड गर्ने - फाइलको नाम Deepmani.ttf नै हुनुपर्छ */
         @font-face {
@@ -24,7 +24,6 @@
         }
         .full { grid-column: span 4; }
         
-        /* इनपुट बक्समा पनि दिपमनी फन्ट देखिने बनाइएको */
         #captionInput { 
             width: 100%; padding: 12px; border-radius: 5px; border: 2px solid #0984e3; 
             font-family: 'Deepmani', Arial, sans-serif; 
@@ -82,8 +81,8 @@
             <input type="color" id="textColor" value="#ffffff" oninput="drawAll()">
         </div>
         <div>
-            <label>ब्राइटनेस: <span id="bVal">150</span>%</label>
-            <input type="range" id="brightRange" min="50" max="200" value="150" oninput="drawAll()">
+            <label>ब्राइटनेस: <span id="bVal">120</span>%</label>
+            <input type="range" id="brightRange" min="50" max="200" value="120" oninput="drawAll()">
         </div>
 
         <div class="btn-group">
@@ -108,9 +107,8 @@
     let logoObj = { img: null, x: 20, y: 20, w: 100, h: 100, isDragging: false };
     let isDraggingImg = false, selectedImgIdx = -1, startX, startY;
 
-    // मल्टी-फङ्सन १: फन्ट लोड भए नभएको चेक गर्ने
+    // मल्टी-फङ्सन १: फन्ट लोड चेक
     document.fonts.load("20px 'Deepmani'").then(function() {
-        console.log("Deepmani Loaded");
         drawAll();
     });
 
@@ -147,26 +145,37 @@
         reader.readAsDataURL(file);
     }
 
-    // मल्टी-फङ्सन ४: मुख्य ड्रइङ
+    // मल्टी-फङ्सन ४: मुख्य ड्रइङ (बार्डर सहित)
     function drawAll() {
         document.getElementById('bVal').innerText = document.getElementById('brightRange').value;
         document.getElementById('fSizeVal').innerText = document.getElementById('fontSizeRange').value;
         document.getElementById('lSizeVal').innerText = document.getElementById('logoSizeRange').value;
         
         ctx.clearRect(0, 0, CW, CH);
-        ctx.filter = `brightness(${document.getElementById('brightRange').value}%)`;
-
+        
         imgObjects.forEach((obj, i) => {
             let dx = 0, dy = 0;
             if (imgObjects.length === 2) dx = i * obj.cellW;
             else if (imgObjects.length >= 3) { dx = (i % 2) * obj.cellW; dy = Math.floor(i / 2) * obj.cellH; }
+            
             ctx.save();
-            ctx.beginPath(); ctx.rect(dx, dy, obj.cellW, obj.cellH); ctx.clip();
+            // फोटो ब्राइटनेस
+            ctx.filter = `brightness(${document.getElementById('brightRange').value}%)`;
+            
+            // क्लिपिङ मास्क ताकि फोटो सेल बाहिर नजाओस्
+            ctx.beginPath(); 
+            ctx.rect(dx, dy, obj.cellW, obj.cellH); 
+            ctx.clip();
+            
+            // फोटो ड्र गर्ने
             ctx.drawImage(obj.img, dx + obj.x, dy + obj.y, obj.img.width * obj.scale, obj.img.height * obj.scale);
             ctx.restore();
-        });
 
-        ctx.filter = 'none';
+            // *** कालो बार्डर थपिएको ***
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 4;
+            ctx.strokeRect(dx, dy, obj.cellW, obj.cellH);
+        });
 
         // लोगो साइज कन्ट्रोल
         if (logoObj.img) {
@@ -180,7 +189,7 @@
         textObj.text = document.getElementById('captionInput').value;
         if (textObj.text) {
             const fSize = parseInt(document.getElementById('fontSizeRange').value);
-            ctx.font = `${fSize}px 'Deepmani'`; // यहाँ Deepmani मात्र लेख्ने
+            ctx.font = `${fSize}px 'Deepmani'`;
             ctx.textAlign = "center";
             ctx.lineWidth = fSize/7;
             ctx.strokeStyle = "black";
@@ -190,7 +199,7 @@
         }
     }
 
-    // ड्र्याग एण्ड ड्रप लजिक
+    // माउस इभेन्ट्स (Drag & Drop)
     canvas.onmousedown = (e) => {
         const rect = canvas.getBoundingClientRect();
         const mx = (e.clientX - rect.left) * (CW / rect.width);
@@ -225,13 +234,14 @@
 
         if (logoObj.isDragging) { logoObj.x += dx; logoObj.y += dy; }
         else if (textObj.isDragging) { textObj.x += dx; textObj.y += dy; }
-        else { imgObjects[selectedImgIdx].x += dx; imgObjects[selectedImgIdx].y += dy; }
+        else { if(imgObjects[selectedImgIdx]) { imgObjects[selectedImgIdx].x += dx; imgObjects[selectedImgIdx].y += dy; } }
         
         startX = mx; startY = my; drawAll();
     };
 
     window.onmouseup = () => { logoObj.isDragging = false; textObj.isDragging = false; isDraggingImg = false; selectedImgIdx = -1; };
 
+    // मल्टी-फङ्सन ५: रिसेट र डाउनलोड
     function resetAll() { location.reload(); }
 
     function downloadJPG() {
