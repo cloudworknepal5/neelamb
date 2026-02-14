@@ -2,9 +2,8 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <title>Deepmani Font Fixed Editor - Border Update</title>
+    <title>Deepmani Editor - Smart File Naming</title>
     <style>
-        /* दिपमनी फन्ट लोड गर्ने - फाइलको नाम Deepmani.ttf नै हुनुपर्छ */
         @font-face {
             font-family: 'Deepmani';
             src: url('Deepmani.ttf') format('truetype');
@@ -13,7 +12,7 @@
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: #eceff1; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 950px; width: 100%; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 1000px; width: 100%; text-align: center; }
         
         .upload-section { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .box { border: 2px dashed #0984e3; padding: 10px; border-radius: 10px; background: #f0f7ff; }
@@ -26,19 +25,19 @@
         
         #captionInput { 
             width: 100%; padding: 12px; border-radius: 5px; border: 2px solid #0984e3; 
-            font-family: 'Deepmani', Arial, sans-serif; 
-            font-size: 22px; box-sizing: border-box; 
+            font-family: 'Deepmani', Arial, sans-serif; font-size: 22px; box-sizing: border-box; 
         }
 
-        label { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #636e72; }
+        label { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #636e72; display: block; margin-bottom: 5px; }
+        .checkbox-label { display: flex; align-items: center; gap: 5px; cursor: pointer; text-transform: none; font-size: 14px; margin-top: 5px; }
         input[type="range"], select, input[type="color"] { width: 100%; padding: 5px; cursor: pointer; }
 
         #canvas-wrapper { 
             position: relative; margin: 20px auto; background: #000;
             border: 5px solid black; width: fit-content; line-height: 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); overflow: auto; max-width: 100%;
         }
-        canvas { width: 100%; height: auto; display: block; cursor: crosshair; }
+        canvas { display: block; cursor: crosshair; background: #fff; }
 
         .btn-group { display: flex; gap: 10px; grid-column: span 4; }
         .btn { flex: 1; padding: 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
@@ -49,7 +48,7 @@
 <body>
 
 <div class="card">
-    <h2 style="font-family: 'Deepmani', sans-serif;">Deepmani Font Photo Editor</h2>
+    <h2 style="font-family: 'Deepmani', sans-serif;">Deepmani Photo Editor Pro</h2>
     
     <div class="upload-section">
         <div class="box">
@@ -64,25 +63,46 @@
 
     <div class="controls">
         <div class="full">
-            <label>यहाँ टाइप गर्नुहोस् (यसले दिपमनीमा लेख्नेछ):</label>
+            <label>यहाँ टाइप गर्नुहोस् (दिपमनी फन्ट):</label>
             <input type="text" id="captionInput" placeholder="klkdf] k|of]u u/L n]Vg'xf];\ .." oninput="drawAll()">
         </div>
         
         <div>
-            <label>अक्षर साइज: <span id="fSizeVal">45</span>px</label>
-            <input type="range" id="fontSizeRange" min="10" max="150" value="45" oninput="drawAll()">
+            <label>इमेज आकार (Size):</label>
+            <select id="canvasSize" onchange="changeCanvasSize()">
+                <option value="800x450">800 x 450 (Default)</option>
+                <option value="1200x800">1200 x 800 (Large)</option>
+                <option value="700x350">700 x 350 (Banner)</option>
+            </select>
         </div>
+
         <div>
-            <label>लोगो साइज: <span id="lSizeVal">100</span>px</label>
-            <input type="range" id="logoSizeRange" min="30" max="300" value="100" oninput="drawAll()">
+            <label>बोर्डर सेटिङ:</label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="showBorder" onchange="drawAll()"> बोर्डर सुचारु गर्ने
+            </label>
+            <input type="range" id="borderSizeRange" min="1" max="25" value="5" oninput="drawAll()">
+            <label style="text-transform: none; font-weight: normal;">साइज: <span id="borderSizeVal">5</span>px</label>
         </div>
+
+        <div>
+            <label>अक्षर साइज: <span id="fSizeVal">45</span>px</label>
+            <input type="range" id="fontSizeRange" min="10" max="200" value="45" oninput="drawAll()">
+        </div>
+
+        <div>
+            <label>ब्राइटनेस: <span id="bVal">120</span>%</label>
+            <input type="range" id="brightRange" min="50" max="200" value="120" oninput="drawAll()">
+        </div>
+
         <div>
             <label>अक्षर रङ:</label>
             <input type="color" id="textColor" value="#ffffff" oninput="drawAll()">
         </div>
+
         <div>
-            <label>ब्राइटनेस: <span id="bVal">120</span>%</label>
-            <input type="range" id="brightRange" min="50" max="200" value="120" oninput="drawAll()">
+            <label>लोगो साइज: <span id="lSizeVal">100</span>px</label>
+            <input type="range" id="logoSizeRange" min="30" max="500" value="100" oninput="drawAll()">
         </div>
 
         <div class="btn-group">
@@ -99,7 +119,8 @@
 <script>
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
-    const CW = 800, CH = 450;
+    
+    let CW = 800, CH = 450;
     canvas.width = CW; canvas.height = CH;
 
     let imgObjects = [];
@@ -107,12 +128,28 @@
     let logoObj = { img: null, x: 20, y: 20, w: 100, h: 100, isDragging: false };
     let isDraggingImg = false, selectedImgIdx = -1, startX, startY;
 
-    // मल्टी-फङ्सन १: फन्ट लोड चेक
-    document.fonts.load("20px 'Deepmani'").then(function() {
+    // मल्टी-फङ्सन १: क्यानभास साइज अपडेट
+    function changeCanvasSize() {
+        const size = document.getElementById('canvasSize').value.split('x');
+        CW = parseInt(size[0]); CH = parseInt(size[1]);
+        canvas.width = CW; canvas.height = CH;
+        textObj.x = CW / 2; textObj.y = CH - 70;
+        if (imgObjects.length > 0) refreshImageScaling();
         drawAll();
-    });
+    }
 
-    // मल्टी-फङ्सन २: फोटो लोड गर्ने
+    function refreshImageScaling() {
+        const count = imgObjects.length;
+        imgObjects.forEach((obj, i) => {
+            let cellW = CW, cellH = CH;
+            if (count === 2) cellW = CW / 2;
+            else if (count >= 3) { cellW = CW / 2; cellH = CH / 2; }
+            obj.cellW = cellW; obj.cellH = cellH;
+            obj.scale = Math.max(cellW / obj.img.width, cellH / obj.img.height);
+        });
+    }
+
+    // मल्टी-फङ्सन २: इमेज र लोगो लोड
     async function loadImages() {
         const files = document.getElementById('photoPicker').files;
         if (!files.length) return;
@@ -123,16 +160,12 @@
                 const im = new Image(); im.onload = () => res(im);
                 im.src = URL.createObjectURL(files[i]);
             });
-            let cellW = CW, cellH = CH;
-            if (count === 2) cellW = CW / 2;
-            else if (count >= 3) { cellW = CW / 2; cellH = CH / 2; }
-            const scale = Math.max(cellW / img.width, cellH / img.height);
-            imgObjects.push({ img, x: 0, y: 0, scale, cellW, cellH });
+            imgObjects.push({ img, x: 0, y: 0 });
         }
+        refreshImageScaling();
         drawAll();
     }
 
-    // मल्टी-फङ्सन ३: लोगो लोड गर्ने
     function loadLogo() {
         const file = document.getElementById('logoPicker').files[0];
         if (!file) return;
@@ -145,12 +178,15 @@
         reader.readAsDataURL(file);
     }
 
-    // मल्टी-फङ्सन ४: मुख्य ड्रइङ (बार्डर सहित)
+    // मल्टी-फङ्सन ३: मुख्य ड्रइङ
     function drawAll() {
+        const bSize = document.getElementById('borderSizeRange').value;
+        document.getElementById('borderSizeVal').innerText = bSize;
         document.getElementById('bVal').innerText = document.getElementById('brightRange').value;
         document.getElementById('fSizeVal').innerText = document.getElementById('fontSizeRange').value;
         document.getElementById('lSizeVal').innerText = document.getElementById('logoSizeRange').value;
-        
+        const hasBorder = document.getElementById('showBorder').checked;
+
         ctx.clearRect(0, 0, CW, CH);
         
         imgObjects.forEach((obj, i) => {
@@ -159,25 +195,18 @@
             else if (imgObjects.length >= 3) { dx = (i % 2) * obj.cellW; dy = Math.floor(i / 2) * obj.cellH; }
             
             ctx.save();
-            // फोटो ब्राइटनेस
             ctx.filter = `brightness(${document.getElementById('brightRange').value}%)`;
-            
-            // क्लिपिङ मास्क ताकि फोटो सेल बाहिर नजाओस्
-            ctx.beginPath(); 
-            ctx.rect(dx, dy, obj.cellW, obj.cellH); 
-            ctx.clip();
-            
-            // फोटो ड्र गर्ने
+            ctx.beginPath(); ctx.rect(dx, dy, obj.cellW, obj.cellH); ctx.clip();
             ctx.drawImage(obj.img, dx + obj.x, dy + obj.y, obj.img.width * obj.scale, obj.img.height * obj.scale);
             ctx.restore();
 
-            // *** कालो बार्डर थपिएको ***
-            ctx.strokeStyle = "black";
-            ctx.lineWidth = 4;
-            ctx.strokeRect(dx, dy, obj.cellW, obj.cellH);
+            if (hasBorder) {
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = bSize;
+                ctx.strokeRect(dx, dy, obj.cellW, obj.cellH);
+            }
         });
 
-        // लोगो साइज कन्ट्रोल
         if (logoObj.img) {
             const lSize = document.getElementById('logoSizeRange').value;
             const ratio = logoObj.img.width / logoObj.img.height;
@@ -185,13 +214,12 @@
             ctx.drawImage(logoObj.img, logoObj.x, logoObj.y, logoObj.w, logoObj.h);
         }
 
-        // टेक्स्ट (दिपमनी फन्टमा)
         textObj.text = document.getElementById('captionInput').value;
         if (textObj.text) {
             const fSize = parseInt(document.getElementById('fontSizeRange').value);
             ctx.font = `${fSize}px 'Deepmani'`;
             ctx.textAlign = "center";
-            ctx.lineWidth = fSize/7;
+            ctx.lineWidth = fSize/6;
             ctx.strokeStyle = "black";
             ctx.strokeText(textObj.text, textObj.x, textObj.y);
             ctx.fillStyle = document.getElementById('textColor').value;
@@ -199,7 +227,7 @@
         }
     }
 
-    // माउस इभेन्ट्स (Drag & Drop)
+    // मल्टी-फङ्सन ४: ड्र्याग एण्ड ड्रप
     canvas.onmousedown = (e) => {
         const rect = canvas.getBoundingClientRect();
         const mx = (e.clientX - rect.left) * (CW / rect.width);
@@ -234,31 +262,32 @@
 
         if (logoObj.isDragging) { logoObj.x += dx; logoObj.y += dy; }
         else if (textObj.isDragging) { textObj.x += dx; textObj.y += dy; }
-        else { if(imgObjects[selectedImgIdx]) { imgObjects[selectedImgIdx].x += dx; imgObjects[selectedImgIdx].y += dy; } }
+        else if (imgObjects[selectedImgIdx]) { imgObjects[selectedImgIdx].x += dx; imgObjects[selectedImgIdx].y += dy; }
         
         startX = mx; startY = my; drawAll();
     };
 
     window.onmouseup = () => { logoObj.isDragging = false; textObj.isDragging = false; isDraggingImg = false; selectedImgIdx = -1; };
 
-    // मल्टी-फङ्सन ५: रिसेट र डाउनलोड
-    function resetAll() { location.reload(); }
-
+    // मल्टी-फङ्सन ५: मिति सहितको स्मार्ट डाउनलोड
     function downloadJPG() {
-        let q = 0.9;
-        const save = () => {
-            canvas.toBlob(blob => {
-                if (blob.size > 200 * 1024 && q > 0.2) { q -= 0.05; save(); }
-                else {
-                    const link = document.createElement('a');
-                    link.download = `Photo_Deepmani_Edit.jpg`;
-                    link.href = URL.createObjectURL(blob); link.click();
-                }
-            }, 'image/jpeg', q);
-        };
-        save();
-    }
-</script>
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
 
-</body>
-</html>
+        const fileName = `Image_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.jpg`;
+        
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL('image/jpeg', 0.9);
+        link.click();
+    }
+
+    function resetAll() { location.reload(); }
+    
+    document.fonts.load("20px 'Deepmani'").then(() => drawAll());
+</script>
