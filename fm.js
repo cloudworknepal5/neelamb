@@ -29,7 +29,7 @@
             </div>
             <div style="background: rgba(255, 234, 0, 0.05); border-radius: 4px; padding: 2px 8px; border: 1px dashed rgba(255, 234, 0, 0.3);">
                 <marquee scrollamount="3" style="color: #ffea00; font-size: 10px; font-weight: bold; display: block;">
-                    ✨ विज्ञापन: बिरगंज इन्टरटेन्मेन्टमा स्वागत छ! सम्पर्क: 98XXXXXXXX ✨
+                    ✨वीरगंज इन्टरटेनमेन्ट अनलिमिटेडमा तपाईलाई स्वागत छ । ✨ विज्ञापन:  के तपाईं आफ्नो छुट्टै खाले मौलिक वेबसाइट, न्यूज पोर्टल, व्यावसायिक वेबसाइट, ई कमर्श वेबसाइट बनाउन चाहनुहुन्छ ? हामी बनाउँछौं भीडभन्दा अलग वेबसाइट । विस्तृत जानकारीको लागि भिजिट गर्नुहोला: https://Neelamb.com,  मोबाइल नं.+977-9814272487 (<a href="https://wa.me/9779814272487" rel="nofollow" target="_blank">CALL</a>) ✨
                 </marquee>
             </div>
         </div>
