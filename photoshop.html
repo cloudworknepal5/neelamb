@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <title>My Photoshop - Neelamb</title>
+    <title>मेरो फोटोशप - Neelamb.com</title>
     <style>
         @font-face {
             font-family: 'Deepmani';
@@ -10,37 +10,27 @@
             font-weight: normal; font-style: normal;
         }
         body { font-family: 'Segoe UI', sans-serif; background: #ffffff; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* Container styling - Background and borders removed as requested */
         .card { background: transparent; padding: 20px; max-width: 1400px; width: 100%; box-sizing: border-box; }
-        
         .upload-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .box { border: 2px dashed #0984e3; padding: 12px; border-radius: 8px; background: #f8fbff; text-align: center; }
-        
         .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #eee; }
         .full { grid-column: 1 / -1; }
-        
         #captionInput { width: 100%; padding: 12px; border-radius: 6px; border: 2px solid #0984e3; font-family: 'Deepmani', sans-serif; font-size: 26px; box-sizing: border-box; }
-        
         label { font-size: 11px; font-weight: 700; color: #444; display: block; margin-bottom: 5px; text-transform: uppercase; }
         input[type="range"], select, input[type="color"] { width: 100%; cursor: pointer; height: 35px; border: 1px solid #ccc; border-radius: 4px; }
-        
         .nav-section { background: #dfe6e9; padding: 10px; border-radius: 8px; text-align: center; }
         .arrow-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 120px; margin: 0 auto; }
         .arrow-btn { background: #2d3436; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 16px; }
         .arrow-btn:hover { background: #0984e3; }
-        
         #canvas-wrapper { display: flex; justify-content: center; margin: 20px auto; background: #f0f0f0; line-height: 0; max-width: 100%; overflow: auto; border-radius: 8px; }
         canvas { background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        
         .btn-group { display: flex; gap: 10px; grid-column: 1 / -1; }
         .btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; color: white; }
         .btn-save { background: #27ae60; }
         .btn-reset { background: #c0392b; }
-        
         .status-bar { font-size: 13px; background: #ffeaa7; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-weight: bold; text-align: center; color: #2d3436; }
-        
-        footer { margin-top: 30px; padding: 20px; font-weight: bold; color: #636e72; }
+        footer { margin-top: 30px; padding: 20px; font-weight: bold; color: #636e72; text-align: center; }
+        footer a { text-decoration: none; color: #0984e3; }
     </style>
 </head>
 <body>
@@ -63,43 +53,50 @@
         <div>
             <label>प्लेटफर्म र साइजहरू:</label>
             <select id="canvasSize" onchange="canvasManager.changeSize()">
-                <optgroup label="Social Media">
+                <optgroup label="Facebook">
                     <option value="1200x630">FB Shared Link (1200x630)</option>
-                    <option value="1080x1350">Portrait (1080x1350)</option>
-                    <option value="1080x1080">Square (1080x1080)</option>
-                    <option value="1280x720">YouTube Thumbnail</option>
-                    <option value="1080x1920">Story / Reels</option>
+                    <option value="1080x1350">FB Portrait (1080x1350)</option>
+                    <option value="1200x1200">FB Square (1200x1200)</option>
+                </optgroup>
+                <optgroup label="Instagram/TikTok">
+                    <option value="1080x1080">Insta Square (1080x1080)</option>
+                    <option value="1080x1920">Story / Reels (1080x1920)</option>
+                </optgroup>
+                <optgroup label="YouTube">
+                    <option value="1280x720">YT Thumbnail (1280x720)</option>
                 </optgroup>
             </select>
         </div>
 
         <div>
-            <label>अक्षर र स्ट्रोक रङ:</label>
-            <div style="display:flex; gap:10px;">
-                <input type="color" id="textColor" value="#ffffff" oninput="renderEngine.drawAll()">
-                <input type="color" id="strokeColor" value="#000000" oninput="renderEngine.drawAll()">
-            </div>
-            <label style="margin-top:8px;">अक्षर साइज: <span id="fSizeVal">60</span>px</label>
-            <input type="range" id="fontSizeRange" min="10" max="600" value="60" oninput="renderEngine.drawAll()">
+            <label>फोटो साइज (Zoom): <span id="imgScaleVal">100</span>%</label>
+            <input type="range" id="imgScaleRange" min="10" max="500" value="100" oninput="imageHandler.updateScale()">
+        </div>
+
+        <div>
+            <label>डाउनलोड क्वालिटी (KB): <span id="qVal">95</span>%</label>
+            <input type="range" id="qualityRange" min="10" max="100" value="95" oninput="renderEngine.drawAll()">
+            <p style="font-size: 9px; color: #666; margin: 0;">(थोरै % = थोरै KB)</p>
         </div>
 
         <div>
             <label>बोर्डर सेटिङ:</label>
+            <label style="margin-bottom:5px;"><input type="checkbox" id="showBorder" onchange="renderEngine.drawAll()"> बोर्डर अन गर्ने</label>
             <input type="color" id="borderColor" value="#000000" oninput="renderEngine.drawAll()">
-            <label style="margin-top:5px;"><input type="checkbox" id="showBorder" onchange="renderEngine.drawAll()"> बोर्डर अन गर्ने</label>
             <input type="range" id="borderSizeRange" min="1" max="100" value="10" oninput="renderEngine.drawAll()">
         </div>
 
         <div>
-            <label>लोगो सेटिङ:</label>
-            <label>धमिलोपन: <span id="lOpacityVal">100</span>%</label>
-            <input type="range" id="logoOpacityRange" min="0" max="100" value="100" oninput="renderEngine.drawAll()">
-            <label>साइज: <span id="lSizeVal">150</span>px</label>
-            <input type="range" id="logoSizeRange" min="20" max="800" value="150" oninput="renderEngine.drawAll()">
+            <label>अक्षर साइज: <span id="fSizeVal">60</span>px</label>
+            <input type="range" id="fontSizeRange" min="10" max="600" value="60" oninput="renderEngine.drawAll()">
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="color" id="textColor" value="#ffffff" oninput="renderEngine.drawAll()">
+                <input type="color" id="strokeColor" value="#000000" oninput="renderEngine.drawAll()">
+            </div>
         </div>
 
         <div class="nav-section">
-            <label>फोटो स्थान परिवर्तन (Swap)</label>
+            <label>फोटो स्थान (Swap)</label>
             <div class="arrow-pad">
                 <div></div><button class="arrow-btn" onclick="uiManager.shift('up')">▲</button><div></div>
                 <button class="arrow-btn" onclick="uiManager.shift('left')">◀</button>
@@ -109,21 +106,19 @@
         </div>
 
         <div>
-            <label>फोटो ब्राइटनेस: <span id="bVal">100</span>%</label>
+            <label>ब्राइटनेस: <span id="bVal">100</span>%</label>
             <input type="range" id="brightRange" min="20" max="200" value="100" oninput="renderEngine.drawAll()">
         </div>
 
         <div class="btn-group">
-            <button class="btn btn-save" onclick="uiManager.download()">फोटो डाउनलोड</button>
+            <button class="btn btn-save" onclick="downloadEngine.save()">फोटो डाउनलोड</button>
             <button class="btn btn-reset" onclick="uiManager.reset()">रिसेट</button>
         </div>
     </div>
 
     <div id="canvas-wrapper"><canvas id="mainCanvas"></canvas></div>
 
-    <footer style="text-align: center;">
-        DevelopBy: <a href="https://neelamb.com" target="_blank" style="text-decoration: none; color: #0984e3;">Neelamb.com</a>
-    </footer>
+    <footer>DevelopBy: <a href="https://neelamb.com" target="_blank">Neelamb.com</a></footer>
 </div>
 
 <script>
@@ -138,7 +133,6 @@
     let dragInfo = { isDraggingImg: false, selectedIdx: -1, startX: 0, startY: 0 };
     let activeElement = "none";
 
-    // Multi-function Canvas Manager
     const canvasManager = {
         changeSize() {
             const size = document.getElementById('canvasSize').value.split('x');
@@ -150,7 +144,6 @@
         }
     };
 
-    // Multi-function Image Handler
     const imageHandler = {
         async load() {
             const files = document.getElementById('photoPicker').files;
@@ -162,10 +155,10 @@
                     im.onload = () => res(im);
                     im.src = URL.createObjectURL(files[i]);
                 });
-                imgObjects.push({ img, x: 0, y: 0, cellW: 0, cellH: 0, scale: 1 });
+                imgObjects.push({ img, x: 0, y: 0, cellW: 0, cellH: 0, baseScale: 1, userScale: 1 });
             }
             this.refreshScaling();
-            activeElement = 'photo'; dragInfo.selectedIdx = 0;
+            dragInfo.selectedIdx = 0; activeElement = 'photo';
             renderEngine.drawAll();
         },
         refreshScaling() {
@@ -174,8 +167,15 @@
                 if (imgObjects.length === 2) cellW = CW / 2;
                 else if (imgObjects.length >= 3) { cellW = CW / 2; cellH = CH / 2; }
                 obj.cellW = cellW; obj.cellH = cellH;
-                obj.scale = Math.max(cellW / obj.img.width, cellH / obj.img.height);
+                obj.baseScale = Math.max(cellW / obj.img.width, cellH / obj.img.height);
             });
+        },
+        updateScale() {
+            if (dragInfo.selectedIdx === -1 || !imgObjects[dragInfo.selectedIdx]) return;
+            const val = document.getElementById('imgScaleRange').value;
+            imgObjects[dragInfo.selectedIdx].userScale = val / 100;
+            document.getElementById('imgScaleVal').innerText = val;
+            renderEngine.drawAll();
         }
     };
 
@@ -193,21 +193,16 @@
         }
     };
 
-    // Rendering Engine with conditional Grid/Border logic
     const renderEngine = {
         drawAll() {
             const bSize = parseInt(document.getElementById('borderSizeRange').value);
             const bColor = document.getElementById('borderColor').value;
             const isBorderOn = document.getElementById('showBorder').checked;
-            const lSize = parseInt(document.getElementById('logoSizeRange').value);
-            const lOpacity = parseInt(document.getElementById('logoOpacityRange').value);
             const fSize = parseInt(document.getElementById('fontSizeRange').value);
-            const tColor = document.getElementById('textColor').value;
-            const sColor = document.getElementById('strokeColor').value;
             const bright = document.getElementById('brightRange').value;
+            const quality = document.getElementById('qualityRange').value;
 
-            document.getElementById('lSizeVal').innerText = lSize;
-            document.getElementById('lOpacityVal').innerText = lOpacity;
+            document.getElementById('qVal').innerText = quality;
             document.getElementById('fSizeVal').innerText = fSize;
             document.getElementById('bVal').innerText = bright;
 
@@ -217,49 +212,40 @@
                 let dx = 0, dy = 0;
                 if (imgObjects.length === 2) dx = i * obj.cellW;
                 else if (imgObjects.length >= 3) { dx = (i % 2) * obj.cellW; dy = Math.floor(i / 2) * obj.cellH; }
-                
                 ctx.save();
                 ctx.beginPath(); ctx.rect(dx, dy, obj.cellW, obj.cellH); ctx.clip();
                 ctx.filter = `brightness(${bright}%)`;
-                ctx.drawImage(obj.img, dx + obj.x, dy + obj.y, obj.img.width * obj.scale, obj.img.height * obj.scale);
-                
-                // Highlight selected photo for editing
+                const finalScale = obj.baseScale * obj.userScale;
+                ctx.drawImage(obj.img, dx + obj.x, dy + obj.y, obj.img.width * finalScale, obj.img.height * finalScale);
                 if(activeElement === 'photo' && dragInfo.selectedIdx === i) {
-                    ctx.strokeStyle = "rgba(9, 132, 227, 0.5)"; ctx.lineWidth = 5; ctx.strokeRect(dx, dy, obj.cellW, obj.cellH);
+                    ctx.strokeStyle = "rgba(9, 132, 227, 0.5)"; ctx.lineWidth = 6; ctx.strokeRect(dx, dy, obj.cellW, obj.cellH);
                 }
                 ctx.restore();
             });
 
-            // Drawing Logo
             if (logoObj.img) {
+                const lSize = parseInt(document.getElementById('logoSizeRange').value);
+                const lOpacity = parseInt(document.getElementById('logoOpacityRange').value);
                 const ratio = logoObj.img.width / logoObj.img.height;
                 logoObj.w = lSize; logoObj.h = lSize / ratio;
-                ctx.save();
-                ctx.globalAlpha = lOpacity / 100;
+                ctx.save(); ctx.globalAlpha = lOpacity / 100;
                 ctx.drawImage(logoObj.img, logoObj.x, logoObj.y, logoObj.w, logoObj.h);
                 ctx.restore();
             }
 
-            // Drawing Text
             textObj.text = document.getElementById('captionInput').value;
             if (textObj.text) {
-                ctx.save();
-                ctx.font = `${fSize}px 'Deepmani'`;
-                ctx.textAlign = "center";
-                ctx.lineWidth = fSize/4.5; ctx.strokeStyle = sColor;
+                ctx.save(); ctx.font = `${fSize}px 'Deepmani'`; ctx.textAlign = "center";
+                ctx.lineWidth = fSize/4.5; ctx.strokeStyle = document.getElementById('strokeColor').value;
                 ctx.strokeText(textObj.text, textObj.x, textObj.y);
-                ctx.fillStyle = tColor;
-                ctx.fillText(textObj.text, textObj.x, textObj.y);
-                ctx.restore();
+                ctx.fillStyle = document.getElementById('textColor').value;
+                ctx.fillText(textObj.text, textObj.x, textObj.y); ctx.restore();
             }
 
-            // Conditional Border and Grid Rendering (Only if checked)
             if (isBorderOn) {
                 ctx.strokeStyle = bColor; ctx.lineWidth = bSize;
                 ctx.strokeRect(bSize/2, bSize/2, CW - bSize, CH - bSize);
-                if (imgObjects.length === 2) { 
-                    ctx.beginPath(); ctx.moveTo(CW/2, 0); ctx.lineTo(CW/2, CH); ctx.stroke(); 
-                }
+                if (imgObjects.length === 2) { ctx.beginPath(); ctx.moveTo(CW/2, 0); ctx.lineTo(CW/2, CH); ctx.stroke(); }
                 else if (imgObjects.length >= 3) {
                     ctx.beginPath(); ctx.moveTo(CW/2, 0); ctx.lineTo(CW/2, CH); ctx.stroke();
                     ctx.beginPath(); ctx.moveTo(0, CH/2); ctx.lineTo(CW, CH/2); ctx.stroke();
@@ -268,37 +254,36 @@
         }
     };
 
+    // Multi-function Download Engine for Quality Control
+    const downloadEngine = {
+        save() {
+            const quality = parseInt(document.getElementById('qualityRange').value) / 100;
+            const link = document.createElement('a');
+            link.download = `Neelamb_${Date.now()}.jpg`;
+            // quality parameter (0.1 to 1.0) directly affects KB size
+            link.href = canvas.toDataURL('image/jpeg', quality);
+            link.click();
+            status.innerText = "फोटो डाउनलोड भयो। क्वालिटी: " + (quality * 100) + "%";
+        }
+    };
+
     const uiManager = {
         shift(dir) {
             if (imgObjects.length < 2 || dragInfo.selectedIdx === -1) return;
-            let current = dragInfo.selectedIdx;
-            let target = -1;
-
-            if (imgObjects.length === 2) {
-                target = (current === 0) ? 1 : 0;
-            } else if (imgObjects.length >= 3) {
+            let current = dragInfo.selectedIdx, target = -1;
+            if (imgObjects.length === 2) target = (current === 0) ? 1 : 0;
+            else if (imgObjects.length >= 3) {
                 if(dir === 'right' && current % 2 === 0) target = current + 1;
                 if(dir === 'left' && current % 2 === 1) target = current - 1;
                 if(dir === 'down' && current < 2) target = current + 2;
                 if(dir === 'up' && current >= 2) target = current - 2;
             }
-
             if (target !== -1 && imgObjects[target]) {
-                let temp = imgObjects[current];
-                imgObjects[current] = imgObjects[target];
-                imgObjects[target] = temp;
-                dragInfo.selectedIdx = target;
-                imageHandler.refreshScaling();
-                renderEngine.drawAll();
-                status.innerText = "फोटोको स्थान परिवर्तन गरियो।";
+                let temp = imgObjects[current]; imgObjects[current] = imgObjects[target]; imgObjects[target] = temp;
+                dragInfo.selectedIdx = target; imageHandler.refreshScaling(); renderEngine.drawAll();
             }
         },
-        download() {
-            const link = document.createElement('a');
-            link.download = `Neelamb_Edit_${Date.now()}.jpg`;
-            link.href = canvas.toDataURL('image/jpeg', 0.95); link.click();
-        },
-        reset() { if(confirm("के तपाइँ सबै रिसेट गर्न चाहनुहुन्छ?")) location.reload(); }
+        reset() { if(confirm("के सबै रिसेट गर्ने हो?")) location.reload(); }
     };
 
     function getPos(e) {
@@ -321,7 +306,8 @@
                 else if (imgObjects.length >= 3) { dx = (i % 2) * obj.cellW; dy = Math.floor(i / 2) * obj.cellH; }
                 if (x >= dx && x <= dx + obj.cellW && y >= dy && y <= dy + obj.cellH) {
                     dragInfo.selectedIdx = i; dragInfo.isDraggingImg = true; activeElement = 'photo';
-                    status.innerText = `फोटो ${i+1} छानियो। माउसले तान्नुहोस् वा एरो बटन थिच्नुहोस्।`;
+                    document.getElementById('imgScaleRange').value = obj.userScale * 100;
+                    document.getElementById('imgScaleVal').innerText = Math.round(obj.userScale * 100);
                 }
             });
         }
@@ -331,7 +317,7 @@
     function onMove(e) {
         if (!logoObj.isDragging && !textObj.isDragging && !dragInfo.isDraggingImg) return;
         const { x, y } = getPos(e);
-        const dx = x - dragInfo.startX; const dy = y - dragInfo.startY;
+        const dx = x - dragInfo.startX, dy = y - dragInfo.startY;
         if (logoObj.isDragging) { logoObj.x += dx; logoObj.y += dy; }
         else if (textObj.isDragging) { textObj.x += dx; textObj.y += dy; }
         else if (dragInfo.isDraggingImg) { imgObjects[dragInfo.selectedIdx].x += dx; imgObjects[dragInfo.selectedIdx].y += dy; }
@@ -341,13 +327,8 @@
 
     function onUp() { logoObj.isDragging = false; textObj.isDragging = false; dragInfo.isDraggingImg = false; }
 
-    canvas.addEventListener('mousedown', onDown);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    canvas.addEventListener('touchstart', onDown, { passive: false });
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend', onUp);
-
+    canvas.addEventListener('mousedown', onDown); window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
+    canvas.addEventListener('touchstart', onDown, { passive: false }); window.addEventListener('touchmove', onMove, { passive: false }); window.addEventListener('touchend', onUp);
     canvas.width = CW; canvas.height = CH;
     document.fonts.load("24px 'Deepmani'").then(() => renderEngine.drawAll());
 </script>
