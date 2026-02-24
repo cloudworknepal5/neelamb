@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <title>My-photoshop</title>
+    <title>My Photoshop</title>
     <style>
         @font-face {
             font-family: 'Deepmani';
@@ -18,7 +18,6 @@
             flex-direction: column; 
             align-items: center; 
         }
-        /* कार्डको चौडाइ १४०० पिक्सल बनाइएको छ */
         .card { 
             background: white; 
             padding: 25px; 
@@ -61,20 +60,31 @@
         .btn-group { display: flex; gap: 15px; grid-column: span 4; }
         .btn { flex: 1; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; }
         .btn-save { background: #00b894; color: white; }
-        .btn-save:hover { background: #00a082; }
         .btn-reset { background: #d63031; color: white; }
-        .btn-reset:hover { background: #b32626; }
+
+        /* फुटर स्टाइल */
+        footer {
+            margin-top: 30px;
+            padding: 20px;
+            color: #636e72;
+            font-size: 14px;
+            border-top: 1px solid #dfe6e9;
+            width: 100%;
+            max-width: 1400px;
+            text-align: center;
+        }
+        footer a { color: #0984e3; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h1 style="font-family: 'Deepmani', sans-serif; color: #2d3436; margin-bottom: 10px;">मेरो फोटोशप</h1>
-    <p class="info-text">🚀 <b>Quick Tips:</b> फोटो साट्न <b>Double Click</b> गर्नुहोस् | फोटो भित्र मिलाउन माउसले थिचेर तान्नुहोस् ।</p>
+    <p class="info-text">🚀 <b>Quick Tips:</b> फेसबुक साइज डिफल्ट सेट गरिएको छ | फोटो साट्न <b>Double Click</b> गर्नुहोस् ।</p>
     
     <div class="upload-section">
         <div class="box">
-            <label>फोटोहरू अपलोड (१ देखि ४ वटा):</label>
+            <label>फोटोहरू अपलोड (१-४ वटा):</label>
             <input type="file" id="photoPicker" accept="image/*" multiple onchange="loadImages()">
         </div>
         <div class="box">
@@ -85,16 +95,16 @@
 
     <div class="controls">
         <div class="full">
-            <label>यहाँ टाइप गर्नुहोस् (दिपमनी फन्टमा):</label>
+            <label>यहाँ टाइप गर्नुहोस् (दिपमनी फन्ट):</label>
             <input type="text" id="captionInput" placeholder="klkdf] k|of]u u/L n]Vg'xf];\ .." oninput="drawAll()">
         </div>
         
         <div>
             <label>इमेज साइज (Ratio):</label>
             <select id="canvasSize" onchange="changeCanvasSize()">
-                <option value="800x450">800 x 450 (Standard)</option>
-                <option value="1200x630">1200 x 630 (FB Shared)</option>
-                <option value="600x315">600 x 315 (FB Small)</option>
+                <option value="1200x630">1200 x 630 (Facebook Standard)</option>
+                <option value="600x315">600 x 315 (Facebook Small)</option>
+                <option value="800x450">800 x 450 (Standard HD)</option>
                 <option value="1200x800">1200 x 800 (Large)</option>
                 <option value="700x350">700 x 350 (Banner)</option>
             </select>
@@ -138,17 +148,22 @@
     <div id="canvas-wrapper">
         <canvas id="mainCanvas"></canvas>
     </div>
+
+    <footer>
+        &copy; 2026 सर्वाधिकार सुरक्षित | डिजाइन तथा विकास: <a href="https://neelamb.com" target="_blank">neelamb.com</a>
+    </footer>
 </div>
 
 <script>
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
     
-    let CW = 800, CH = 450;
+    // डिफल्ट साइज १२४०x६३० बनाइएको छ
+    let CW = 1200, CH = 630;
     canvas.width = CW; canvas.height = CH;
 
     let imgObjects = [];
-    let textObj = { text: "", x: 400, y: 380, isDragging: false };
+    let textObj = { text: "", x: CW/2, y: CH-70, isDragging: false };
     let logoObj = { img: null, x: 20, y: 20, w: 100, h: 100, isDragging: false };
     let isDraggingImg = false, selectedImgIdx = -1, startX, startY;
     let swapSourceIdx = -1;
@@ -162,16 +177,12 @@
         drawAll();
     }
 
-    // "Multi-function" Scaling logic to prevent white gaps
     function refreshImageScaling() {
         imgObjects.forEach((obj, i) => {
             let cellW = CW, cellH = CH;
             if (imgObjects.length === 2) cellW = CW / 2;
             else if (imgObjects.length >= 3) { cellW = CW / 2; cellH = CH / 2; }
-            
-            obj.cellW = cellW;
-            obj.cellH = cellH;
-            // Cover logic
+            obj.cellW = cellW; obj.cellH = cellH;
             obj.scale = Math.max(cellW / obj.img.width, cellH / obj.img.height);
         });
     }
@@ -215,17 +226,13 @@
 
         ctx.clearRect(0, 0, CW, CH);
         
-        // १. फोटोहरू लेयर
         imgObjects.forEach((obj, i) => {
             let dx = 0, dy = 0;
             if (imgObjects.length === 2) dx = i * obj.cellW;
             else if (imgObjects.length >= 3) { dx = (i % 2) * obj.cellW; dy = Math.floor(i / 2) * obj.cellH; }
             
             ctx.save();
-            ctx.beginPath();
-            ctx.rect(dx, dy, obj.cellW, obj.cellH);
-            ctx.clip();
-
+            ctx.beginPath(); ctx.rect(dx, dy, obj.cellW, obj.cellH); ctx.clip();
             ctx.filter = `brightness(${document.getElementById('brightRange').value}%)`;
             ctx.drawImage(obj.img, dx + obj.x, dy + obj.y, obj.img.width * obj.scale, obj.img.height * obj.scale);
             
@@ -237,7 +244,6 @@
             ctx.restore();
         });
 
-        // २. लोगो लेयर
         if (logoObj.img) {
             const lSize = document.getElementById('logoSizeRange').value;
             const ratio = logoObj.img.width / logoObj.img.height;
@@ -245,7 +251,6 @@
             ctx.drawImage(logoObj.img, logoObj.x, logoObj.y, logoObj.w, logoObj.h);
         }
 
-        // ३. अक्षर लेयर
         textObj.text = document.getElementById('captionInput').value;
         if (textObj.text) {
             const fSize = parseInt(document.getElementById('fontSizeRange').value);
@@ -258,7 +263,6 @@
             ctx.fillText(textObj.text, textObj.x, textObj.y);
         }
 
-        // ४. बोर्डर लेयर (Top Index)
         if (hasBorder) {
             ctx.strokeStyle = "black";
             ctx.lineWidth = bSize;
@@ -272,19 +276,16 @@
         }
     }
 
-    // Drag and Swap Functions
     canvas.ondblclick = (e) => {
         const rect = canvas.getBoundingClientRect();
         const mx = (e.clientX - rect.left) * (CW / rect.width);
         const my = (e.clientY - rect.top) * (CH / rect.height);
-
         imgObjects.forEach((obj, i) => {
             let dx = 0, dy = 0;
             if (imgObjects.length === 2) dx = i * obj.cellW;
             else if (imgObjects.length >= 3) { dx = (i % 2) * obj.cellW; dy = Math.floor(i / 2) * obj.cellH; }
             if (mx >= dx && mx <= dx + obj.cellW && my >= dy && my <= dy + obj.cellH) {
-                swapSourceIdx = i;
-                drawAll();
+                swapSourceIdx = i; drawAll();
             }
         });
     };
@@ -307,9 +308,7 @@
                 imgObjects[swapSourceIdx] = imgObjects[targetIdx];
                 imgObjects[targetIdx] = temp;
                 swapSourceIdx = -1;
-                refreshImageScaling();
-                drawAll();
-                return;
+                refreshImageScaling(); drawAll(); return;
             }
         }
 
@@ -353,13 +352,12 @@
 
     function downloadJPG() {
         const link = document.createElement('a');
-        const ts = new Date().getTime();
-        link.download = `Deepmani_HQ_${ts}.jpg`;
+        link.download = `Photo_Edit_${Date.now()}.jpg`;
         link.href = canvas.toDataURL('image/jpeg', 0.98);
         link.click();
     }
 
-    function resetAll() { if(confirm("के तपाईं सबै सेटिङ रिसेट गर्न चाहनुहुन्छ?")) location.reload(); }
+    function resetAll() { if(confirm("सबै सेटिङ रिसेट गर्ने?")) location.reload(); }
     document.fonts.load("24px 'Deepmani'").then(() => drawAll());
 </script>
 </body>
