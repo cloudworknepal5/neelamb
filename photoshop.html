@@ -11,23 +11,31 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background: #ffffff; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         .card { background: transparent; padding: 20px; max-width: 1400px; width: 100%; box-sizing: border-box; }
+        
+        /* Multi-section Layout */
         .upload-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .box { border: 2px dashed #0984e3; padding: 12px; border-radius: 8px; background: #f8fbff; text-align: center; }
-        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #eee; }
+        
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #eee; }
         .full { grid-column: 1 / -1; }
+        
         #captionInput { width: 100%; padding: 12px; border-radius: 6px; border: 2px solid #0984e3; font-family: 'Deepmani', sans-serif; font-size: 26px; box-sizing: border-box; }
+        
         label { font-size: 11px; font-weight: 700; color: #444; display: block; margin-bottom: 5px; text-transform: uppercase; }
         input[type="range"], select, input[type="color"] { width: 100%; cursor: pointer; height: 35px; border: 1px solid #ccc; border-radius: 4px; }
+        
         .nav-section { background: #dfe6e9; padding: 10px; border-radius: 8px; text-align: center; }
         .arrow-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 120px; margin: 0 auto; }
         .arrow-btn { background: #2d3436; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 16px; }
-        .arrow-btn:hover { background: #0984e3; }
+        
         #canvas-wrapper { display: flex; justify-content: center; margin: 20px auto; background: #f0f0f0; line-height: 0; max-width: 100%; overflow: auto; border-radius: 8px; }
         canvas { background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
         .btn-group { display: flex; gap: 10px; grid-column: 1 / -1; }
         .btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; color: white; }
         .btn-save { background: #27ae60; }
         .btn-reset { background: #c0392b; }
+        
         .status-bar { font-size: 13px; background: #ffeaa7; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-weight: bold; text-align: center; color: #2d3436; }
         footer { margin-top: 30px; padding: 20px; font-weight: bold; color: #636e72; text-align: center; }
         footer a { text-decoration: none; color: #0984e3; }
@@ -37,7 +45,7 @@
 
 <div class="card">
     <h2 style="text-align:center; margin: 0 0 15px 0;">मेरो फोटोशप</h2>
-    <div class="status-bar" id="statusBar">फोटो छान्नुहोस् र सम्पादन सुरु गर्नुहोस्।</div>
+    <div class="status-bar" id="statusBar">फोटो र लोगो छान्नुहोस्।</div>
 
     <div class="upload-section">
         <div class="box"><label>फोटोहरू (१-४ सम्म):</label><input type="file" id="photoPicker" accept="image/*" multiple onchange="imageHandler.load()"></div>
@@ -46,7 +54,7 @@
 
     <div class="controls">
         <div class="full">
-            <label>अक्षर लेख्नुहोस् (दिपमनी):</label>
+            <label>अक्षर लेख्नुहोस् (दिपमनी फन्ट):</label>
             <input type="text" id="captionInput" placeholder="यहाँ केही लेख्नुहोस्..." oninput="renderEngine.drawAll()">
         </div>
 
@@ -57,46 +65,61 @@
                     <option value="1200x630">FB Shared Link (1200x630)</option>
                     <option value="1080x1350">FB Portrait (1080x1350)</option>
                     <option value="1200x1200">FB Square (1200x1200)</option>
-                </optgroup>
-                <optgroup label="Instagram/TikTok">
-                    <option value="1080x1080">Insta Square (1080x1080)</option>
-                    <option value="1080x1920">Story / Reels (1080x1920)</option>
+                    <option value="820x312">FB Cover (820x312)</option>
                 </optgroup>
                 <optgroup label="YouTube">
                     <option value="1280x720">YT Thumbnail (1280x720)</option>
+                    <option value="2560x1440">YT Channel Art (2560x1440)</option>
+                </optgroup>
+                <optgroup label="Instagram">
+                    <option value="1080x1080">Insta Square (1080x1080)</option>
+                    <option value="1080x1350">Insta Portrait (1080x1350)</option>
+                    <option value="1080x1920">Insta Story / Reels (1080x1920)</option>
+                </optgroup>
+                <optgroup label="TikTok/WhatsApp">
+                    <option value="1080x1920">TikTok Video (1080x1920)</option>
+                    <option value="800x800">WA Status Square (800x800)</option>
+                    <option value="750x1334">WA Status Full (750x1334)</option>
+                </optgroup>
+                <optgroup label="Custom">
+                    <option value="1920x1080">Full HD (1920x1080)</option>
+                    <option value="1000x1000">1:1 Standard (1000x1000)</option>
                 </optgroup>
             </select>
         </div>
 
         <div>
-            <label>फोटो साइज (Zoom): <span id="imgScaleVal">100</span>%</label>
-            <input type="range" id="imgScaleRange" min="10" max="500" value="100" oninput="imageHandler.updateScale()">
-        </div>
-
-        <div>
-            <label>डाउनलोड क्वालिटी (KB): <span id="qVal">95</span>%</label>
-            <input type="range" id="qualityRange" min="10" max="100" value="95" oninput="renderEngine.drawAll()">
-            <p style="font-size: 9px; color: #666; margin: 0;">(थोरै % = थोरै KB)</p>
-        </div>
-
-        <div>
-            <label>बोर्डर सेटिङ:</label>
-            <label style="margin-bottom:5px;"><input type="checkbox" id="showBorder" onchange="renderEngine.drawAll()"> बोर्डर अन गर्ने</label>
-            <input type="color" id="borderColor" value="#000000" oninput="renderEngine.drawAll()">
-            <input type="range" id="borderSizeRange" min="1" max="100" value="10" oninput="renderEngine.drawAll()">
+            <label>लोगो साइज: <span id="lSizeVal">150</span>px</label>
+            <input type="range" id="logoSizeRange" min="20" max="800" value="150" oninput="renderEngine.drawAll()">
+            <label style="margin-top:8px;">लोगो धमिलोपन: <span id="lOpacityVal">100</span>%</label>
+            <input type="range" id="logoOpacityRange" min="0" max="100" value="100" oninput="renderEngine.drawAll()">
         </div>
 
         <div>
             <label>अक्षर साइज: <span id="fSizeVal">60</span>px</label>
             <input type="range" id="fontSizeRange" min="10" max="600" value="60" oninput="renderEngine.drawAll()">
             <div style="display:flex; gap:5px; margin-top:5px;">
-                <input type="color" id="textColor" value="#ffffff" oninput="renderEngine.drawAll()">
-                <input type="color" id="strokeColor" value="#000000" oninput="renderEngine.drawAll()">
+                <input type="color" id="textColor" value="#ffffff" title="अक्षरको रङ" oninput="renderEngine.drawAll()">
+                <input type="color" id="strokeColor" value="#000000" title="बोर्डरको रङ" oninput="renderEngine.drawAll()">
             </div>
         </div>
 
+        <div>
+            <label>छानिएको फोटो Zoom: <span id="imgScaleVal">100</span>%</label>
+            <input type="range" id="imgScaleRange" min="10" max="500" value="100" oninput="imageHandler.updateScale()">
+            <label style="margin-top:8px;">डाउनलोड क्वालिटी (KB): <span id="qVal">95</span>%</label>
+            <input type="range" id="qualityRange" min="10" max="100" value="95" oninput="renderEngine.drawAll()">
+        </div>
+
+        <div>
+            <label>बोर्डर सेटिङ:</label>
+            <label style="margin-bottom:5px; display:flex; align-items:center;"><input type="checkbox" id="showBorder" onchange="renderEngine.drawAll()" style="width:20px; height:20px;"> &nbsp; बोर्डर/ग्रिड अन</label>
+            <input type="color" id="borderColor" value="#000000" oninput="renderEngine.drawAll()">
+            <input type="range" id="borderSizeRange" min="1" max="100" value="10" oninput="renderEngine.drawAll()">
+        </div>
+
         <div class="nav-section">
-            <label>फोटो स्थान (Swap)</label>
+            <label>फोटो स्थान परिवर्तन</label>
             <div class="arrow-pad">
                 <div></div><button class="arrow-btn" onclick="uiManager.shift('up')">▲</button><div></div>
                 <button class="arrow-btn" onclick="uiManager.shift('left')">◀</button>
@@ -112,7 +135,7 @@
 
         <div class="btn-group">
             <button class="btn btn-save" onclick="downloadEngine.save()">फोटो डाउनलोड</button>
-            <button class="btn btn-reset" onclick="uiManager.reset()">रिसेट</button>
+            <button class="btn btn-reset" onclick="uiManager.reset()">सबै रिसेट</button>
         </div>
     </div>
 
@@ -133,6 +156,7 @@
     let dragInfo = { isDraggingImg: false, selectedIdx: -1, startX: 0, startY: 0 };
     let activeElement = "none";
 
+    // 1. Canvas Size Manager
     const canvasManager = {
         changeSize() {
             const size = document.getElementById('canvasSize').value.split('x');
@@ -144,6 +168,7 @@
         }
     };
 
+    // 2. Image Handler (Load & Zoom)
     const imageHandler = {
         async load() {
             const files = document.getElementById('photoPicker').files;
@@ -179,6 +204,7 @@
         }
     };
 
+    // 3. Logo Handler
     const logoHandler = {
         load() {
             const file = document.getElementById('logoPicker').files[0];
@@ -193,21 +219,27 @@
         }
     };
 
+    // 4. Render Engine (Drawing Logic)
     const renderEngine = {
         drawAll() {
             const bSize = parseInt(document.getElementById('borderSizeRange').value);
             const bColor = document.getElementById('borderColor').value;
             const isBorderOn = document.getElementById('showBorder').checked;
             const fSize = parseInt(document.getElementById('fontSizeRange').value);
+            const lSize = parseInt(document.getElementById('logoSizeRange').value);
+            const lOpacity = parseInt(document.getElementById('logoOpacityRange').value);
             const bright = document.getElementById('brightRange').value;
             const quality = document.getElementById('qualityRange').value;
 
-            document.getElementById('qVal').innerText = quality;
+            document.getElementById('lSizeVal').innerText = lSize;
+            document.getElementById('lOpacityVal').innerText = lOpacity;
             document.getElementById('fSizeVal').innerText = fSize;
             document.getElementById('bVal').innerText = bright;
+            document.getElementById('qVal').innerText = quality;
 
             ctx.clearRect(0, 0, CW, CH);
 
+            // Draw Images
             imgObjects.forEach((obj, i) => {
                 let dx = 0, dy = 0;
                 if (imgObjects.length === 2) dx = i * obj.cellW;
@@ -223,9 +255,8 @@
                 ctx.restore();
             });
 
+            // Draw Logo
             if (logoObj.img) {
-                const lSize = parseInt(document.getElementById('logoSizeRange').value);
-                const lOpacity = parseInt(document.getElementById('logoOpacityRange').value);
                 const ratio = logoObj.img.width / logoObj.img.height;
                 logoObj.w = lSize; logoObj.h = lSize / ratio;
                 ctx.save(); ctx.globalAlpha = lOpacity / 100;
@@ -233,6 +264,7 @@
                 ctx.restore();
             }
 
+            // Draw Text (Caption)
             textObj.text = document.getElementById('captionInput').value;
             if (textObj.text) {
                 ctx.save(); ctx.font = `${fSize}px 'Deepmani'`; ctx.textAlign = "center";
@@ -242,7 +274,9 @@
                 ctx.fillText(textObj.text, textObj.x, textObj.y); ctx.restore();
             }
 
+            // Draw Border/Grid
             if (isBorderOn) {
+                ctx.save();
                 ctx.strokeStyle = bColor; ctx.lineWidth = bSize;
                 ctx.strokeRect(bSize/2, bSize/2, CW - bSize, CH - bSize);
                 if (imgObjects.length === 2) { ctx.beginPath(); ctx.moveTo(CW/2, 0); ctx.lineTo(CW/2, CH); ctx.stroke(); }
@@ -250,23 +284,24 @@
                     ctx.beginPath(); ctx.moveTo(CW/2, 0); ctx.lineTo(CW/2, CH); ctx.stroke();
                     ctx.beginPath(); ctx.moveTo(0, CH/2); ctx.lineTo(CW, CH/2); ctx.stroke();
                 }
+                ctx.restore();
             }
         }
     };
 
-    // Multi-function Download Engine for Quality Control
+    // 5. Download Engine (KB Quality Control)
     const downloadEngine = {
         save() {
             const quality = parseInt(document.getElementById('qualityRange').value) / 100;
             const link = document.createElement('a');
-            link.download = `Neelamb_${Date.now()}.jpg`;
-            // quality parameter (0.1 to 1.0) directly affects KB size
+            link.download = `Neelamb_Photo_${Date.now()}.jpg`;
             link.href = canvas.toDataURL('image/jpeg', quality);
             link.click();
-            status.innerText = "फोटो डाउनलोड भयो। क्वालिटी: " + (quality * 100) + "%";
+            status.innerText = "फोटो डाउनलोड भयो!";
         }
     };
 
+    // 6. UI Manager (Swap & Reset)
     const uiManager = {
         shift(dir) {
             if (imgObjects.length < 2 || dragInfo.selectedIdx === -1) return;
@@ -283,9 +318,10 @@
                 dragInfo.selectedIdx = target; imageHandler.refreshScaling(); renderEngine.drawAll();
             }
         },
-        reset() { if(confirm("के सबै रिसेट गर्ने हो?")) location.reload(); }
+        reset() { if(confirm("के सबै सफा गर्ने हो?")) location.reload(); }
     };
 
+    // Mouse & Touch Events
     function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
@@ -329,6 +365,7 @@
 
     canvas.addEventListener('mousedown', onDown); window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
     canvas.addEventListener('touchstart', onDown, { passive: false }); window.addEventListener('touchmove', onMove, { passive: false }); window.addEventListener('touchend', onUp);
+    
     canvas.width = CW; canvas.height = CH;
     document.fonts.load("24px 'Deepmani'").then(() => renderEngine.drawAll());
 </script>
