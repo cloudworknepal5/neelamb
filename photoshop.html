@@ -2,6 +2,7 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>मेरो फोटोशप - Neelamb.com</title>
     <style>
         @font-face {
@@ -9,14 +10,14 @@
             src: url('Deepmani.ttf') format('truetype');
             font-weight: normal; font-style: normal;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: #ffffff; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: transparent; padding: 20px; max-width: 1400px; width: 100%; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #ffffff; padding: 10px; display: flex; flex-direction: column; align-items: center; margin: 0; }
+        .card { background: transparent; padding: 10px; max-width: 1400px; width: 100%; box-sizing: border-box; }
         
         /* Multi-section Layout */
-        .upload-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .upload-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
         .box { border: 2px dashed #0984e3; padding: 12px; border-radius: 8px; background: #f8fbff; text-align: center; }
         
-        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #eee; }
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #eee; }
         .full { grid-column: 1 / -1; }
         
         #captionInput { width: 100%; padding: 12px; border-radius: 6px; border: 2px solid #0984e3; font-family: 'Deepmani', sans-serif; font-size: 26px; box-sizing: border-box; }
@@ -29,7 +30,7 @@
         .arrow-btn { background: #2d3436; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 16px; }
         
         #canvas-wrapper { display: flex; justify-content: center; margin: 20px auto; background: #f0f0f0; line-height: 0; max-width: 100%; overflow: auto; border-radius: 8px; }
-        canvas { background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        canvas { background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-width: 100%; height: auto !important; }
         
         .btn-group { display: flex; gap: 10px; grid-column: 1 / -1; }
         .btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; color: white; }
@@ -39,6 +40,13 @@
         .status-bar { font-size: 13px; background: #ffeaa7; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-weight: bold; text-align: center; color: #2d3436; }
         footer { margin-top: 30px; padding: 20px; font-weight: bold; color: #636e72; text-align: center; }
         footer a { text-decoration: none; color: #0984e3; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .controls { grid-template-columns: 1fr; }
+            .btn-group { flex-direction: column; }
+            #captionInput { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -107,7 +115,7 @@
         <div>
             <label>छानिएको फोटो Zoom: <span id="imgScaleVal">100</span>%</label>
             <input type="range" id="imgScaleRange" min="10" max="500" value="100" oninput="imageHandler.updateScale()">
-            <label style="margin-top:8px;">डाउनलोड क्वालिटी (KB): <span id="qVal">95</span>%</label>
+            <label style="margin-top:8px;">डाउनलोड क्वालिटी: <span id="qVal">95</span>%</label>
             <input type="range" id="qualityRange" min="10" max="100" value="95" oninput="renderEngine.drawAll()">
         </div>
 
@@ -156,7 +164,6 @@
     let dragInfo = { isDraggingImg: false, selectedIdx: -1, startX: 0, startY: 0 };
     let activeElement = "none";
 
-    // 1. Canvas Size Manager
     const canvasManager = {
         changeSize() {
             const size = document.getElementById('canvasSize').value.split('x');
@@ -168,7 +175,6 @@
         }
     };
 
-    // 2. Image Handler (Load & Zoom)
     const imageHandler = {
         async load() {
             const files = document.getElementById('photoPicker').files;
@@ -204,7 +210,6 @@
         }
     };
 
-    // 3. Logo Handler
     const logoHandler = {
         load() {
             const file = document.getElementById('logoPicker').files[0];
@@ -219,9 +224,8 @@
         }
     };
 
-    // 4. Render Engine (Drawing Logic)
     const renderEngine = {
-        drawAll() {
+        drawAll(isPrinting = false) {
             const bSize = parseInt(document.getElementById('borderSizeRange').value);
             const bColor = document.getElementById('borderColor').value;
             const isBorderOn = document.getElementById('showBorder').checked;
@@ -231,15 +235,16 @@
             const bright = document.getElementById('brightRange').value;
             const quality = document.getElementById('qualityRange').value;
 
-            document.getElementById('lSizeVal').innerText = lSize;
-            document.getElementById('lOpacityVal').innerText = lOpacity;
-            document.getElementById('fSizeVal').innerText = fSize;
-            document.getElementById('bVal').innerText = bright;
-            document.getElementById('qVal').innerText = quality;
+            if(!isPrinting){
+                document.getElementById('lSizeVal').innerText = lSize;
+                document.getElementById('lOpacityVal').innerText = lOpacity;
+                document.getElementById('fSizeVal').innerText = fSize;
+                document.getElementById('bVal').innerText = bright;
+                document.getElementById('qVal').innerText = quality;
+            }
 
             ctx.clearRect(0, 0, CW, CH);
 
-            // Draw Images
             imgObjects.forEach((obj, i) => {
                 let dx = 0, dy = 0;
                 if (imgObjects.length === 2) dx = i * obj.cellW;
@@ -249,13 +254,14 @@
                 ctx.filter = `brightness(${bright}%)`;
                 const finalScale = obj.baseScale * obj.userScale;
                 ctx.drawImage(obj.img, dx + obj.x, dy + obj.y, obj.img.width * finalScale, obj.img.height * finalScale);
-                if(activeElement === 'photo' && dragInfo.selectedIdx === i) {
-                    ctx.strokeStyle = "rgba(9, 132, 227, 0.5)"; ctx.lineWidth = 6; ctx.strokeRect(dx, dy, obj.cellW, obj.cellH);
+                
+                // Only show blue selection border if NOT printing/saving
+                if(!isPrinting && activeElement === 'photo' && dragInfo.selectedIdx === i) {
+                    ctx.strokeStyle = "rgba(9, 132, 227, 0.8)"; ctx.lineWidth = 8; ctx.strokeRect(dx, dy, obj.cellW, obj.cellH);
                 }
                 ctx.restore();
             });
 
-            // Draw Logo
             if (logoObj.img) {
                 const ratio = logoObj.img.width / logoObj.img.height;
                 logoObj.w = lSize; logoObj.h = lSize / ratio;
@@ -264,7 +270,6 @@
                 ctx.restore();
             }
 
-            // Draw Text (Caption)
             textObj.text = document.getElementById('captionInput').value;
             if (textObj.text) {
                 ctx.save(); ctx.font = `${fSize}px 'Deepmani'`; ctx.textAlign = "center";
@@ -274,7 +279,6 @@
                 ctx.fillText(textObj.text, textObj.x, textObj.y); ctx.restore();
             }
 
-            // Draw Border/Grid
             if (isBorderOn) {
                 ctx.save();
                 ctx.strokeStyle = bColor; ctx.lineWidth = bSize;
@@ -289,19 +293,23 @@
         }
     };
 
-    // 5. Download Engine (KB Quality Control)
     const downloadEngine = {
         save() {
+            // Re-render without selection border
+            renderEngine.drawAll(true);
+            
             const quality = parseInt(document.getElementById('qualityRange').value) / 100;
             const link = document.createElement('a');
             link.download = `Neelamb_Photo_${Date.now()}.jpg`;
             link.href = canvas.toDataURL('image/jpeg', quality);
             link.click();
             status.innerText = "फोटो डाउनलोड भयो!";
+            
+            // Re-render selection border back for UI
+            renderEngine.drawAll(false);
         }
     };
 
-    // 6. UI Manager (Swap & Reset)
     const uiManager = {
         shift(dir) {
             if (imgObjects.length < 2 || dragInfo.selectedIdx === -1) return;
@@ -321,7 +329,6 @@
         reset() { if(confirm("के सबै सफा गर्ने हो?")) location.reload(); }
     };
 
-    // Mouse & Touch Events
     function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
