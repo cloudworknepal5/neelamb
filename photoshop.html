@@ -43,9 +43,12 @@
 
         /* Mobile Adjustments */
         @media (max-width: 600px) {
-            .controls { grid-template-columns: 1fr; }
+            .controls { grid-template-columns: 1fr; padding: 10px; }
             .btn-group { flex-direction: column; }
-            #captionInput { font-size: 20px; }
+            /* मोबाइलमा इनपुट बक्सको फन्ट सानो पारिएको */
+            #captionInput { font-size: 18px; padding: 8px; }
+            .card { padding: 5px; }
+            h2 { font-size: 20px; }
         }
     </style>
 </head>
@@ -105,7 +108,7 @@
 
         <div>
             <label>अक्षर साइज: <span id="fSizeVal">60</span>px</label>
-            <input type="range" id="fontSizeRange" min="10" max="20" value="20" oninput="renderEngine.drawAll()">
+            <input type="range" id="fontSizeRange" min="10" max="600" value="60" oninput="renderEngine.drawAll()">
             <div style="display:flex; gap:5px; margin-top:5px;">
                 <input type="color" id="textColor" value="#ffffff" title="अक्षरको रङ" oninput="renderEngine.drawAll()">
                 <input type="color" id="strokeColor" value="#000000" title="बोर्डरको रङ" oninput="renderEngine.drawAll()">
@@ -159,7 +162,7 @@
     
     let CW = 1200, CH = 630;
     let imgObjects = [];
-    let textObj = { text: "", x: 20, y: 560, isDragging: false };
+    let textObj = { text: "", x: 600, y: 560, isDragging: false };
     let logoObj = { img: null, x: 40, y: 40, w: 150, h: 150, isDragging: false };
     let dragInfo = { isDraggingImg: false, selectedIdx: -1, startX: 0, startY: 0 };
     let activeElement = "none";
@@ -250,12 +253,12 @@
                 if (imgObjects.length === 2) dx = i * obj.cellW;
                 else if (imgObjects.length >= 3) { dx = (i % 2) * obj.cellW; dy = Math.floor(i / 2) * obj.cellH; }
                 ctx.save();
-                ctx.beginPath(); ctx.rect(dx, dy, obj.cellW, obj.cellH); ctx.clip();
                 ctx.filter = `brightness(${bright}%)`;
+                ctx.beginPath(); ctx.rect(dx, dy, obj.cellW, obj.cellH); ctx.clip();
+                
                 const finalScale = obj.baseScale * obj.userScale;
                 ctx.drawImage(obj.img, dx + obj.x, dy + obj.y, obj.img.width * finalScale, obj.img.height * finalScale);
                 
-                // Only show blue selection border if NOT printing/saving
                 if(!isPrinting && activeElement === 'photo' && dragInfo.selectedIdx === i) {
                     ctx.strokeStyle = "rgba(9, 132, 227, 0.8)"; ctx.lineWidth = 8; ctx.strokeRect(dx, dy, obj.cellW, obj.cellH);
                 }
@@ -295,17 +298,13 @@
 
     const downloadEngine = {
         save() {
-            // Re-render without selection border
             renderEngine.drawAll(true);
-            
             const quality = parseInt(document.getElementById('qualityRange').value) / 100;
             const link = document.createElement('a');
             link.download = `Neelamb_Photo_${Date.now()}.jpg`;
             link.href = canvas.toDataURL('image/jpeg', quality);
             link.click();
             status.innerText = "फोटो डाउनलोड भयो!";
-            
-            // Re-render selection border back for UI
             renderEngine.drawAll(false);
         }
     };
