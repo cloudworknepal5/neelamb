@@ -1,107 +1,119 @@
-<div id="gh-outer-wrapper" style="width: 100%; overflow: hidden; display: flex; flex-direction: column; align-items: center; background: #f4f4f4; padding-bottom: 50px;">
-    <div id="gh-master-container"></div>
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal Top Khabar - News Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        body { background: #f4f4f4; margin: 0; padding: 0; }
+        #gh-outer-wrapper {
+            width: 100%; overflow: hidden; display: flex; 
+            flex-direction: column; align-items: center; padding-bottom: 50px;
+        }
+
+        /* 1. Preview & Scaling Logic */
+        #gh-master-container {
+            transform-origin: top center;
+            transition: transform 0.2s ease-out;
+            margin: 20px 0;
+        }
+
+        /* 2. Fixed News Card (Facebook Size) */
+        .gh-master-wrap { 
+            width: 1200px; height: 630px; 
+            font-family: 'Mukta', sans-serif; text-align: center; 
+            border: 15px solid #ed1c24; background: #fff; 
+            box-sizing: border-box; position: relative;
+            display: flex; flex-direction: column; justify-content: flex-start; 
+            overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .gh-logo-watermark { 
+            position: absolute; top: 30px; right: 25px; 
+            width: 150px; height: auto; z-index: 100; 
+            object-fit: contain;
+        }
+
+        .gh-img-frame { 
+            position: relative; width: 100%; height: 430px; 
+            background: #000; overflow: hidden; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .gh-img-frame img { 
+            width: 100%; height: 100%; 
+            object-fit: cover; object-position: center;
+        }
+
+        .gh-red-overlay { 
+            position: absolute; top: 12px; left: 12px; right: 12px; bottom: 12px; 
+            border: 2px solid rgba(237, 28, 36, 0.4); z-index: 10; pointer-events: none; 
+        }
+
+        .gh-small-ribbon { 
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%); 
+            background: #ed1c24; color: #fff; padding: 3px 35px; 
+            font-size: 16px; font-weight: 700; z-index: 20; border-radius: 3px; 
+        }
+
+        /* 3. Icons Styling */
+        .gh-social-icons { 
+            position: absolute; bottom: 15px; left: 20px; 
+            display: flex; gap: 10px; z-index: 110; 
+        }
+        .gh-social-icons img, .icon-btn { 
+            width: 42px; height: 42px; background: #fff; padding: 8px; 
+            border-radius: 50%; border: 1px solid #ed1c24; 
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #ed1c24; font-size: 20px; 
+            pointer-events: auto; box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .gh-headline { 
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            padding: 10px 40px; font-size: 52px; font-weight: 800; 
+            color: #ed1c24; line-height: 1.1; margin: 0; text-align: center;
+            text-rendering: optimizeLegibility; /* Fix for font clarity */
+        }
+
+        .gh-footer-strip { 
+            background: #002e5b; color: #fff !important; 
+            padding: 5px 60px; font-weight: 800; font-size: 22px; 
+            border-radius: 5px 5px 0 0; width: fit-content; margin: 0 auto;
+        }
+
+        /* 4. Navigation Controls */
+        .gh-nav-row { 
+            display: flex; justify-content: center; gap: 15px; 
+            margin: 20px 0; width: 100%;
+        }
+        .gh-nav-btn { 
+            background: #ed1c24; color: #fff; padding: 12px 30px; 
+            border: none; font-weight: bold; cursor: pointer; border-radius: 4px;
+            font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .gh-nav-btn:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div id="gh-outer-wrapper">
+    <div id="gh-master-container">
+        </div>
 </div>
-
-<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-<style>
-    /* 1. Preview & Scaling Logic */
-    #gh-master-container {
-        transform-origin: top center;
-        transition: transform 0.2s ease-out;
-        margin: 20px 0;
-    }
-
-    /* 2. Fixed News Card (Facebook Size) */
-    .gh-master-wrap { 
-        width: 1200px; height: 630px; 
-        font-family: 'Mukta', sans-serif; text-align: center; 
-        border: 15px solid #ed1c24; background: #fff; 
-        box-sizing: border-box; position: relative;
-        display: flex; flex-direction: column; justify-content: flex-start; 
-        overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-
-    .gh-logo-watermark { 
-        position: absolute; top: 30px; right: 25px; 
-        width: 150px; height: auto; z-index: 100; 
-        object-fit: contain;
-    }
-
-    .gh-img-frame { 
-        position: relative; width: 100%; height: 430px; 
-        background: #000; overflow: hidden; 
-        display: flex; align-items: center; justify-content: center;
-    }
-    
-    .gh-img-frame img { 
-        width: 100%; height: 100%; 
-        object-fit: cover; object-position: center;
-    }
-
-    .gh-red-overlay { 
-        position: absolute; top: 12px; left: 12px; right: 12px; bottom: 12px; 
-        border: 2px solid rgba(237, 28, 36, 0.4); z-index: 10; pointer-events: none; 
-    }
-
-    .gh-small-ribbon { 
-        position: absolute; top: -10px; left: 50%; transform: translateX(-50%); 
-        background: #ed1c24; color: #fff; padding: 3px 35px; 
-        font-size: 16px; font-weight: 700; z-index: 20; border-radius: 3px; 
-    }
-    
-    /* 3. Icons Styling */
-    .gh-social-icons { 
-        position: absolute; bottom: 5px; left: 20px; 
-        display: flex; gap: 8px; z-index: 110; 
-    }
-
-    .gh-social-icons img, .icon-btn { 
-        width: 38px; height: 38px; background: #fff; padding: 6px; 
-        border-radius: 50%; border: 1px solid #ed1c24; 
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: #ed1c24; font-size: 18px; 
-        pointer-events: auto; box-sizing: border-box;
-    }
-
-    .gh-headline { 
-        flex-grow: 1; display: flex; align-items: center; justify-content: center;
-        padding: 10px 40px; font-size: 52px; font-weight: 800; 
-        color: #ed1c24; line-height: 1.1; margin: 0; text-align: center;
-    }
-
-    .gh-footer-strip { 
-        background: #002e5b; color: #fff !important; 
-        padding: 5px 60px; font-weight: 800; font-size: 22px; 
-        border-radius: 5px 5px 0 0; width: fit-content; margin: 0 auto;
-    }
-
-    /* 4. Navigation Controls */
-    .gh-nav-row { 
-        display: flex; justify-content: center; gap: 15px; 
-        margin: 20px 0; width: 100%;
-    }
-
-    .gh-nav-btn { 
-        background: #ed1c24; color: #fff; padding: 12px 30px; 
-        border: none; font-weight: bold; cursor: pointer; border-radius: 4px;
-        font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .gh-nav-btn:disabled { background: #ccc; cursor: not-allowed; }
-</style>
 
 <script>
 let gh_posts_data = [];
 let gh_current_idx = 0;
 const SITE_DOMAIN = "nepaltopkhabar.com";
 const SITE_LOGO_URL = "https://nepaltopkhabar.com/wp-content/uploads/2025/09/logo11-copy-300x84.png";
-const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/channel/UCfySzdquhwBDUKx1Aa5CU_w"; // eNepal Khabar Official
+const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/channel/UCfySzdquhwBDUKx1Aa5CU_w";
 
-/**
- * Multi-Function 1: Dynamic Responsive Scaling
+/** * Multi-Function 1: Dynamic Responsive Scaling 
  */
 function adjustScale() {
     const container = document.getElementById('gh-master-container');
@@ -117,8 +129,7 @@ function adjustScale() {
     }
 }
 
-/**
- * Multi-Function 2: WhatsApp Sharing
+/** * Multi-Function 2: WhatsApp Sharing 
  */
 function shareWhatsApp() {
     const post = gh_posts_data[gh_current_idx];
@@ -126,46 +137,67 @@ function shareWhatsApp() {
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
-/**
- * Multi-Function 3: YouTube Link
+/** * Multi-Function 3: YouTube Redirect 
  */
 function openYouTube() {
     window.open(YOUTUBE_CHANNEL_URL, '_blank');
 }
 
-/**
- * Multi-Function 4: High-Quality PNG Export
+/** * Multi-Function 4 (Fixed): High-Quality PNG Export for Mobile
+ * Issues like font distortion are fixed by resetting scale during capture.
  */
 async function capturePNG() {
+    const container = document.getElementById('gh-master-container');
     const target = document.querySelector('.gh-master-wrap');
     const downloadBtn = document.querySelector('.download-trigger');
+
+    // Hide download button during capture
     downloadBtn.style.visibility = "hidden";
 
-    html2canvas(target, {
-        useCORS: true,
-        scale: 2,
-        width: 1200,
-        height: 630,
-        backgroundColor: "#ffffff"
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `news-${Date.now()}.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-        downloadBtn.style.visibility = "visible";
-    });
+    // Store original styles
+    const originalTransform = container.style.transform;
+    const originalMargin = container.style.marginBottom;
+
+    // Reset scale to 1:1 for sharp capture
+    container.style.transform = "scale(1)";
+    container.style.marginBottom = "0px";
+
+    // Small delay to let browser recalculate layout
+    setTimeout(async () => {
+        try {
+            const canvas = await html2canvas(target, {
+                useCORS: true,
+                scale: 3, // Higher scale for crisp text
+                width: 1200,
+                height: 630,
+                backgroundColor: "#ffffff",
+                letterRendering: true
+            });
+
+            const link = document.createElement('a');
+            link.download = `news-${Date.now()}.png`;
+            link.href = canvas.toDataURL("image/png", 1.0);
+            link.click();
+        } catch (err) {
+            console.error("Capture Error:", err);
+            alert("तस्विर सेभ गर्न सकिएन ।");
+        } finally {
+            // Restore scale for mobile view
+            container.style.transform = originalTransform;
+            container.style.marginBottom = originalMargin;
+            downloadBtn.style.visibility = "visible";
+        }
+    }, 150);
 }
 
-/**
- * Multi-Function 5: Image Security Wrapper
+/** * Multi-Function 5: Image Security & Proxy 
  */
 function getSecureImg(url) {
     if(!url) return 'https://via.placeholder.com/1200x630?text=No+Image';
     return "https://images.weserv.nl/?url=" + encodeURIComponent(url.replace(/https?:\/\//, ""));
 }
 
-/**
- * Multi-Function 6: UI Renderer
+/** * Multi-Function 6: UI Core Renderer 
  */
 function updateDisplay() {
     const box = document.getElementById('gh-master-container');
@@ -191,8 +223,8 @@ function updateDisplay() {
                 <div class="gh-social-icons">
                     <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" title="Facebook">
                     <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" title="TikTok">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" onclick="openYouTube()" title="YouTube Channel">
-                    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" onclick="shareWhatsApp()" title="Share to WhatsApp">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" onclick="openYouTube()" title="YouTube">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" onclick="shareWhatsApp()" title="WhatsApp">
                     <div class="icon-btn download-trigger" onclick="capturePNG()"><i class="fas fa-download"></i></div>
                 </div>
             </div>
@@ -212,10 +244,15 @@ async function loadData() {
         const res = await fetch(`https://${SITE_DOMAIN}/wp-json/wp/v2/posts?_embed&per_page=20`);
         gh_posts_data = await res.json();
         if (gh_posts_data.length > 0) updateDisplay();
-    } catch (err) { console.error("Load Error"); }
+    } catch (err) { 
+        console.error("API Error"); 
+    }
 }
 
 window.move = (n) => { gh_current_idx += n; updateDisplay(); };
 window.addEventListener('resize', adjustScale);
 loadData();
 </script>
+
+</body>
+</html>
