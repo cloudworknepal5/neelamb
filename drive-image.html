@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Election Update</title>
+    <title>election-update</title>
     <style>
         :root { 
             --primary: #007bff; --success: #28a745; --danger: #dc3545; --bg: #f4f7f6; 
@@ -28,8 +28,8 @@
             overflow: hidden; 
             border: 1px solid var(--border); 
             width: 413px; 
-            transition: 0.3s; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
         }
         .thumb { 
             width: 413px; 
@@ -42,12 +42,19 @@
             height: 100%; 
             object-fit: cover; 
             display: block;
-            cursor: pointer;
         }
 
         .info { padding: 10px; text-align: center; }
         .btn-group { display: flex; gap: 10px; justify-content: center; }
         .action-btn { padding: 8px 20px; border-radius: 6px; text-decoration: none; color: white !important; font-size: 13px; font-weight: bold; border: none; cursor: pointer; flex: 1; }
+
+        /* Bottom Upload Section */
+        .upload-section {
+            background: var(--card); padding: 25px; border-radius: 15px;
+            margin-top: 50px; border: 2px dashed var(--border);
+            text-align: center;
+        }
+        .btn-main { padding: 12px 30px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
 
         #load-more-btn { padding: 12px 40px; background: var(--primary); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; display: none; margin: 30px auto; }
         #status-msg { text-align: center; padding: 50px; font-weight: bold; }
@@ -64,25 +71,33 @@
     <div id="display-container" class="drive-grid"></div>
     
     <div style="text-align:center;">
-        <button id="load-more-btn" onclick="renderBatch()">थप हेर्नुहोस् (Show More)</button>
+        <button id="load-more-btn" onclick="renderBatch()">थप हेर्नुहोस् (Load More)</button>
     </div>
-    
-    <div id="status-msg">लोड हुँदैछन्...</div>
+
+    <div id="status-msg"> लोड हुँदैछन्...</div>
+
+    <hr style="margin-top: 50px; border: 0; border-top: 1px solid var(--border);">
+
+    <div class="upload-section">
+        <h3 style="margin-top:0;">नयाँ फोटो अपलोड गर्नुहोस्</h3>
+        <input type="file" id="file-input" style="font-size: 14px; margin-bottom: 10px;"><br>
+        <button class="btn-main" onclick="handleUpload()">सर्भरमा अपलोड गर्नुहोस्</button>
+        <div id="up-status" style="margin-top: 10px; font-weight: bold;"></div>
+    </div>
 </div>
 
 <script>
 /**
  * Multi-function logic [cite: 2026-03-06]:
- * १. getFullSizeUrl: Google Drive बाट पूर्ण गुणस्तरको फोटो लिने।
- * २. batchProcessing: डाटालाई निश्चित ब्याचमा लोड गर्ने।
- * ३. errorHandling: फोटो लोड नभएमा वैकल्पिक थम्बनेल देखाउने।
+ * १. getFullSizeUrl: फोटोको क्वालिटी मेन्टेन गर्ने।
+ * २. renderBatch: ब्याच वाइज (६-६ वटा) डेटा लोड गर्ने।
+ * ३. handleUpload: फाइल अपलोड गर्ने फसन।
  */
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrPPrq3PPqatYotrgDYomh-3V8F7HYteiVmcQh1Vt2lzpHRy2Z5vsXVseAcQq2sDRS/exec";
 let allFiles = [], currentIndex = 0;
-const BATCH_SIZE = 9;
+const BATCH_SIZE = 6; // एक पटकमा ६ वटा मात्र देखिने
 
-// मुख्य डाटा लोड गर्ने फसन
 async function init() {
     try {
         const res = await fetch(SCRIPT_URL);
@@ -90,20 +105,15 @@ async function init() {
         document.getElementById('status-msg').style.display = 'none';
         renderBatch();
     } catch (e) { 
-        document.getElementById('status-msg').innerHTML = "डाटा लोड गर्न सकिएन। SCRIPT_URL चेक गर्नुहोस्।"; 
+        document.getElementById('status-msg').innerHTML = "डाटा लोड गर्न सकिएन।"; 
     }
 }
 
-/**
- * फसन १: फुल साइज इमेज URL जेनेरेट गर्ने
- */
 function getFullSizeUrl(id) {
     return `https://drive.google.com/uc?export=view&id=${id}`;
 }
 
-/**
- * फसन २: फोटोहरू ग्रिडमा देखाउने (Title र View हटाइएको)
- */
+// फोटोहरू रेन्डर गर्ने फसन
 function renderBatch() {
     const container = document.getElementById('display-container');
     const btn = document.getElementById('load-more-btn');
@@ -113,16 +123,12 @@ function renderBatch() {
     items.forEach(file => {
         const div = document.createElement('div');
         div.className = 'file-card';
-        
         const fullImg = getFullSizeUrl(file.id);
         const backupThumb = `https://drive.google.com/thumbnail?id=${file.id}&sz=w1000`;
 
         div.innerHTML = `
             <div class="thumb">
-                <img src="${fullImg}" 
-                     onerror="this.src='${backupThumb}'" 
-                     loading="lazy" 
-                     onclick="window.open('${fullImg}', '_blank')">
+                <img src="${fullImg}" onerror="this.src='${backupThumb}'" loading="lazy">
             </div>
             <div class="info">
                 <div class="btn-group">
@@ -135,36 +141,53 @@ function renderBatch() {
 
     currentIndex += BATCH_SIZE;
     btn.style.display = currentIndex < allFiles.length ? 'block' : 'none';
-    
-    if(allFiles.length === 0) {
-        document.getElementById('status-msg').style.display = 'block';
-        document.getElementById('status-msg').innerHTML = "कुनै पनि फोटो फेला परेन।";
-    }
 }
 
-/**
- * फसन ३: फाइल डिलेट गर्ने फसन
- */
-async function deleteFile(id, btn) {
-    const pass = prompt("मास्टर पासवर्ड हाल्नुहोस्:");
-    if (!pass) return;
+// अपलोड फसन
+async function handleUpload() {
+    const input = document.getElementById('file-input');
+    const status = document.getElementById('up-status');
+    if (!input.files[0]) return alert("कृपया फाइल छान्नुहोस्!");
     
-    const originalText = btn.innerText;
-    btn.innerText = "...";
-    btn.disabled = true;
+    const file = input.files[0];
+    const reader = new FileReader();
+    status.innerHTML = "⏳ अपलोड हुँदैछ... कृपया पर्खनुहोस्।";
+    status.style.color = "orange";
 
+    reader.onload = async function(e) {
+        const base64 = e.target.result.split(',')[1];
+        try {
+            await fetch(SCRIPT_URL, { 
+                method: "POST", 
+                mode: "no-cors", 
+                body: JSON.stringify({ base64: base64, type: file.type, name: file.name }) 
+            });
+            status.innerHTML = "✅ अपलोड सफल भयो!";
+            status.style.color = "green";
+            setTimeout(() => location.reload(), 1500);
+        } catch (err) {
+            status.innerHTML = "❌ त्रुटि भयो!";
+            status.style.color = "red";
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+// डिलेट फसन
+async function deleteFile(id, btn) {
+    const pass = prompt("मास्टर पासवर्ड:");
+    if (!pass) return;
+    btn.innerText = "...";
     try {
         await fetch(SCRIPT_URL, { 
             method: "POST", 
             mode: "no-cors", 
             body: JSON.stringify({ action: "delete", id: id, password: pass }) 
         });
-        btn.parentElement.parentElement.parentElement.style.opacity = '0.3';
-        btn.innerText = "Deleted";
+        btn.parentElement.parentElement.parentElement.style.display = 'none';
     } catch (e) {
         alert("त्रुटि भयो!");
-        btn.innerText = originalText;
-        btn.disabled = false;
+        btn.innerText = "हटाउनुहोस्";
     }
 }
 
