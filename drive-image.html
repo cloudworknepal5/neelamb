@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>फेमस नेपाल - प्रिमियम ग्यालरी</title>
+    <title>Election update</title>
     <style>
         :root { 
             --primary: #007bff; --success: #28a745; --danger: #dc3545; --bg: #f4f7f6; 
@@ -15,7 +15,7 @@
             color: var(--text); 
             margin: 0; 
             padding: 10px; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
         }
 
         .container { max-width: 1200px; margin: 0 auto; }
@@ -24,8 +24,7 @@
         .drive-grid { 
             display: grid; 
             gap: 20px; 
-            /* मोबाइलमा १ कोलम (Default) */
-            grid-template-columns: 1fr; 
+            grid-template-columns: 1fr; /* मोबाइलमा १ कोलम */
             justify-items: center;
         }
 
@@ -36,21 +35,19 @@
             }
         }
         
-        /* File Card: ४१३x३६४ को अनुपात मिलाइएको */
         .file-card { 
             background: var(--card); 
             border-radius: 12px; 
             overflow: hidden; 
             border: 1px solid var(--border); 
-            width: 100%; /* मोबाइलमा पूर्ण चौडाइ */
-            max-width: 413px; /* अधिकतम चौडाइ */
-            transition: 0.3s; 
+            width: 100%;
+            max-width: 413px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         .thumb { 
             width: 100%;
-            aspect-ratio: 413 / 364; /* फिक्स्ड रेसियो */
+            aspect-ratio: 413 / 364; 
             background: #000; 
             overflow: hidden; 
         }
@@ -77,7 +74,6 @@
             flex: 1; 
         }
 
-        /* Load More Button */
         #load-more-btn { 
             padding: 12px 40px; 
             background: var(--primary); 
@@ -122,15 +118,15 @@
     <div id="display-container" class="drive-grid"></div>
     
     <div style="text-align:center;">
-        <button id="load-more-btn" onclick="renderBatch()">थप हेर्नुहोस्</button>
+        <button id="load-more-btn" onclick="renderBatch()">थप हेर्नुहोस् (Load More)</button>
     </div>
 
-    <div id="status-msg">फाइलहरू लोड हुँदैछन्...</div>
+    <div id="status-msg">लोड हुँदैछन्...</div>
 
     <div class="upload-section">
         <h3 style="margin-top:0;">नयाँ फोटो अपलोड गर्नुहोस्</h3>
-        <input type="file" id="file-input" style="font-size: 14px;"><br>
-        <button class="btn-main" onclick="handleUpload()">अपलोड गर्नुहोस्</button>
+        <input type="file" id="file-input" accept="image/*" style="font-size: 14px;"><br>
+        <button class="btn-main" onclick="handleUpload()">सर्भरमा पठाउनुहोस्</button>
         <div id="up-status" style="margin-top: 15px; font-weight: bold;"></div>
     </div>
 </div>
@@ -138,10 +134,9 @@
 <script>
 /**
  * Multi-function logic [cite: 2026-03-06]:
- * १. getFullSizeUrl: गुगल ड्राइभबाट वास्तविक फोटो तान्ने।
- * २. renderBatch: ब्याच वाइज लोड गर्ने (६ वटा)।
- * ३. handleUpload: सर्भरमा डाटा पठाउने।
- * ४. deleteFile: पासवर्ड सुरक्षासहित डिलेट गर्ने।
+ * १. sorting: .reverse() प्रयोग गरेर नयाँ फाइललाई माथि (Top) ल्याउने।
+ * २. batching: ६ वटाको दरले रेन्डर गर्ने।
+ * ३. responsiveness: मोबाइलमा १ कोलम र डेस्कटपमा ३ कोलम।
  */
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrPPrq3PPqatYotrgDYomh-3V8F7HYteiVmcQh1Vt2lzpHRy2Z5vsXVseAcQq2sDRS/exec";
@@ -151,11 +146,15 @@ const BATCH_SIZE = 6;
 async function init() {
     try {
         const res = await fetch(SCRIPT_URL);
-        allFiles = await res.json();
+        const data = await res.json();
+        
+        // फाइलहरूलाई उल्टो क्रममा राख्ने (नयाँ अपलोड माथि ल्याउन)
+        allFiles = data.reverse(); 
+        
         document.getElementById('status-msg').style.display = 'none';
         renderBatch();
     } catch (e) { 
-        document.getElementById('status-msg').innerHTML = "डाटा लोड गर्न सकिएन।"; 
+        document.getElementById('status-msg').innerHTML = "डाटा लोड गर्न सकिएन। SCRIPT_URL चेक गर्नुहोस्।"; 
     }
 }
 
@@ -190,17 +189,22 @@ function renderBatch() {
 
     currentIndex += BATCH_SIZE;
     btn.style.display = currentIndex < allFiles.length ? 'inline-block' : 'none';
+    
+    if(allFiles.length === 0) {
+        document.getElementById('status-msg').style.display = 'block';
+        document.getElementById('status-msg').innerHTML = "कुनै पनि फाइल भेटिएन।";
+    }
 }
 
 // २. अपलोड फसन
 async function handleUpload() {
     const input = document.getElementById('file-input');
     const status = document.getElementById('up-status');
-    if (!input.files[0]) return alert("फोटो छान्नुहोस्!");
+    if (!input.files[0]) return alert("कृपया फोटो छान्नुहोस्!");
     
     const file = input.files[0];
     const reader = new FileReader();
-    status.innerHTML = "⏳ अपलोड हुँदैछ...";
+    status.innerHTML = "⏳ अपलोड हुँदैछ... पेज रिफ्रेस नगर्नुहोस्।";
     status.style.color = "blue";
 
     reader.onload = async function(e) {
@@ -211,11 +215,13 @@ async function handleUpload() {
                 mode: "no-cors", 
                 body: JSON.stringify({ base64: base64, type: file.type, name: file.name }) 
             });
-            status.innerHTML = "✅ सफल भयो!";
+            status.innerHTML = "✅ सफल भयो! नयाँ फाइल माथि देखिनेछ।";
             status.style.color = "green";
+            // नयाँ फाइल माथि देखाउन पेज रिफ्रेस गर्ने
             setTimeout(() => location.reload(), 1500);
         } catch (err) {
-            status.innerHTML = "❌ त्रुटि भयो!";
+            status.innerHTML = "❌ त्रुटि भयो! फेरि प्रयास गर्नुहोस्।";
+            status.style.color = "red";
         }
     };
     reader.readAsDataURL(file);
@@ -223,7 +229,7 @@ async function handleUpload() {
 
 // ३. डिलेट फसन
 async function deleteFile(id, btn) {
-    const pass = prompt("मास्टर पासवर्ड:");
+    const pass = prompt("मास्टर पासवर्ड हाल्नुहोस्:");
     if (!pass) return;
     btn.innerText = "...";
     try {
@@ -232,7 +238,7 @@ async function deleteFile(id, btn) {
             mode: "no-cors", 
             body: JSON.stringify({ action: "delete", id: id, password: pass }) 
         });
-        btn.closest('.file-card').style.display = 'none';
+        btn.closest('.file-card').remove();
     } catch (e) {
         alert("त्रुटि भयो!");
         btn.innerText = "डिलेट";
