@@ -3,37 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>election-update</title>
+    <title>फेमस नेपाल - मोबाइल फ्रेन्डली ग्यालरी</title>
     <style>
         :root { 
-            --primary: #007bff; --success: #28a745; --danger: #dc3545; --bg: #f4f7f6; 
-            --card: #ffffff; --text: #1c1e21; --border: #ddd;
+            --primary: #007bff; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; 
+            --card: #ffffff; --text: #1c1e21; --border: #e4e6eb;
         }
 
-        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; font-family: 'Segoe UI', sans-serif; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 15px; }
 
-        /* Gallery Grid Layout */
+        /* Modern Responsive Grid */
         .drive-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(413px, 1fr)); 
-            gap: 25px; 
-            justify-items: center;
+            /* डेस्कटपमा ३ वटा, ट्याब्लेटमा २ वटा र मोबाइलमा १ वा २ वटा मिलाउने */
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 20px; 
+            padding: 10px 0;
         }
         
-        /* Fixed Image Size: 413x364 */
+        /* File Card with Flexible Sizing */
         .file-card { 
             background: var(--card); 
             border-radius: 12px; 
             overflow: hidden; 
             border: 1px solid var(--border); 
-            width: 413px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
         }
+
+        /* Fixed Aspect Ratio for Images (४१३x३६४ को अनुपात कायम राखिएको) */
         .thumb { 
-            width: 413px; 
-            height: 364px; 
+            width: 100%;
+            aspect-ratio: 413 / 364; /* मोबाइलमा पनि यही अनुपातमा सानो-ठुलो हुन्छ */
             background: #000; 
             overflow: hidden; 
         }
@@ -44,24 +47,69 @@
             display: block;
         }
 
-        .info { padding: 10px; text-align: center; }
-        .btn-group { display: flex; gap: 10px; justify-content: center; }
-        .action-btn { padding: 8px 20px; border-radius: 6px; text-decoration: none; color: white !important; font-size: 13px; font-weight: bold; border: none; cursor: pointer; flex: 1; }
-
-        /* Bottom Upload Section */
-        .upload-section {
-            background: var(--card); padding: 25px; border-radius: 15px;
-            margin-top: 50px; border: 2px dashed var(--border);
+        .info { padding: 12px; background: #fff; }
+        .btn-group { display: flex; gap: 8px; justify-content: center; }
+        
+        .action-btn { 
+            padding: 10px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            color: white !important; 
+            font-size: 13px; 
+            font-weight: bold; 
+            border: none; 
+            cursor: pointer; 
+            flex: 1; 
             text-align: center;
         }
-        .btn-main { padding: 12px 30px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
 
-        #load-more-btn { padding: 12px 40px; background: var(--primary); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; display: none; margin: 30px auto; }
-        #status-msg { text-align: center; padding: 50px; font-weight: bold; }
+        /* Load More Button Styles */
+        #load-more-btn { 
+            padding: 14px 40px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            display: none; 
+            margin: 40px auto;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
 
-        @media (max-width: 450px) {
-            .drive-grid { grid-template-columns: 1fr; }
-            .file-card, .thumb { width: 100%; height: auto; aspect-ratio: 413 / 364; }
+        /* Responsive Bottom Upload Section */
+        .upload-section {
+            background: var(--card); 
+            padding: 30px 20px; 
+            border-radius: 20px;
+            margin-top: 50px; 
+            border: 2px dashed #ccd0d5;
+            text-align: center;
+        }
+        .file-input-wrapper { margin-bottom: 15px; }
+        .btn-main { 
+            width: 100%; 
+            max-width: 300px; 
+            padding: 12px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+        }
+
+        #status-msg { text-align: center; padding: 40px; font-weight: 600; color: #65676b; }
+
+        /* मोबाइल स्पेसिफिक सुधार */
+        @media (max-width: 600px) {
+            .drive-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); 
+                gap: 15px; 
+            }
+            .container { padding: 10px; }
+            .action-btn { padding: 12px; font-size: 14px; }
         }
     </style>
 </head>
@@ -70,33 +118,30 @@
 <div class="container">
     <div id="display-container" class="drive-grid"></div>
     
-    <div style="text-align:center;">
-        <button id="load-more-btn" onclick="renderBatch()">थप हेर्नुहोस् (Load More)</button>
-    </div>
-
-    <div id="status-msg"> लोड हुँदैछन्...</div>
-
-    <hr style="margin-top: 50px; border: 0; border-top: 1px solid var(--border);">
+    <button id="load-more-btn" onclick="renderBatch()">थप हेर्नुहोस्</button>
+    <div id="status-msg">डाटा लोड हुँदैछ...</div>
 
     <div class="upload-section">
-        <h3 style="margin-top:0;">नयाँ फोटो अपलोड गर्नुहोस्</h3>
-        <input type="file" id="file-input" style="font-size: 14px; margin-bottom: 10px;"><br>
-        <button class="btn-main" onclick="handleUpload()">सर्भरमा अपलोड गर्नुहोस्</button>
-        <div id="up-status" style="margin-top: 10px; font-weight: bold;"></div>
+        <h3 style="margin-top:0; color:#4b4f56;">नयाँ फोटो थप्नुहोस्</h3>
+        <div class="file-input-wrapper">
+            <input type="file" id="file-input" accept="image/*">
+        </div>
+        <button class="btn-main" onclick="handleUpload()">अपलोड गर्नुहोस्</button>
+        <div id="up-status" style="margin-top: 15px; font-weight: bold;"></div>
     </div>
 </div>
 
 <script>
 /**
- * Multi-function logic [cite: 2026-03-06]:
- * १. getFullSizeUrl: फोटोको क्वालिटी मेन्टेन गर्ने।
- * २. renderBatch: ब्याच वाइज (६-६ वटा) डेटा लोड गर्ने।
- * ३. handleUpload: फाइल अपलोड गर्ने फसन।
+ * Multi-function logic:
+ * १. dynamicGrid: स्क्रिन साइज अनुसार कोलमहरू आफैं मिलाउने।
+ * २. aspectFix: सबै फोटोलाई एकै नाशको (Uniform) देखाउने।
+ * ३. batchRender: ६-६ वटाको दरले लोड गर्ने।
  */
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrPPrq3PPqatYotrgDYomh-3V8F7HYteiVmcQh1Vt2lzpHRy2Z5vsXVseAcQq2sDRS/exec";
 let allFiles = [], currentIndex = 0;
-const BATCH_SIZE = 6; // एक पटकमा ६ वटा मात्र देखिने
+const BATCH_SIZE = 6;
 
 async function init() {
     try {
@@ -105,7 +150,7 @@ async function init() {
         document.getElementById('status-msg').style.display = 'none';
         renderBatch();
     } catch (e) { 
-        document.getElementById('status-msg').innerHTML = "डाटा लोड गर्न सकिएन।"; 
+        document.getElementById('status-msg').innerHTML = "डाटा लोड हुन सकेन।"; 
     }
 }
 
@@ -113,11 +158,9 @@ function getFullSizeUrl(id) {
     return `https://drive.google.com/uc?export=view&id=${id}`;
 }
 
-// फोटोहरू रेन्डर गर्ने फसन
 function renderBatch() {
     const container = document.getElementById('display-container');
     const btn = document.getElementById('load-more-btn');
-
     const items = allFiles.slice(currentIndex, currentIndex + BATCH_SIZE);
     
     items.forEach(file => {
@@ -133,7 +176,7 @@ function renderBatch() {
             <div class="info">
                 <div class="btn-group">
                     <a href="https://drive.google.com/uc?export=download&id=${file.id}" class="action-btn" style="background:var(--success)">डाउनलोड</a>
-                    <button onclick="deleteFile('${file.id}', this)" class="action-btn" style="background:var(--danger)">हटाउनुहोस्</button>
+                    <button onclick="deleteFile('${file.id}', this)" class="action-btn" style="background:var(--danger)">डिलेट</button>
                 </div>
             </div>`;
         container.appendChild(div);
@@ -143,16 +186,15 @@ function renderBatch() {
     btn.style.display = currentIndex < allFiles.length ? 'block' : 'none';
 }
 
-// अपलोड फसन
 async function handleUpload() {
     const input = document.getElementById('file-input');
     const status = document.getElementById('up-status');
-    if (!input.files[0]) return alert("कृपया फाइल छान्नुहोस्!");
+    if (!input.files[0]) return alert("फोटो छान्नुहोस्!");
     
     const file = input.files[0];
     const reader = new FileReader();
-    status.innerHTML = "⏳ अपलोड हुँदैछ... कृपया पर्खनुहोस्।";
-    status.style.color = "orange";
+    status.innerHTML = "⏳ अपलोड हुँदैछ...";
+    status.style.color = "#1877f2";
 
     reader.onload = async function(e) {
         const base64 = e.target.result.split(',')[1];
@@ -162,7 +204,7 @@ async function handleUpload() {
                 mode: "no-cors", 
                 body: JSON.stringify({ base64: base64, type: file.type, name: file.name }) 
             });
-            status.innerHTML = "✅ अपलोड सफल भयो!";
+            status.innerHTML = "✅ सफल भयो!";
             status.style.color = "green";
             setTimeout(() => location.reload(), 1500);
         } catch (err) {
@@ -173,9 +215,8 @@ async function handleUpload() {
     reader.readAsDataURL(file);
 }
 
-// डिलेट फसन
 async function deleteFile(id, btn) {
-    const pass = prompt("मास्टर पासवर्ड:");
+    const pass = prompt("पासवर्ड हाल्नुहोस्:");
     if (!pass) return;
     btn.innerText = "...";
     try {
@@ -184,10 +225,10 @@ async function deleteFile(id, btn) {
             mode: "no-cors", 
             body: JSON.stringify({ action: "delete", id: id, password: pass }) 
         });
-        btn.parentElement.parentElement.parentElement.style.display = 'none';
+        btn.closest('.file-card').remove();
     } catch (e) {
         alert("त्रुटि भयो!");
-        btn.innerText = "हटाउनुहोस्";
+        btn.innerText = "डिलेट";
     }
 }
 
