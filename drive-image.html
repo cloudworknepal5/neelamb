@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>फेमस नेपाल - मिनिमल ग्यालरी</title>
+    <style>
+        :root { 
+            --primary: #007bff; --success: #28a745; --danger: #dc3545; --bg: #f4f7f6; 
+            --card: #ffffff; --text: #1c1e21; --border: #ddd;
+        }
+
+        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; font-family: 'Segoe UI', sans-serif; }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        /* Gallery Grid Layout */
+        .drive-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(413px, 1fr)); 
+            gap: 25px; 
+            justify-items: center;
+        }
+        
+        /* Fixed Image Size: 413x364 */
+        .file-card { 
+            background: var(--card); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+            width: 413px; 
+            transition: 0.3s; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .thumb { 
+            width: 413px; 
+            height: 364px; 
+            background: #000; 
+            overflow: hidden; 
+        }
+        .thumb img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block;
+            cursor: pointer;
+        }
+
+        .info { padding: 10px; text-align: center; }
+        .btn-group { display: flex; gap: 10px; justify-content: center; }
+        .action-btn { padding: 8px 20px; border-radius: 6px; text-decoration: none; color: white !important; font-size: 13px; font-weight: bold; border: none; cursor: pointer; flex: 1; }
+
+        #load-more-btn { padding: 12px 40px; background: var(--primary); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; display: none; margin: 30px auto; }
+        #status-msg { text-align: center; padding: 50px; font-weight: bold; }
+
+        @media (max-width: 450px) {
+            .drive-grid { grid-template-columns: 1fr; }
+            .file-card, .thumb { width: 100%; height: auto; aspect-ratio: 413 / 364; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="display-container" class="drive-grid"></div>
+    
+    <div style="text-align:center;">
+        <button id="load-more-btn" onclick="renderBatch()">थप हेर्नुहोस् (Show More)</button>
+    </div>
+    
+    <div id="status-msg">फाइलहरू लोड हुँदैछन्...</div>
+</div>
+
+<script>
+/**
+ * Multi-function logic [cite: 2026-03-06]:
+ * १. getFullSizeUrl: Google Drive बाट पूर्ण गुणस्तरको फोटो लिने।
+ * २. batchProcessing: डाटालाई निश्चित ब्याचमा लोड गर्ने।
+ * ३. errorHandling: फोटो लोड नभएमा वैकल्पिक थम्बनेल देखाउने।
+ */
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrPPrq3PPqatYotrgDYomh-3V8F7HYteiVmcQh1Vt2lzpHRy2Z5vsXVseAcQq2sDRS/exec";
+let allFiles = [], currentIndex = 0;
+const BATCH_SIZE = 9;
+
+// मुख्य डाटा लोड गर्ने फसन
+async function init() {
+    try {
+        const res = await fetch(SCRIPT_URL);
+        allFiles = await res.json();
+        document.getElementById('status-msg').style.display = 'none';
+        renderBatch();
+    } catch (e) { 
+        document.getElementById('status-msg').innerHTML = "डाटा लोड गर्न सकिएन। SCRIPT_URL चेक गर्नुहोस्।"; 
+    }
+}
+
+/**
+ * फसन १: फुल साइज इमेज URL जेनेरेट गर्ने
+ */
+function getFullSizeUrl(id) {
+    return `https://drive.google.com/uc?export=view&id=${id}`;
+}
+
+/**
+ * फसन २: फोटोहरू ग्रिडमा देखाउने (Title र View हटाइएको)
+ */
+function renderBatch() {
+    const container = document.getElementById('display-container');
+    const btn = document.getElementById('load-more-btn');
+
+    const items = allFiles.slice(currentIndex, currentIndex + BATCH_SIZE);
+    
+    items.forEach(file => {
+        const div = document.createElement('div');
+        div.className = 'file-card';
+        
+        const fullImg = getFullSizeUrl(file.id);
+        const backupThumb = `https://drive.google.com/thumbnail?id=${file.id}&sz=w1000`;
+
+        div.innerHTML = `
+            <div class="thumb">
+                <img src="${fullImg}" 
+                     onerror="this.src='${backupThumb}'" 
+                     loading="lazy" 
+                     onclick="window.open('${fullImg}', '_blank')">
+            </div>
+            <div class="info">
+                <div class="btn-group">
+                    <a href="https://drive.google.com/uc?export=download&id=${file.id}" class="action-btn" style="background:var(--success)">डाउनलोड</a>
+                    <button onclick="deleteFile('${file.id}', this)" class="action-btn" style="background:var(--danger)">हटाउनुहोस्</button>
+                </div>
+            </div>`;
+        container.appendChild(div);
+    });
+
+    currentIndex += BATCH_SIZE;
+    btn.style.display = currentIndex < allFiles.length ? 'block' : 'none';
+    
+    if(allFiles.length === 0) {
+        document.getElementById('status-msg').style.display = 'block';
+        document.getElementById('status-msg').innerHTML = "कुनै पनि फोटो फेला परेन।";
+    }
+}
+
+/**
+ * फसन ३: फाइल डिलेट गर्ने फसन
+ */
+async function deleteFile(id, btn) {
+    const pass = prompt("मास्टर पासवर्ड हाल्नुहोस्:");
+    if (!pass) return;
+    
+    const originalText = btn.innerText;
+    btn.innerText = "...";
+    btn.disabled = true;
+
+    try {
+        await fetch(SCRIPT_URL, { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify({ action: "delete", id: id, password: pass }) 
+        });
+        btn.parentElement.parentElement.parentElement.style.opacity = '0.3';
+        btn.innerText = "Deleted";
+    } catch (e) {
+        alert("त्रुटि भयो!");
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
