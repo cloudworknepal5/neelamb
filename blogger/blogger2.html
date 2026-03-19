@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SubhLabh News Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Mukta', sans-serif; background: #f4f7f6; margin: 0; padding: 0; }
+        .container { max-width: 1100px; margin: auto; padding: 20px; }
+        header { text-align: center; padding: 30px 0; background: #fff; border-bottom: 4px solid #e31e24; margin-bottom: 30px; cursor: pointer; }
+        h1 { margin: 0; color: #111; font-size: 36px; }
+        
+        /* Grid for News List */
+        #content-area { min-height: 500px; }
+        .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); cursor: pointer; transition: 0.3s; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .card img { width: 100%; height: 210px; object-fit: cover; }
+        .card-body { padding: 18px; }
+        .card-title { font-size: 21px; font-weight: bold; color: #222; line-height: 1.4; margin-bottom: 10px; }
+        .card-date { font-size: 13px; color: #888; margin-bottom: 8px; }
+
+        /* Single Post Detail View */
+        .post-detail { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.05); }
+        .btn-back { display: inline-block; background: #e31e24; color: #fff; padding: 8px 20px; border-radius: 5px; text-decoration: none; margin-bottom: 25px; cursor: pointer; font-weight: bold; }
+        .post-detail h1 { font-size: 38px; line-height: 1.2; margin-bottom: 20px; color: #111; }
+        .post-content { font-size: 19px; line-height: 1.8; color: #333; }
+        .post-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+        
+        .loading { text-align: center; font-size: 20px; padding: 50px; }
+    </style>
+</head>
+<body>
+
+<header onclick="goHome()">
+    <div class="container">
+        <h1>SubhLabh News</h1>
+        <p>ताजा र विश्वसनीय समाचार</p>
+    </div>
+</header>
+
+<div class="container">
+    <div id="content-area">
+        <div class="loading">समाचार लोड हुँदैछ...</div>
+    </div>
+</div>
+
+<script>
+    // तपाईको जानकारी
+    const BLOG_ID = '4810240129416724295';
+    const API_KEY = 'AIzaSyDFoCQMjO-uLxIEAKdqCpLCzGt1AIviqEw';
+    const BASE_URL = 'https://www.googleapis.com/blogger/v3/blogs/' + BLOG_ID + '/posts';
+
+    // १. पेज लोड हुँदा कुन समाचार देखाउने फैसला गर्ने
+    window.addEventListener('popstate', handleRouting);
+    window.onload = handleRouting;
+
+    function handleRouting() {
+        const params = new URLSearchParams(window.location.search);
+        const postId = params.get('post');
+        if (postId) {
+            loadSinglePost(postId);
+        } else {
+            loadNewsList();
+        }
+    }
+
+    // २. सबै समाचारको सूची देखाउने
+    async function loadNewsList() {
+        const contentArea = document.getElementById('content-area');
+        contentArea.innerHTML = '<div class="loading">ताजा अपडेटहरू लोड हुँदैछ...</div>';
+        
+        try {
+            const response = await fetch(`${BASE_URL}?key=${API_KEY}&maxResults=12`);
+            const data = await response.json();
+            
+            if (!data.items) {
+                contentArea.innerHTML = "अहिले कुनै समाचार फेला परेन।";
+                return;
+            }
+
+            let html = '<div class="news-grid">';
+            data.items.forEach(post => {
+                let imgMatch = post.content.match(/<img[^>]+src="([^">]+)"/);
+                let thumb = imgMatch ? imgMatch[1].replace(/\/s[0-9]+(-c)?\//, '/s600/') : 'https://via.placeholder.com/600x400?text=SubhLabh+News';
+                
+                html += `
+                    <div class="card" onclick="openPost('${post.id}')">
+                        <img src="${thumb}" alt="${post.title}">
+                        <div class="card-body">
+                            <div class="card-date">📅 ${new Date(post.published).toLocaleDateString('ne-NP')}</div>
+                            <div class="card-title">${post.title}</div>
+                        </div>
+                    </div>`;
+            });
+            html += '</div>';
+            contentArea.innerHTML = html;
+        } catch (error) {
+            contentArea.innerHTML = "सर्भरसँग जोडिन सकिएन।";
+        }
+    }
+
+    // ३. पोष्टमा क्लिक गर्दा चल्ने फङ्सन (URL परिवर्तन गर्छ तर ब्लगरमा लैजाँदैन)
+    function openPost(id) {
+        const newUrl = window.location.pathname + '?post=' + id;
+        window.history.pushState({id: id}, '', newUrl);
+        loadSinglePost(id);
+        window.scrollTo(0, 0);
+    }
+
+    // ४. एउटा पोष्टको पूरा विवरण देखाउने
+    async function loadSinglePost(id) {
+        const contentArea = document.getElementById('content-area');
+        contentArea.innerHTML = '<div class="loading">पुरा समाचार लोड हुँदैछ...</div>';
+        
+        try {
+            const response = await fetch(`${BASE_URL}/${id}?key=${API_KEY}`);
+            const post = await response.json();
+            
+            contentArea.innerHTML = `
+                <div class="post-detail">
+                    <div class="btn-back" onclick="goHome()">← पछाडि जानुहोस्</div>
+                    <h1>${post.title}</h1>
+                    <div class="card-date" style="margin-bottom:20px;">प्रकाशित मिति: ${new Date(post.published).toLocaleDateString('ne-NP')}</div>
+                    <div class="post-content">${post.content}</div>
+                </div>`;
+        } catch (error) {
+            contentArea.innerHTML = "यो समाचार लोड हुन सकेन।";
+        }
+    }
+
+    // होमपेजमा फिर्ता जाने
+    function goHome() {
+        window.history.pushState({}, '', window.location.pathname);
+        loadNewsList();
+    }
+</script>
+
+</body>
+</html>
