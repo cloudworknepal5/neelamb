@@ -16,7 +16,7 @@
 
         /* Instructions */
         .gh-instructions-box { 
-            background: #fff; border-left: 6px solid var(--fb-red); padding: 20px; 
+            background: #fff; border-left: 6px solid var(--fb-blue); padding: 20px; 
             margin: 20px auto; width: 90%; max-width: 850px; border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #333;
         }
@@ -34,7 +34,7 @@
 
         .gh-master-wrap { 
             width: 1600px; height: 1600px; 
-            background: #000; border: 25px solid var(--fb-red); 
+            background: #000; border: 25px solid var(--fb-blue); 
             box-sizing: border-box; position: relative;
             overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
         }
@@ -43,7 +43,7 @@
         
         .gh-domain-ribbon { 
             position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
-            background: var(--fb-red); color: #fff; padding: 10px 80px;
+            background: var(--fb-blue); color: #fff; padding: 10px 80px;
             font-size: 28px; font-weight: 800; z-index: 35; border-radius: 0 0 20px 20px;
         }
 
@@ -63,12 +63,12 @@
             text-shadow: 4px 4px 15px rgba(0,0,0,1);
             word-break: keep-all; user-select: none;
         }
-        .word-white { color: #ffffff; }
-        .word-yellow { color: var(--fb-yellow); }
+        .word-red { color: var(--fb-red); }
+        .word-blue { color: #5dade2; } /* Readable blue for dark background */
 
         /* Comment Ribbon */
         .comment-ribbon {
-            background: var(--fb-red);
+            background: var(--fb-blue);
             color: white;
             padding: 10px 40px;
             font-size: 35px;
@@ -80,7 +80,7 @@
         }
 
         .gh-nav-row { display: flex; justify-content: center; gap: 15px; margin: 20px 0; width: 100%; }
-        .gh-nav-btn { background: var(--fb-red); color: #fff; padding: 12px 35px; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; font-size: 18px; }
+        .gh-nav-btn { background: var(--fb-blue); color: #fff; padding: 12px 35px; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; font-size: 18px; }
         .gh-footer { margin-top: 30px; padding: 20px; width: 100%; text-align: center; background: #fff; border-top: 1px solid #ddd; font-weight: bold; color: #555; }
     </style>
 </head>
@@ -88,11 +88,10 @@
 
 <div id="gh-outer-wrapper">
     <div class="gh-instructions-box">
-        <h3><i class="fas fa-tools"></i> नयाँ अपडेट (1600x1600):</h3>
+        <h3><i class="fas fa-tools"></i> नयाँ अपडेट (Blue Theme):</h3>
         <ul>
-            <li><b>साइज:</b> अब यो कार्ड सधैं १६००x१६०० साइजमा आउनेछ।</li>
-            <li><b>हेडलाइन कलर:</b> हेडलाइनको पहिलो २ शब्द सेतो र बाँकी पहेलो हुनेछ।</li>
-            <li><b>कमेन्ट रिबन:</b> हेडलाइन मुनि "विस्तृत समाचार कमेन्टमा" भन्ने रिबन थपिएको छ।</li>
+            <li><b>बोर्डर:</b> कार्डको मुख्य बोर्डर अब निलो रङ्गको छ।</li>
+            <li><b>हेडलाइन कलर:</b> हेडलाइनको आधा भाग रातो र बाँकी आधा निलो हुनेछ।</li>
         </ul>
     </div>
 
@@ -159,22 +158,21 @@ function adjustHeadline() {
     if (headline) headline.style.fontSize = document.getElementById('headlineSize').value + "px";
 }
 
-// Multi-Function: Split title for two colors
+// Multi-Function: Split title for Red and Blue colors
 function formatHeadline(text) {
     const words = text.split(' ');
     const totalWords = words.length;
     
-    // यदि एउटा मात्र शब्द छ भने सेतो देखाउने
-    if (totalWords <= 1) return `<span class="word-white">${text}</span>`;
+    if (totalWords <= 1) return `<span class="word-red">${text}</span>`;
     
-    // कुल शब्द संख्यालाई २ ले भाग गरेर आधा भाग निकाल्ने (बिजोड भएमा पहिलो भाग सानो हुन्छ)
-    const halfIndex = Math.floor(totalWords / 2);
+    const halfIndex = Math.ceil(totalWords / 2);
     
     const firstHalf = words.slice(0, halfIndex).join(' ');
     const secondHalf = words.slice(halfIndex).join(' ');
     
-    return `<span class="word-white">${firstHalf}</span> <span class="word-yellow">${secondHalf}</span>`;
+    return `<span class="word-red">${firstHalf}</span> <span class="word-blue">${secondHalf}</span>`;
 }
+
 function updateDisplay() {
     const container = document.getElementById('gh-master-container');
     const p = gh_posts_data[gh_current_idx];
