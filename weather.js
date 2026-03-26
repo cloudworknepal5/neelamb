@@ -1,112 +1,98 @@
 (function() {
     "use strict";
 
-    // १. CSS: लेआउट र एनिमेसन
-    const css = `
+    // CSS Injection (वेबसाइटको डिजाइन नबिग्रिने गरी)
+    const style = document.createElement('style');
+    style.textContent = `
         #weather-widget {
             width: 50px !important; height: 25px !important;
             display: inline-flex !important; align-items: center !important;
             cursor: pointer; background: #000; border-radius: 4px;
             border: 1px solid #333; padding: 0 4px !important;
-            font-family: sans-serif; transition: 0.3s;
+            font-family: sans-serif; transition: 0.3s; position: relative;
         }
-        #weather-icon-box img { width: 18px !important; height: 18px !important; }
+        #weather-icon-box img { width: 18px !important; height: 18px !important; display: block; }
         #weather-temp { font-size: 11px !important; font-weight: bold; color: #ff5722; margin-left: 2px; }
-        
-        /* Modal Popup: नयाँ ट्याब नखोली यही पेजमा देखिने */
-        #weather-hub-overlay {
+        #weather-loc { display: none; }
+
+        /* Overlay Popup */
+        #weather-hub-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 999999; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
         }
-        #hub-bg-img {
-            position: absolute; width: 100%; height: 100%; z-index: -1;
-            background-size: cover; background-position: center; filter: brightness(0.4);
-        }
-        .hub-card {
+        .hub-body {
             background: rgba(255,255,255,0.1); width: 90%; max-width: 360px;
             padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
             text-align: center; color: white; position: relative;
         }
-        .forecast-item {
+        .forecast-row {
             display: flex; align-items: center; justify-content: space-between;
-            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px;
+            background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px;
             margin-top: 8px; font-size: 14px;
         }
-        .hub-close { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 28px; color: #fff; }
+        .close-hub { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 28px; }
     `;
-
-    const styleTag = document.createElement("style");
-    styleTag.textContent = css;
-    document.head.appendChild(styleTag);
-
-    // २. HTML Structure (Overlay/Modal)
-    const modalHTML = `
-        <div id="weather-hub-overlay">
-            <div id="hub-bg-img"></div>
-            <div class="hub-card">
-                <span class="hub-close" id="close-weather">&times;</span>
-                <h2 id="hub-city-name">Birgunj</h2>
-                <h1 id="hub-current-temp" style="font-size:3rem; color:#ff5722; margin:10px 0;">--°C</h1>
-                <p id="hub-weather-desc" style="text-transform:capitalize; opacity:0.8;">Loading...</p>
-                <div id="forecast-container"></div>
-            </div>
-        </div>
-    `;
+    document.head.appendChild(style);
 
     const WeatherApp = {
         apiKey: "9c17c4095ee2a4042c26bbd4d4de1726",
         city: "Birgunj",
 
         init: function() {
-            // पप-अप मोडलाई बडीमा जोड्ने
-            const div = document.createElement('div');
-            div.innerHTML = modalHTML;
-            document.body.appendChild(div);
+            // Modal Structure
+            const modal = document.createElement('div');
+            modal.id = "weather-hub-modal";
+            modal.innerHTML = `
+                <div class="hub-body">
+                    <span class="close-hub" id="close-weather">&times;</span>
+                    <h2 id="hub-city-name">Loading...</h2>
+                    <h1 id="hub-current-temp" style="font-size:3rem; color:#ff5722; margin:10px 0;">--°C</h1>
+                    <div id="forecast-container"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
 
-            // इभेन्टहरू बाइन्ड गर्ने
+            // Click Events
             const trigger = document.getElementById('weather-widget');
-            if (trigger) { trigger.onclick = (e) => { e.preventDefault(); this.openModal(); }; }
-            document.getElementById('close-weather').onclick = () => { document.getElementById('weather-hub-overlay').style.display = 'none'; };
+            if (trigger) trigger.onclick = () => this.openHub();
+            document.getElementById('close-weather').onclick = () => { modal.style.display = 'none'; };
 
-            this.fetchCurrent();
+            this.loadWeather();
         },
 
-        fetchCurrent: async function() {
+        loadWeather: function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    p => this.fetchData(`lat=${p.coords.latitude}&lon=${p.coords.longitude}`),
+                    () => this.fetchData(`q=${this.city}`)
+                );
+            } else { this.fetchData(`q=${this.city}`); }
+        },
+
+        fetchData: async function(query) {
             try {
-                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${this.city}&units=metric&appid=${this.apiKey}&lang=ne`);
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?${query}&units=metric&appid=${this.apiKey}&lang=ne`);
                 const data = await res.json();
                 
-                // विजेट अपडेट
-                if(document.getElementById('weather-temp')) document.getElementById('weather-temp').innerText = Math.round(data.main.temp) + "°";
-                if(document.getElementById('weather-icon-box')) document.getElementById('weather-icon-box').innerHTML = `<img src="https://openweathermap.org/img/wn/${data.weather[0].icon}.png">`;
-
-                // पप-अप डाटा अपडेट
+                document.getElementById('weather-temp').innerText = Math.round(data.main.temp) + "°";
+                document.getElementById('weather-icon-box').innerHTML = `<img src="https://openweathermap.org/img/wn/${data.weather[0].icon}.png">`;
                 document.getElementById('hub-city-name').innerText = data.name;
                 document.getElementById('hub-current-temp').innerText = Math.round(data.main.temp) + "°C";
-                document.getElementById('hub-weather-desc').innerText = data.weather[0].description;
-                
-                // ब्याकग्राउन्ड (Unsplash बाट मौसम अनुसार)
-                const bgType = data.weather[0].main.toLowerCase();
-                document.getElementById('hub-bg-img').style.backgroundImage = `url('https://images.unsplash.com/photo-1561484930-998b6a7b22e8?w=800')`;
-            } catch (e) { console.error("Weather failed"); }
+            } catch (e) { console.log("Weather error"); }
         },
 
-        openModal: async function() {
-            document.getElementById('weather-hub-overlay').style.display = 'flex';
-            const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${this.city}&units=metric&appid=${this.apiKey}&lang=ne`);
+        openHub: async function() {
+            document.getElementById('weather-hub-modal').style.display = 'flex';
+            const city = document.getElementById('hub-city-name').innerText;
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
             const data = await res.json();
             
             let html = '';
             for (let i = 0; i < data.list.length; i += 8) {
                 const day = data.list[i];
                 const dayName = new Date(day.dt * 1000).toLocaleDateString('ne-NP', { weekday: 'long' });
-                html += `
-                    <div class="forecast-item">
-                        <span>${dayName}</span>
-                        <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png" width="30">
-                        <span style="font-weight:bold">${Math.round(day.main.temp)}°C</span>
-                    </div>`;
+                html += `<div class="forecast-row"><span>${dayName}</span><img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png" width="30"><b>${Math.round(day.main.temp)}°C</b></div>`;
             }
             document.getElementById('forecast-container').innerHTML = html;
         }
