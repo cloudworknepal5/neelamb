@@ -1,99 +1,87 @@
 (function() {
-    // १. CSS Styles Injection (अनावश्यक प्याडिङ हटाइएको)
+    // १. CSS Styles: तपाइँको वेबसाइटको डिजाइनसँग मिल्ने गरी
     const css = `
-        :root { --p-orange: #ff5722; --glass: rgba(0, 0, 0, 0.8); }
-        #nb-weather-trigger {
-            width: 50px; height: 25px; background: #000; color: #fff;
-            border-radius: 3px; display: inline-flex; align-items: center; justify-content: center;
-            border: 1px solid #333; cursor: pointer; transition: 0.3s;
-            position: relative; overflow: hidden; font-family: sans-serif;
-            margin: 0; padding: 0; z-index: 999;
+        #weather-widget {
+            width: 50px !important; height: 25px !important;
+            display: flex !important; align-items: center !important;
+            cursor: pointer; overflow: hidden; background: #000;
+            border-radius: 4px; border: 1px solid #333; padding: 0 4px !important;
+            font-family: sans-serif; transition: 0.3s;
         }
-        #nb-weather-trigger:hover { border-color: var(--p-orange); transform: scale(1.05); }
-        #small-icon { width: 16px; height: 16px; margin-right: 2px; }
-        #small-icon img { width: 100%; height: auto; display: block; }
-        #mini-temp { font-size: 10px; font-weight: bold; color: var(--p-orange); }
+        #weather-widget:hover { border-color: #ff5722; transform: scale(1.05); }
+        #weather-icon-box img { width: 18px; height: 18px; display: block; }
+        #weather-temp { font-size: 10px !important; font-weight: bold; color: #ff5722; margin-left: 2px; }
+        #weather-loc { display: none; } /* सानो विजेटमा लोकेसन लुकाइएको */
 
-        /* Full Screen Hub */
+        /* Full Screen Pop-up Hub */
         #weather-hub {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 100000; justify-content: center; align-items: center; color: white;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
         }
         #dynamic-bg-image {
             position: absolute; width: 100%; height: 100%; z-index: -1;
-            background-size: cover; background-position: center; filter: brightness(0.5);
+            background-size: cover; background-position: center; filter: brightness(0.4);
         }
         .hub-content {
-            background: var(--glass); backdrop-filter: blur(10px);
-            width: 90%; max-width: 380px; padding: 20px; border-radius: 15px;
-            text-align: center; border: 1px solid rgba(255,255,255,0.1); position: relative;
+            background: rgba(255,255,255,0.1); width: 90%; max-width: 360px;
+            padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
+            text-align: center; position: relative;
         }
         .forecast-row {
             display: flex; align-items: center; justify-content: space-between;
-            background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 10px;
-            margin-top: 8px; font-size: 13px;
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px;
+            margin-top: 10px; font-size: 14px;
         }
-        .close-hub { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 20px; }
+        .close-hub { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 24px; }
     `;
 
     const styleTag = document.createElement("style");
     styleTag.textContent = css;
     document.head.appendChild(styleTag);
 
-    // २. HTML Structure Creation
-    const widgetHTML = `
-        <div id="nb-weather-trigger">
-            <div id="small-icon"><img src="" id="mini-img"></div>
-            <span id="mini-temp">--°</span>
-        </div>
+    // २. पप-अप स्ट्रक्चर (body मा थप्ने)
+    const hubHTML = `
         <div id="weather-hub">
             <div id="dynamic-bg-image"></div>
             <div class="hub-content">
-                <span class="close-hub">&times;</span>
+                <span class="close-hub" onclick="document.getElementById('weather-hub').style.display='none'">&times;</span>
                 <div id="hub-main-data">
-                    <h2 id="hub-city" style="margin:0">Birgunj</h2>
+                    <h2 id="hub-city" style="margin:0">लोकेसन...</h2>
                     <h1 id="hub-temp" style="font-size:3rem; margin:10px 0; color:#ff5722">--°C</h1>
-                    <p id="hub-desc" style="text-transform:capitalize">Loading...</p>
+                    <p id="hub-desc" style="text-transform:capitalize; opacity:0.8">Loading...</p>
                 </div>
                 <div id="forecast-render"></div>
             </div>
         </div>
     `;
 
-    // ३. Widget Logic
     const WeatherApp = {
         apiKey: "9c17c4095ee2a4042c26bbd4d4de1726",
         city: "Birgunj",
-        bgImages: {
-            "Clear": "https://images.unsplash.com/photo-1599385073111-e126ac5e2e88?w=600",
-            "Rain": "https://images.unsplash.com/photo-1502472304192-140b9c3f443b?w=600",
-            "Clouds": "https://images.unsplash.com/photo-1610444648792-50d4f13456bb?w=600"
-        },
 
         init: function() {
-            const container = document.createElement("div");
-            container.innerHTML = widgetHTML;
-            // वेबसाइटको सबैभन्दा माथि राख्न (Prepending to body)
-            document.body.prepend(container);
+            // पप-अप थप्ने
+            const div = document.createElement('div');
+            div.innerHTML = hubHTML;
+            document.body.appendChild(div);
 
-            this.bindEvents();
+            // तपाइँको HTML विजेटमा क्लिक इभेन्ट जोड्ने
+            const trigger = document.getElementById('weather-widget');
+            if(trigger) {
+                trigger.onclick = () => this.openHub();
+            }
+
             this.loadData();
         },
 
-        bindEvents: function() {
-            document.getElementById('nb-weather-trigger').onclick = () => this.openHub();
-            document.querySelector('.close-hub').onclick = () => this.closeHub();
-        },
-
-        loadData: async function() {
+        loadData: function() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     p => this.fetchWeather(`lat=${p.coords.latitude}&lon=${p.coords.longitude}`),
                     () => this.fetchWeather(`q=${this.city}`)
                 );
-            } else {
-                this.fetchWeather(`q=${this.city}`);
-            }
+            } else { this.fetchWeather(`q=${this.city}`); }
         },
 
         fetchWeather: async function(query) {
@@ -101,15 +89,23 @@
                 const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?${query}&units=metric&appid=${this.apiKey}&lang=ne`);
                 const data = await res.json();
                 
-                document.getElementById('mini-temp').innerText = Math.round(data.main.temp) + "°";
-                document.getElementById('mini-img').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+                // वेबसाइटमा भएको HTML अपडेट गर्ने
+                if(document.getElementById('weather-temp')) 
+                    document.getElementById('weather-temp').innerText = Math.round(data.main.temp) + "°";
+                
+                if(document.getElementById('weather-icon-box'))
+                    document.getElementById('weather-icon-box').innerHTML = `<img src="https://openweathermap.org/img/wn/${data.weather[0].icon}.png">`;
+
+                // पप-अप डाटा अपडेट गर्ने
                 document.getElementById('hub-city').innerText = data.name;
                 document.getElementById('hub-temp').innerText = Math.round(data.main.temp) + "°C";
                 document.getElementById('hub-desc').innerText = data.weather[0].description;
                 
-                const condition = data.weather[0].main;
-                document.getElementById('dynamic-bg-image').style.backgroundImage = `url('${this.bgImages[condition] || this.bgImages.Clouds}')`;
-            } catch (e) { console.error("Weather Error", e); }
+                // मौसम अनुसार ब्याकग्राउन्ड इमेज
+                const conditions = { "Clear": "sun", "Rain": "rain", "Clouds": "clouds" };
+                const bg = data.weather[0].main;
+                document.getElementById('dynamic-bg-image').style.backgroundImage = `url('https://source.unsplash.com/600x800/?weather,${conditions[bg] || 'sky'}')`;
+            } catch (e) { console.error("Weather update failed"); }
         },
 
         openHub: async function() {
@@ -128,10 +124,9 @@
                     </div>`;
             }
             document.getElementById('forecast-render').innerHTML = html;
-        },
-
-        closeHub: function() { document.getElementById('weather-hub').style.display = 'none'; }
+        }
     };
 
-    WeatherApp.init();
+    // विन्डो लोड भएपछि रन गर्ने
+    window.addEventListener('load', () => WeatherApp.init());
 })();
