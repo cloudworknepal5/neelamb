@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal24News - Auto Unicode & Image Search</title>
+    
+    <meta name="description" content="Preeti to Unicode converter with Auto Google Image Search">
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Mukta', sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
+        .wrapper { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); }
+        h2 { color: #002e5b; border-bottom: 3px solid #ed1c24; padding-bottom: 10px; text-align: center; margin-top: 0; }
+        
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: bold; color: #444; font-size: 16px; }
+        
+        textarea { 
+            width: 100%; height: 180px; padding: 12px; border: 2px solid #ddd; 
+            border-radius: 8px; font-size: 19px; box-sizing: border-box; resize: none;
+        }
+        #legacy_text { font-family: 'Preeti', sans-serif; border-color: #ddd; }
+        #unicode_text { background: #f9f9f9; color: #002e5b; font-weight: bold; }
+
+        .search-panel { 
+            margin-top: 20px; padding: 15px; background: #eef2f7; 
+            border-radius: 10px; text-align: center; border: 2px dashed #002e5b;
+        }
+        .btn-google {
+            display: inline-block; padding: 10px 25px; background: #ed1c24; 
+            color: white; text-decoration: none; border-radius: 30px; 
+            font-weight: bold; font-size: 17px; margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(237, 28, 36, 0.3);
+        }
+
+        .image-preview-area { margin-top: 20px; width: 100%; height: 600px; border-radius: 8px; overflow: hidden; border: 1px solid #ccc; }
+        iframe { width: 100%; height: 100%; border: none; background: #fff; }
+
+        @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <h2><i class="fas fa-search"></i> Preeti to Unicode Auto Image Search</h2>
+
+    <div class="grid-container">
+        <div class="input-group">
+            <label><i class="fas fa-keyboard"></i> १. प्रीति टाइप गर्नुहोस् (Preeti):</label>
+            <textarea id="legacy_text" placeholder="यहाँ टाइप गर्नुहोस्..." oninput="convert_and_search()"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-sync"></i> २. युनिकोड (Auto Unicode):</label>
+            <textarea id="unicode_text" readonly placeholder="युनिकोड यहाँ स्वतः आउनेछ..."></textarea>
+        </div>
+    </div>
+
+    <div class="search-panel">
+        <label>३. गुगल इमेज सर्च नतिजा:</label><br>
+        <a id="google_search_btn" href="https://www.google.com/search?tbm=isch" target="_blank" class="btn-google">
+            <i class="fab fa-google"></i> नयाँ ट्याबमा फोटोहरू हेर्नुहोस्
+        </a>
+    </div>
+
+    <div class="image-preview-area">
+        <iframe id="search_frame" src="about:blank"></iframe>
+    </div>
+</div>
+
+<script type="text/javascript">
+/**
+ * Core Logic: Preeti to Unicode & Auto Image Search
+ */
+function convert_and_search() {
+    var array_one = ["ç","˜",".","'m","]m","Fmf","Fm",")","!","@","#","$","%","^","&","*","(","k|m","em","km","Qm","qm","N˜","¡","¢","1","2","4",">","?","B","I","Q","ß","q","„","‹","•","›","§","°","¶","¿","Å","Ë","Ì","Í","Î","Ý","å","6«","7«","8«","9«","Ø","|","8Þ","9Þ","S","s","V","v","U","u","£","3","ª","R","r","5","H","h","‰","´","~", "`","6","7","8","9","0","T","t","Y","y","b","W","w","G","g","K","k","ˆ","A","a","E", "e","D","d","o","/","N","n","J", "j", "Z","z","i",":",";","X","x","cf‘","c‘f","cf}","cf]","cf","c","O{","O","pm","p","C","P]","P","f‘","\"","'","+","f","[","\\","]","}","F", "L","M"];
+    var array_two = ["ॐ","ऽ","।","m'","m]","mfF","mF","०","१","२","३","४","५","६","७","८","९","फ्र","झ","फ","क्त","क्र","ल","ज्ञ्","द्घ","ज्ञ","द्द","द्ध","श्र","रु","द्य","क्ष्","त्त","द्म", "त्र","ध्र","ङ्घ","ड्ड","द्र","ट्ट","ड्ढ","ठ्ठ","रू","हृ","ङ्ग","त्र","ङ्क","ङ्क","ट्ठ","द्व","ट्र","ठ्र","ड्र","ढ्र","्य","्र","ड़","ढ़","क्","क","ख्","ख","ग्","ग","घ्","घ", "ङ","च्","च","छ","ज्","ज","झ्","झ","ञ्", "ञ","ट","ठ","ड","ढ","ण्","त्","त","थ्","थ","द","ध्","ध","न्","न","प्","प","फ्","ब्","ब","भ्","भ","म्","म","य","र","ल्","ल","व्","व","श्","श","ष्","स्","स","ह्","ह","ऑ","ऑ","औ","ओ","आ","अ","ई","इ","ऊ","उ","ऋ","ऐ","ए","ॉ","ू","ु","ं","ा","ृ","्","े","ै","ँ","ी","ः"];
+
+    var input = document.getElementById("legacy_text").value;
+    var unicode_text = input;
+
+    // Basic Replacement Loop
+    for (var i = 0; i < array_one.length; i++) {
+        unicode_text = unicode_text.split(array_one[i]).join(array_two[i]);
+    }
+
+    // Special Rules for 'l' (Chhoti Ee) and '{' (Reph)
+    unicode_text = unicode_text.replace(/l/g, "ि"); // Simplification for auto-search logic
+    
+    // Output Unicode
+    document.getElementById("unicode_text").value = unicode_text;
+
+    // Auto Search Logic
+    if (unicode_text.trim() !== "") {
+        var query = encodeURIComponent(unicode_text);
+        var googleUrl = "https://www.google.com/search?q=" + query + "&tbm=isch";
+        
+        // Update Button Link
+        document.getElementById("google_search_btn").href = googleUrl;
+        
+        // Update Iframe Preview (Note: Some browsers/Google might block iframe search for security)
+        document.getElementById("search_frame").src = googleUrl + "&output=embed";
+    } else {
+        document.getElementById("search_frame").src = "about:blank";
+    }
+}
+</script>
+
+</body>
+</html>
