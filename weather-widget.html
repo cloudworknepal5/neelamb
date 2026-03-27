@@ -12,24 +12,25 @@
             border: 1px solid #ff5722; /* ओरेन्ज बोर्डर */
             border-radius: 2px;
             height: 20px; /* २० पिक्सल हाइट */
-            width: 40px;  /* ४० पिक्सल वाइड */
-            padding: 0 !important; /* चारैतिरको प्याडिङ हटाउन */
-            margin: 0 !important;  /* चारैतिरको मार्जिन हटाउन */
+            min-width: 40px; /* न्युनतम ४० पिक्सल */
+            width: auto; /* पूरा नाम अटाउन अटोमेटिक विड्थ */
+            padding: 0 4px !important; /* दायाँ-बायाँ हल्का स्पेस ताकि अक्षर बोर्डरमा नटाँसियोस् */
+            margin: 0 !important;  
             overflow: hidden;
             box-sizing: border-box;
             font-family: sans-serif;
             vertical-align: middle;
-            line-height: 0; /* एक्स्ट्रा स्पेस हटाउन */
+            line-height: normal;
         }
 
         /* अक्षरहरूको बनावट */
         .weather-info {
-            font-size: 8px; 
+            font-size: 9px; 
             color: white;
             display: flex;
-            flex-direction: column;
-            line-height: 8px; /* अक्षरहरू बीचको ग्याप कम गर्न */
-            text-align: center;
+            align-items: center;
+            gap: 4px; /* नाम र तापक्रम बीचको ग्याप */
+            white-space: nowrap; /* नामलाई अर्को लाइनमा जान नदिन */
             font-weight: bold;
             padding: 0;
             margin: 0;
@@ -38,14 +39,16 @@
         .temp-text {
             color: #ff5722; 
         }
+
+        /* लोडिङ एनिमेसन (Optional) */
+        .loading { opacity: 0.5; font-size: 7px; }
     </style>
 </head>
 <body>
 
     <div class="nb-weather-widget">
-        <div class="weather-info">
-            <span id="widget-city">---</span>
-            <span id="widget-temp" class="temp-text">--°</span>
+        <div class="weather-info" id="weather-content">
+            <span class="loading">खोज्दै...</span>
         </div>
     </div>
 
@@ -55,37 +58,47 @@
             
             init: function() {
                 this.autoDetect();
-                // १५ मिनेटमा अटो अपडेट
-                setInterval(() => this.autoDetect(), 900000);
+                // हरेक ३० मिनेटमा अटो अपडेट
+                setInterval(() => this.autoDetect(), 1800000);
             },
 
+            // IP को आधारमा अटोमेटिक लोकेशन पत्ता लगाउने
             autoDetect: async function() {
                 try {
                     const res = await fetch('https://ipapi.co/json/');
                     const data = await res.json();
-                    this.fetchWeather(data.city || "Birgunj");
+                    if(data.city) {
+                        this.fetchWeather(data.city);
+                    } else {
+                        throw new Error("Location not found");
+                    }
                 } catch(e) {
+                    // यदि IP फेल भयो भने डिफल्ट Birgunj राख्ने
                     this.fetchWeather("Birgunj");
                 }
             },
 
+            // मौसम डाटा लिने
             fetchWeather: async function(city) {
                 try {
                     const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}`);
                     const data = await res.json();
                     
-                    // सहरको नाम ३ अक्षरमा (जस्तै: BIR)
-                    const cityName = data.name.substring(0, 3).toUpperCase();
+                    const fullCityName = data.name; // पूरा नाम
                     const temperature = Math.round(data.main.temp);
 
-                    document.getElementById('widget-city').innerText = cityName;
-                    document.getElementById('widget-temp').innerText = temperature + "°";
+                    // HTML अपडेट
+                    document.getElementById('weather-content').innerHTML = `
+                        <span id="widget-city">${fullCityName}</span>
+                        <span id="widget-temp" class="temp-text">${temperature}°</span>
+                    `;
                 } catch(err) {
-                    console.error("Weather update failed.");
+                    document.getElementById('weather-content').innerHTML = "Err";
                 }
             }
         };
 
+        // पेज लोड भएपछि सुरु गर्ने
         WeatherWidget.init();
     </script>
 
