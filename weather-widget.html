@@ -2,166 +2,92 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'w-accent': '#ff5722',
-                        'w-dark': '#0d1117',
-                    },
-                    boxShadow: {
-                        'w-glow': '0 0 40px rgba(255, 87, 34, 0.4)',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        /* Fade In Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, -45%); }
-            to { opacity: 1; transform: translate(-50%, -50%); }
-        }
-        
-        #weather-popup.active {
-            display: flex !important;
-            animation: fadeIn 0.4s ease-out forwards;
+        /* १. मुख्य विजेट स्टाइल (No Padding/Margin) */
+        .nb-weather-widget {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #000; /* कालो ब्याकग्राउन्ड */
+            border: 1px solid #ff5722; /* ओरेन्ज बोर्डर */
+            border-radius: 2px;
+            height: 20px; 
+            width: 40px; 
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            vertical-align: middle;
         }
 
-        /* Glassmorphism Effect */
-        .glass-card {
-            background: rgba(13, 17, 23, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+        /* अक्षरहरूको बनावट */
+        .weather-info {
+            font-size: 8px; 
+            color: white;
+            display: flex;
+            flex-direction: column;
+            line-height: 8px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
-        .w-transition-all {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        .temp-text {
+            color: #ff5722; /* तापक्रमको रङ */
         }
     </style>
 </head>
-<body class="bg-gray-900">
+<body>
 
-    <div class="nb-weather-embed fixed top-4 right-4">
-        <div id="weather-btn" class="w-[40px] h-[20px] bg-black border border-w-accent rounded-sm cursor-pointer flex items-center justify-center p-0 m-0 overflow-hidden z-[999999]">
-            <div class="text-white text-[8px] flex flex-col leading-none text-center font-bold font-sans pointer-events-none">
-                <span id="m-city">BIR</span>
-                <span id="m-temp" class="text-w-accent">--°</span>
-            </div>
-        </div>
-
-        <div id="weather-popup" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[350px] glass-card border border-white/20 rounded-[2rem] shadow-w-glow hidden flex-col z-[10000000] overflow-hidden font-sans">
-            
-            <span id="close-popup" class="absolute top-4 right-5 text-2xl text-white/50 hover:text-white cursor-pointer z-50">&times;</span>
-
-            <div id="popup-bg" class="flex-1 p-6 flex flex-col items-center justify-between text-white w-transition-all bg-cover bg-center relative">
-                <div class="text-center">
-                    <div id="clock" class="text-4xl font-black tracking-tighter">00:00:00</div>
-                    <div id="en-date" class="text-[10px] uppercase tracking-widest text-white/60">-- ---, ----</div>
-                </div>
-
-                <div class="flex flex-col items-center">
-                    <img id="main-icon" src="" class="w-16 h-16 -mb-2 drop-shadow-lg" alt="Weather Icon">
-                    <div id="hub-temp" class="text-7xl font-black text-w-accent leading-none">--°</div>
-                    <div class="text-center mt-1">
-                        <p id="hub-city" class="text-lg font-bold">लोड हुँदै...</p>
-                        <span id="hub-desc" class="text-[10px] text-w-accent font-bold uppercase tracking-widest">---</span>
-                    </div>
-                </div>
-
-                <div class="w-full border-t border-white/10 pt-4">
-                    <div id="forecast-render" class="flex justify-between items-center px-1">
-                        </div>
-                </div>
-            </div>
+    <div class="nb-weather-widget">
+        <div class="weather-info">
+            <span id="widget-city">---</span>
+            <span id="widget-temp" class="temp-text">--°</span>
         </div>
     </div>
 
     <script>
-        const WeatherApp = {
+        const WeatherWidget = {
             apiKey: "9c17c4095ee2a4042c26bbd4d4de1726",
             
             init: function() {
-                this.updateClock();
-                setInterval(() => this.updateClock(), 1000);
                 this.autoDetect();
-                this.setupListeners();
-            },
-
-            setupListeners: function() {
-                const btn = document.getElementById('weather-btn');
-                const close = document.getElementById('close-popup');
-                const popup = document.getElementById('weather-popup');
-
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    popup.classList.add('active');
-                });
-
-                close.addEventListener('click', () => popup.classList.remove('active'));
-
-                document.addEventListener('click', (e) => {
-                    if (!popup.contains(e.target) && e.target !== btn) {
-                        popup.classList.remove('active');
-                    }
-                });
+                // हरेक १५ मिनेटमा अपडेट गर्ने
+                setInterval(() => this.autoDetect(), 900000);
             },
 
             autoDetect: async function() {
                 try {
+                    // प्रयोगकर्ताको सहर पत्ता लगाउने
                     const res = await fetch('https://ipapi.co/json/');
                     const data = await res.json();
                     this.fetchWeather(data.city || "Birgunj");
-                } catch(e) { this.fetchWeather("Birgunj"); }
+                } catch(e) {
+                    this.fetchWeather("Birgunj");
+                }
             },
 
             fetchWeather: async function(city) {
                 try {
-                    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
+                    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}`);
                     const data = await res.json();
                     
-                    // आइकन सेट गर्ने (Icon Fix)
-                    const iconCode = data.weather[0].icon;
-                    document.getElementById('main-icon').src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-                    
-                    document.getElementById('m-city').innerText = data.name.substring(0, 3).toUpperCase();
-                    document.getElementById('m-temp').innerText = Math.round(data.main.temp) + "°";
-                    document.getElementById('hub-temp').innerText = Math.round(data.main.temp) + "°";
-                    document.getElementById('hub-city').innerText = data.name;
-                    document.getElementById('hub-desc').innerText = data.weather[0].description;
-                    
-                    this.fetchForecast(city);
-                } catch(err) { console.error("Weather Load Error:", err); }
-            },
+                    // सहरको नामलाई ३ अक्षरमा खुम्च्याउने (जस्तै: BIR)
+                    const cityName = data.name.substring(0, 3).toUpperCase();
+                    const temperature = Math.round(data.main.temp);
 
-            fetchForecast: async function(city) {
-                const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
-                const data = await res.json();
-                let html = '';
-                for(let i = 0; i < data.list.length; i += 8) {
-                    const d = data.list[i];
-                    const day = new Date(d.dt * 1000).toLocaleDateString('ne-NP', {weekday: 'short'});
-                    html += `
-                        <div class="flex flex-col items-center">
-                            <span class="text-[8px] text-white/50 font-bold mb-1">${day}</span>
-                            <img src="https://openweathermap.org/img/wn/${d.weather[0].icon}.png" class="w-6 h-6">
-                            <span class="text-[10px] font-bold mt-1">${Math.round(d.main.temp)}°</span>
-                        </div>`;
+                    document.getElementById('widget-city').innerText = cityName;
+                    document.getElementById('widget-temp').innerText = temperature + "°";
+                } catch(err) {
+                    console.error("Weather update failed.");
                 }
-                document.getElementById('forecast-render').innerHTML = html;
-            },
-
-            updateClock: function() {
-                const now = new Date();
-                document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', {hour12: false});
-                document.getElementById('en-date').innerText = now.toLocaleDateString('en-US', {day: 'numeric', month: 'short', year: 'numeric'});
             }
         };
 
-        window.onload = () => WeatherApp.init();
+        // लोड भएपछि सुचारु गर्ने
+        WeatherWidget.init();
     </script>
+
 </body>
 </html>
