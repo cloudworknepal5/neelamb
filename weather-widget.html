@@ -3,88 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeelamB Minimal Weather</title>
+    <title>NeelamB Flexible Weather Tool</title>
     <style>
-        :root { --accent: #ff5722; --bg-dark: #121212; }
+        :root { --accent: #ff5722; --bg-dark: #121212; --panel-w: 280px; }
         body { margin: 0; padding: 0; background: transparent; font-family: 'Segoe UI', sans-serif; }
 
-        /* १. सुरुको सानो २५x२५ आइकन + सेल्सियस मात्र */
-        #weather-icon-trigger {
+        /* मुख्य एम्बेड कन्टेनर (तपाईंले जहाँ राख्नुहुन्छ, त्यहाँ यो बस्छ) */
+        .nb-weather-embed {
+            position: relative; /* पपअपलाई यसको भित्र राख्न */
+            display: inline-block; /* Nav-bar मा अरू मेनुसँग मिल्न */
+            vertical-align: middle;
+            font-family: 'Segoe UI', sans-serif;
+            z-index: 100; /* मेनु भन्दा अलि माथि */
+        }
+
+        /* १. सुरुको सानो २५x२५ आइकन + सेल्सियस (Trigger) */
+        .weather-trigger {
             display: flex; align-items: center; cursor: pointer;
-            position: fixed; top: 10px; left: 10px; z-index: 1000;
-            background: rgba(0,0,0,0.85); border-radius: 8px;
+            background: rgba(0,0,0,0.8); border-radius: 8px;
             padding: 2px 6px 2px 2px; border: 1px solid rgba(255,255,255,0.2);
-            transition: 0.3s;
+            transition: 0.2s; height: 30px; box-sizing: border-box;
         }
-        #weather-icon-trigger:hover { border-color: var(--accent); background: #000; scale: 1.05; }
+        .weather-trigger:hover { border-color: var(--accent); background: #000; }
 
-        #mini-img { width: 25px; height: 25px; display: block; }
-        
-        /* मात्र सेल्सियस देखाउने स्टाइल */
-        #mini-temp-only {
-            font-size: 13px; color: white; font-weight: bold;
-            margin-left: 2px; letter-spacing: -0.5px;
-        }
+        .mini-img { width: 25px; height: 25px; display: block; flex-shrink: 0; }
+        .mini-temp { font-size: 13px; color: white; font-weight: bold; margin-left: 2px; }
 
-        /* २. ३००x३०० पपअप विन्डो */
-        #weather-popup {
-            display: none; position: fixed; top: 50px; left: 10px;
-            width: 300px; height: 300px; border-radius: 15px; 
-            overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+        /* २. पपअप प्यानल (आइकनको ठीक तल खुल्ने) */
+        .weather-panel {
+            display: none; position: absolute; 
+            top: 100%; /* आइकनको तल */
+            left: 0; /* बायाँबाट सुरु */
+            width: var(--panel-w); height: 320px; /* ५ दिनको डाटाका लागि हाइट अलि बढी */
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             background-color: var(--bg-dark); border: 2px solid #fff;
-            z-index: 9999; flex-direction: column;
-            opacity: 0; transform: translateY(-10px);
+            z-index: 99999; flex-direction: column;
+            opacity: 0; transform: translateY(10px);
             transition: 0.3s ease-out; background-size: cover; background-position: center;
+            margin-top: 5px; /* सानो ग्याप */
         }
-        #weather-popup.show { display: flex; opacity: 1; transform: translateY(0); }
+        /* यदि ठाउँ सानो छ भने दायाँतिर सार्ने लजिक (Optional CSS) */
+        .nb-weather-embed.align-right .weather-panel { left: auto; right: 0; }
+
+        .weather-panel.show { display: flex; opacity: 1; transform: translateY(0); }
 
         .overlay {
             flex: 1; background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.9));
-            padding: 12px; display: flex; flex-direction: column; align-items: center; color: white;
+            padding: 10px; display: flex; flex-direction: column; align-items: center; color: white;
         }
 
-        .date-box { background: #fff; padding: 2px 8px; border-radius: 20px; margin-bottom: 5px; transform: scale(0.85); }
-        #clock { font-size: 2.2rem; font-weight: 800; margin: 0; text-shadow: 2px 2px 5px #000; }
-        #en-date { font-size: 0.8rem; opacity: 0.8; margin-bottom: 8px; }
+        .date-box { background: #fff; padding: 2px 8px; border-radius: 20px; margin-bottom: 5px; transform: scale(0.8); }
+        .clock { font-size: 2rem; font-weight: 800; margin: 0; text-shadow: 2px 2px 5px #000; }
+        .en-date { font-size: 0.75rem; opacity: 0.8; margin-bottom: 5px; }
 
-        .weather-main { display: flex; align-items: center; gap: 12px; margin-top: 5px; }
-        #hub-temp { font-size: 3.5rem; font-weight: 900; color: var(--accent); line-height: 1; }
-        #hub-city { font-size: 1.1rem; font-weight: bold; text-transform: uppercase; margin: 0; }
-        #hub-desc { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+        .weather-main { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .hub-temp { font-size: 3.2rem; font-weight: 900; color: var(--accent); line-height: 1; }
+        .hub-city { font-size: 1rem; font-weight: bold; text-transform: uppercase; margin: 0; }
+        .hub-desc { font-size: 0.75rem; color: var(--accent); font-weight: 600; }
 
+        /* ५ दिनको पूर्वानुमान */
         .forecast-grid {
             width: 100%; display: flex; justify-content: space-between;
-            margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); gap: 2px;
         }
-        .f-day { font-size: 0.65rem; text-align: center; background: rgba(0,0,0,0.4); padding: 5px 2px; border-radius: 6px; width: 18%; }
-        .f-day img { width: 22px; height: 22px; }
+        .f-day { font-size: 0.6rem; text-align: center; background: rgba(0,0,0,0.4); padding: 4px 1px; border-radius: 5px; flex: 1; }
+        .f-day img { width: 18px; height: 18px; }
 
-        .close-btn { position: absolute; top: 5px; right: 12px; font-size: 26px; cursor: pointer; color: white; opacity: 0.8; }
+        .close-btn { position: absolute; top: 5px; right: 10px; font-size: 22px; cursor: pointer; color: white; opacity: 0.7; z-index: 10; }
     </style>
 </head>
 <body>
 
-<div id="weather-icon-trigger" onclick="WeatherApp.toggle()">
-    <img id="mini-img" src="" alt="">
-    <span id="mini-temp-only">--°</span>
-</div>
+<div class="nb-weather-embed" id="nb-weather-tool">
+    <div class="weather-trigger" onclick="WeatherApp.toggle()">
+        <img class="mini-img" id="mini-img" src="" alt="">
+        <span class="mini-temp" id="mini-temp-only">--°</span>
+    </div>
 
-<div id="weather-popup">
-    <span class="close-btn" onclick="WeatherApp.toggle()">&times;</span>
-    <div class="overlay" id="popup-bg">
-        <div class="date-box">
-            <iframe scrolling="no" frameborder="0" src="https://www.ashesh.com.np/linknepali-time.php?dwn=only&font_color=ff0000&font_size=12&bikram_sambat=0&api=9011x2p216" width="130" height="22"></iframe>
-        </div>
-        <div id="clock">00:00:00</div>
-        <div id="en-date">-- ---, ----</div>
-        <div class="weather-main">
-            <div id="hub-temp">--°</div>
-            <div style="text-align: left;">
-                <p id="hub-city">Birgunj</p>
-                <span id="hub-desc">लोड हुँदै...</span>
+    <div class="weather-panel" id="weather-popup">
+        <span class="close-btn" onclick="WeatherApp.toggle()">&times;</span>
+        <div class="overlay" id="popup-bg">
+            <div class="date-box">
+                <iframe scrolling="no" frameborder="0" src="https://www.ashesh.com.np/linknepali-time.php?dwn=only&font_color=ff0000&font_size=14&bikram_sambat=0&api=9011x2p216" width="130" height="22"></iframe>
             </div>
+            <div class="clock" id="clock">00:00:00</div>
+            <div class="en-date" id="en-date">-- ---, ----</div>
+            <div class="weather-main">
+                <div class="hub-temp" id="hub-temp">--°</div>
+                <div style="text-align: left;">
+                    <p class="hub-city" id="hub-city">Birgunj</p>
+                    <span class="hub-desc" id="hub-desc">लोड हुँदै...</span>
+                </div>
+            </div>
+            <div class="forecast-grid" id="forecast-render"></div>
         </div>
-        <div class="forecast-grid" id="forecast-render"></div>
     </div>
 </div>
 
@@ -115,7 +128,6 @@ const WeatherApp = {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
         const data = await res.json();
         
-        // मात्र आइकन र तापक्रम (°C) अपडेट
         document.getElementById('mini-img').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
         document.getElementById('mini-temp-only').innerText = `${Math.round(data.main.temp)}°`;
 
@@ -148,13 +160,7 @@ const WeatherApp = {
 
     toggle: function() {
         const popup = document.getElementById('weather-popup');
-        if (popup.classList.contains('show')) {
-            popup.classList.remove('show');
-            setTimeout(() => popup.style.display = 'none', 300);
-        } else {
-            popup.style.display = 'flex';
-            setTimeout(() => popup.classList.add('show'), 10);
-        }
+        popup.classList.toggle('show');
     }
 };
 
