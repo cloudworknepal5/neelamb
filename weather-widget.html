@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        /* १. मुख्य विजेट स्टाइल (No Padding/Margin) */
+        /* १. मुख्य विजेट स्टाइल - No Padding/Margin */
         .nb-weather-widget {
             display: inline-flex;
             align-items: center;
@@ -11,14 +11,15 @@
             background: #000; /* कालो ब्याकग्राउन्ड */
             border: 1px solid #ff5722; /* ओरेन्ज बोर्डर */
             border-radius: 2px;
-            height: 20px; 
-            width: 40px; 
-            padding: 0;
-            margin: 0;
+            height: 20px; /* २० पिक्सल हाइट */
+            width: 40px;  /* ४० पिक्सल वाइड */
+            padding: 0 !important; /* चारैतिरको प्याडिङ हटाउन */
+            margin: 0 !important;  /* चारैतिरको मार्जिन हटाउन */
             overflow: hidden;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: sans-serif;
             vertical-align: middle;
+            line-height: 0; /* एक्स्ट्रा स्पेस हटाउन */
         }
 
         /* अक्षरहरूको बनावट */
@@ -27,14 +28,15 @@
             color: white;
             display: flex;
             flex-direction: column;
-            line-height: 8px;
+            line-height: 8px; /* अक्षरहरू बीचको ग्याप कम गर्न */
             text-align: center;
             font-weight: bold;
-            letter-spacing: 0.5px;
+            padding: 0;
+            margin: 0;
         }
 
         .temp-text {
-            color: #ff5722; /* तापक्रमको रङ */
+            color: #ff5722; 
         }
     </style>
 </head>
@@ -53,13 +55,12 @@
             
             init: function() {
                 this.autoDetect();
-                // हरेक १५ मिनेटमा अपडेट गर्ने
+                // १५ मिनेटमा अटो अपडेट
                 setInterval(() => this.autoDetect(), 900000);
             },
 
             autoDetect: async function() {
                 try {
-                    // प्रयोगकर्ताको सहर पत्ता लगाउने
                     const res = await fetch('https://ipapi.co/json/');
                     const data = await res.json();
                     this.fetchWeather(data.city || "Birgunj");
@@ -73,7 +74,7 @@
                     const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}`);
                     const data = await res.json();
                     
-                    // सहरको नामलाई ३ अक्षरमा खुम्च्याउने (जस्तै: BIR)
+                    // सहरको नाम ३ अक्षरमा (जस्तै: BIR)
                     const cityName = data.name.substring(0, 3).toUpperCase();
                     const temperature = Math.round(data.main.temp);
 
@@ -85,7 +86,6 @@
             }
         };
 
-        // लोड भएपछि सुचारु गर्ने
         WeatherWidget.init();
     </script>
 
