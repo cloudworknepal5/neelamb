@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeelamB Minimal Weather</title>
+    <style>
+        :root { --accent: #ff5722; --bg-dark: #121212; }
+        body { margin: 0; padding: 0; background: transparent; font-family: 'Segoe UI', sans-serif; }
+
+        /* १. सुरुको सानो २५x२५ आइकन + सेल्सियस मात्र */
+        #weather-icon-trigger {
+            display: flex; align-items: center; cursor: pointer;
+            position: fixed; top: 10px; left: 10px; z-index: 1000;
+            background: rgba(0,0,0,0.85); border-radius: 8px;
+            padding: 2px 6px 2px 2px; border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.3s;
+        }
+        #weather-icon-trigger:hover { border-color: var(--accent); background: #000; scale: 1.05; }
+
+        #mini-img { width: 25px; height: 25px; display: block; }
+        
+        /* मात्र सेल्सियस देखाउने स्टाइल */
+        #mini-temp-only {
+            font-size: 13px; color: white; font-weight: bold;
+            margin-left: 2px; letter-spacing: -0.5px;
+        }
+
+        /* २. ३००x३०० पपअप विन्डो */
+        #weather-popup {
+            display: none; position: fixed; top: 50px; left: 10px;
+            width: 300px; height: 300px; border-radius: 15px; 
+            overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            background-color: var(--bg-dark); border: 2px solid #fff;
+            z-index: 9999; flex-direction: column;
+            opacity: 0; transform: translateY(-10px);
+            transition: 0.3s ease-out; background-size: cover; background-position: center;
+        }
+        #weather-popup.show { display: flex; opacity: 1; transform: translateY(0); }
+
+        .overlay {
+            flex: 1; background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.9));
+            padding: 12px; display: flex; flex-direction: column; align-items: center; color: white;
+        }
+
+        .date-box { background: #fff; padding: 2px 8px; border-radius: 20px; margin-bottom: 5px; transform: scale(0.85); }
+        #clock { font-size: 2.2rem; font-weight: 800; margin: 0; text-shadow: 2px 2px 5px #000; }
+        #en-date { font-size: 0.8rem; opacity: 0.8; margin-bottom: 8px; }
+
+        .weather-main { display: flex; align-items: center; gap: 12px; margin-top: 5px; }
+        #hub-temp { font-size: 3.5rem; font-weight: 900; color: var(--accent); line-height: 1; }
+        #hub-city { font-size: 1.1rem; font-weight: bold; text-transform: uppercase; margin: 0; }
+        #hub-desc { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+
+        .forecast-grid {
+            width: 100%; display: flex; justify-content: space-between;
+            margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .f-day { font-size: 0.65rem; text-align: center; background: rgba(0,0,0,0.4); padding: 5px 2px; border-radius: 6px; width: 18%; }
+        .f-day img { width: 22px; height: 22px; }
+
+        .close-btn { position: absolute; top: 5px; right: 12px; font-size: 26px; cursor: pointer; color: white; opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<div id="weather-icon-trigger" onclick="WeatherApp.toggle()">
+    <img id="mini-img" src="" alt="">
+    <span id="mini-temp-only">--°</span>
+</div>
+
+<div id="weather-popup">
+    <span class="close-btn" onclick="WeatherApp.toggle()">&times;</span>
+    <div class="overlay" id="popup-bg">
+        <div class="date-box">
+            <iframe scrolling="no" frameborder="0" src="https://www.ashesh.com.np/linknepali-time.php?dwn=only&font_color=ff0000&font_size=12&bikram_sambat=0&api=9011x2p216" width="130" height="22"></iframe>
+        </div>
+        <div id="clock">00:00:00</div>
+        <div id="en-date">-- ---, ----</div>
+        <div class="weather-main">
+            <div id="hub-temp">--°</div>
+            <div style="text-align: left;">
+                <p id="hub-city">Birgunj</p>
+                <span id="hub-desc">लोड हुँदै...</span>
+            </div>
+        </div>
+        <div class="forecast-grid" id="forecast-render"></div>
+    </div>
+</div>
+
+<script>
+const WeatherApp = {
+    apiKey: "9c17c4095ee2a4042c26bbd4d4de1726",
+    images: {
+        "Clear": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjD9vK0fHjW8V3A_X6_U7Q6K0X6K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0K0/s16000/sunny.JPG",
+        "Rain": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi9W1lXVusj66HU4ISBHII01wMiZUJgATa4_X1wUFocF1Jv8OaHbjzWb_D0aE9LfnJMWYtj4pEUvmaBNsH2AxgVPcY-gxnqtgpuR26IEEG88xSl0euufrUJIZjMYezNJICzCxdA7M7RCMvNN2Pk0eUlTjGNzDNEpopc-mH0IpFkRxJIKP72iydLZtZleW8K/s16000/rainy.JPG",
+        "Clouds": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7R7J_yIkLz_lwqzCEoOoNVLGzww3cyXKS5_-YaYfdi68Iur5DZPlp6fIVJmoGCz_ktUKdsRdH421s7DR_aVy-i-ti8G07KuDt1bN29N-WI3hFQWbg_Ke_UsJe9JugngQpiOpODIdPqm5yr4-TShsA0BAEE3ERhQ9AKyFI6y6DaMdPh-GUZ8VgU1MuJeAI/s16000/cloudy.JPG"
+    },
+
+    init: function() {
+        this.updateClock();
+        setInterval(() => this.updateClock(), 1000);
+        this.autoDetect();
+    },
+
+    autoDetect: async function() {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            this.fetchWeather(data.city || "Birgunj");
+        } catch(e) { this.fetchWeather("Birgunj"); }
+    },
+
+    fetchWeather: async function(city) {
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
+        const data = await res.json();
+        
+        // मात्र आइकन र तापक्रम (°C) अपडेट
+        document.getElementById('mini-img').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+        document.getElementById('mini-temp-only').innerText = `${Math.round(data.main.temp)}°`;
+
+        document.getElementById('hub-temp').innerText = Math.round(data.main.temp) + "°";
+        document.getElementById('hub-city').innerText = data.name;
+        document.getElementById('hub-desc').innerText = data.weather[0].description;
+        
+        const cond = data.weather[0].main;
+        document.getElementById('popup-bg').style.backgroundImage = `url('${this.images[cond] || this.images["Clouds"]}')`;
+        this.fetchForecast(city);
+    },
+
+    fetchForecast: async function(city) {
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
+        const data = await res.json();
+        let html = '';
+        for(let i = 0; i < data.list.length; i += 8) {
+            const d = data.list[i];
+            const day = new Date(d.dt * 1000).toLocaleDateString('ne-NP', {weekday: 'short'});
+            html += `<div class="f-day"><span>${day}</span><br><img src="https://openweathermap.org/img/wn/${d.weather[0].icon}.png"><br><b>${Math.round(d.main.temp)}°</b></div>`;
+        }
+        document.getElementById('forecast-render').innerHTML = html;
+    },
+
+    updateClock: function() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', {hour12: false});
+        document.getElementById('en-date').innerText = now.toLocaleDateString('en-US', {day: 'numeric', month: 'short', year: 'numeric'});
+    },
+
+    toggle: function() {
+        const popup = document.getElementById('weather-popup');
+        if (popup.classList.contains('show')) {
+            popup.classList.remove('show');
+            setTimeout(() => popup.style.display = 'none', 300);
+        } else {
+            popup.style.display = 'flex';
+            setTimeout(() => popup.classList.add('show'), 10);
+        }
+    }
+};
+
+WeatherApp.init();
+</script>
+</body>
+</html>
