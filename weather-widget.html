@@ -2,27 +2,12 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root { 
-            --accent: #ff5722; 
-            --bg-dark: #121212; 
-        }
-
-        /* मुख्य एम्बेड कन्टेनर - कुनै मार्जिन/प्याडिङ नभएको */
-        .nb-weather-embed {
-            position: relative;
-            display: inline-flex;
-            vertical-align: middle;
-            margin: 0;
-            padding: 0;
-            z-index: 999999;
-            line-height: normal;
-        }
-
-        /* १. ट्रिगर बटन (२०px हाइट र ४०px वाइड - No Padding) */
+        :root { --accent: #ff5722; --bg: #121212; }
+        
+        /* १. ट्रिगर बटन (२०x४० पिक्सल - No Padding) */
         .weather-trigger {
-            display: flex; 
+            display: inline-flex; 
             align-items: center; 
             justify-content: center;
             cursor: pointer;
@@ -31,47 +16,49 @@
             border-radius: 2px;
             height: 20px; 
             width: 40px; 
-            box-sizing: border-box;
+            padding: 0;
             margin: 0;
-            padding: 0; /* प्याडिङ शून्य */
             overflow: hidden;
+            position: relative;
+            z-index: 999999;
         }
 
-        /* सानो अक्षरमा सहर र तापक्रम */
         .mini-info {
             font-size: 8px; 
             color: white;
             display: flex;
-            flex-direction: column; /* माथि सहर, तल तापक्रम */
+            flex-direction: column;
             line-height: 9px;
             text-align: center;
             font-weight: bold;
             font-family: sans-serif;
         }
 
-        /* २. पपअप प्यानल */
+        /* २. पपअप प्यानल (सिधै खुल्ने गरी सेट गरिएको) */
         .weather-panel {
-            display: none; 
-            position: absolute; 
-            top: 22px; 
-            right: 0; /* मेनुको दायाँबाट खुल्ने */
+            display: flex; /* सिधै देखिने बनाउन */
+            position: fixed; /* वेबसाइटको अन्य एलिमेन्ट भन्दा माथि बस्न */
+            top: 50px; 
+            right: 20px; 
             width: 250px; 
             height: 300px;
-            border-radius: 8px; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            background-color: var(--bg-dark); 
-            border: 1px solid #fff;
-            z-index: 999999;
+            border-radius: 10px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+            background-color: var(--bg); 
+            border: 2px solid #fff;
+            z-index: 1000000; /* सबैभन्दा उच्च प्रायोरिटी */
             flex-direction: column;
             overflow: hidden;
+            font-family: sans-serif;
         }
 
-        .weather-panel.show { display: flex; }
+        /* बन्द गर्न मिल्ने अप्सन */
+        .weather-panel.hide { display: none; }
 
         .overlay {
             flex: 1; 
-            background: rgba(0,0,0,0.8);
-            padding: 10px; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
+            padding: 15px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -79,37 +66,40 @@
         }
 
         .clock { font-size: 1.5rem; font-weight: 800; margin: 0; }
-        .hub-temp { font-size: 2.2rem; font-weight: 900; color: var(--accent); margin: 5px 0; }
-        .hub-city { font-size: 0.9rem; margin: 0; font-weight: bold; }
+        .hub-temp { font-size: 2.5rem; font-weight: 900; color: var(--accent); margin: 5px 0; }
+        .hub-city { font-size: 1rem; font-weight: bold; margin: 0; }
 
         .forecast-grid {
             width: 100%; display: flex; justify-content: space-between;
-            margin-top: auto; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.2);
         }
         .f-day { font-size: 0.55rem; text-align: center; flex: 1; }
         .f-day img { width: 18px; }
 
-        .close-btn { position: absolute; top: 2px; right: 8px; font-size: 18px; cursor: pointer; color: white; opacity: 0.7; }
+        .close-btn { 
+            position: absolute; top: 5px; right: 10px; 
+            font-size: 20px; cursor: pointer; color: white; 
+            background: rgba(255,255,255,0.1); border-radius: 50%; width: 25px; height: 25px;
+            display: flex; align-items: center; justify-content: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="nb-weather-embed">
-        <div class="weather-trigger" onclick="WeatherApp.toggle()">
-            <div class="mini-info">
-                <span id="m-city">--</span>
-                <span id="m-temp" style="color:var(--accent)">--°</span>
-            </div>
+    <div class="weather-trigger" onclick="WeatherApp.toggle()">
+        <div class="mini-info">
+            <span id="m-city">--</span>
+            <span id="m-temp" style="color:var(--accent)">--°</span>
         </div>
+    </div>
 
-        <div class="weather-panel" id="weather-popup">
-            <span class="close-btn" onclick="WeatherApp.toggle()">&times;</span>
-            <div class="overlay" id="popup-bg">
-                <div class="clock" id="clock">00:00:00</div>
-                <div class="hub-temp" id="hub-temp">--°</div>
-                <p class="hub-city" id="hub-city">लोड हुँदै...</p>
-                <div class="forecast-grid" id="forecast-render"></div>
-            </div>
+    <div class="weather-panel" id="weather-popup">
+        <span class="close-btn" onclick="WeatherApp.toggle()">&times;</span>
+        <div class="overlay" id="popup-bg">
+            <div class="clock" id="clock">00:00:00</div>
+            <div class="hub-temp" id="hub-temp">--°</div>
+            <p class="hub-city" id="hub-city">लोड हुँदै...</p>
+            <div class="forecast-grid" id="forecast-render"></div>
         </div>
     </div>
 
@@ -136,7 +126,6 @@
                     const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
                     const data = await res.json();
                     
-                    // २०x४० को बटनमा अटाउन सहरको नाम ३ अक्षर मात्र
                     document.getElementById('m-city').innerText = data.name.substring(0, 3).toUpperCase();
                     document.getElementById('m-temp').innerText = Math.round(data.main.temp) + "°";
 
@@ -166,7 +155,8 @@
 
             toggle: function() {
                 const popup = document.getElementById('weather-popup');
-                popup.classList.toggle('show');
+                // सुरुमा देखिने भएकोले 'hide' क्लासलाई टगल गर्ने
+                popup.classList.toggle('hide');
             }
         };
 
