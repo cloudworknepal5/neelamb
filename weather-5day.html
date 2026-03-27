@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 'w-accent': '#ff5722' },
+                    animation: {
+                        'sun-rotate': 'rotate-sun 10s linear infinite',
+                        'star-blink': 'blink 2s ease-in-out infinite',
+                        'rain-drop': 'fall 0.8s linear infinite',
+                        'moon-orbit': 'moon-float 15s linear infinite', // नयाँ एनिमेशन
+                    },
+                    keyframes: {
+                        'rotate-sun': { '0%': { transform: 'rotate(0deg) scale(1)' }, '50%': { transform: 'rotate(180deg) scale(1.1)' }, '100%': { transform: 'rotate(360deg) scale(1)' } },
+                        'blink': { '0%, 100%': { opacity: 0.3 }, '50%': { opacity: 1 } },
+                        'fall': { '0%': { transform: 'translateY(-20px)', opacity: 0 }, '50%': { opacity: 0.8 }, '100%': { transform: 'translateY(180px)', opacity: 0 } },
+                        'moon-float': { // नयाँ चन्द्रमा एनिमेशन
+                            '0%': { transform: 'translateX(-50px) translateY(50px)' },
+                            '50%': { transform: 'translateX(250px) translateY(-50px)' },
+                            '100%': { transform: 'translateX(-50px) translateY(50px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .weather-bg { transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .rain-layer span { position: absolute; width: 1px; height: 15px; background: white; opacity: 0.3; top: -20px; }
+        .star-layer span { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; }
+        .moon-layer span { position: absolute; width: 40px; height: 40px; background: white; border-radius: 50%; blur: 2px; box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.5); top: 50px; left: -50px; } /* चन्द्रमाको आकार र चमक */
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-black">
+
+    <div id="main-card" class="w-[300px] h-[200px] border border-white/20 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden p-5 text-white relative weather-bg">
+        
+        <div id="rain-container" class="absolute inset-0 pointer-events-none hidden rain-layer"></div>
+        <div id="star-container" class="absolute inset-0 pointer-events-none hidden star-layer"></div>
+        <div id="moon-container" class="absolute inset-0 pointer-events-none hidden moon-layer"> <span class="animate-moon-orbit"></span>
+        </div>
+        <div id="sun-ray" class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-400/20 blur-3xl animate-sun-rotate hidden"></div>
+
+        <div class="flex justify-between items-start z-20">
+            <div class="glass-section">
+                <div id="clock" class="text-3xl font-black tracking-tighter">00:00:00</div>
+                <div id="en-date" class="text-[9px] uppercase tracking-[0.2em] text-white/70">-- ---, ----</div>
+            </div>
+            <div class="text-right">
+                <p id="hub-city" class="text-[10px] font-bold truncate w-24 uppercase">लोड हुँदै...</p>
+                <div id="hub-desc" class="text-[7px] bg-white/20 px-2 py-0.5 rounded-full inline-block mt-1">---</div>
+            </div>
+        </div>
+
+        <div class="flex-1 flex items-center justify-center z-20">
+            <div id="hub-temp" class="text-7xl font-black leading-none tracking-tighter drop-shadow-2xl">--°</div>
+        </div>
+
+        <div class="border-t border-white/10 pt-3 z-20 bg-black/5 -mx-5 px-5">
+            <div id="forecast-render" class="flex justify-between items-center opacity-90"></div>
+        </div>
+    </div>
+
+    <script>
+        const WeatherApp = {
+            apiKey: "9c17c4095ee2a4042c26bbd4d4de1726",
+            nepaliDays: ["आइतवार", "सोमवार", "मंगलवार", "बुधवार", "बिहीवार", "शुक्रवार", "शनिवार"],
+
+            init: function() {
+                this.updateClock();
+                setInterval(() => this.updateClock(), 1000);
+                this.autoDetect();
+            },
+
+            updateClock: function() {
+                const now = new Date();
+                document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', {hour12: false});
+                document.getElementById('en-date').innerText = now.toLocaleDateString('en-US', {day: 'numeric', month: 'short', year: 'numeric'});
+            },
+
+            autoDetect: async function() {
+                try {
+                    const res = await fetch('https://ipapi.co/json/');
+                    const data = await res.json();
+                    this.fetchWeather(data.city || "Birgunj");
+                } catch(e) { this.fetchWeather("Birgunj"); }
+            },
+
+            applyEffects: function(condition, isDay) {
+                const card = document.getElementById('main-card');
+                const rain = document.getElementById('rain-container');
+                const stars = document.getElementById('star-container');
+                const moon = document.getElementById('moon-container'); // नयाँ चन्द्रमा कंटेनर
+                const sun = document.getElementById('sun-ray');
+
+                // रिसेट
+                rain.classList.add('hidden'); stars.classList.add('hidden'); moon.classList.add('hidden'); sun.classList.add('hidden');
+                rain.innerHTML = ''; stars.innerHTML = '';
+
+                if (condition.includes('clear')) {
+                    if (isDay) {
+                        card.className = "w-[300px] h-[200px] border border-white/30 rounded-[2rem] flex flex-col overflow-hidden p-5 text-white relative weather-bg bg-gradient-to-br from-sky-400 to-orange-400";
+                        sun.classList.remove('hidden');
+                    } else {
+                        card.className = "w-[300px] h-[200px] border border-white/10 rounded-[2rem] flex flex-col overflow-hidden p-5 text-white relative weather-bg bg-gradient-to-br from-gray-950 to-blue-950";
+                        stars.classList.remove('hidden');
+                        moon.classList.remove('hidden'); // चन्द्रमा देखाउने
+                        for(let i=0; i<20; i++) {
+                            const s = document.createElement('span');
+                            s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
+                            s.style.animation = `blink ${Math.random()*2+1}s infinite`;
+                            stars.appendChild(s);
+                        }
+                    }
+                } else if (condition.includes('rain')) {
+                    card.className = "w-[300px] h-[200px] border border-white/10 rounded-[2rem] flex flex-col overflow-hidden p-5 text-white relative weather-bg bg-slate-900";
+                    rain.classList.remove('hidden');
+                    for(let i=0; i<30; i++) {
+                        const d = document.createElement('span');
+                        d.style.left = Math.random()*100+'%'; d.style.animationDelay = Math.random()*1+'s';
+                        d.classList.add('animate-rain-drop');
+                        rain.appendChild(d);
+                    }
+                } else {
+                    card.className = "w-[300px] h-[200px] border border-white/10 rounded-[2rem] flex flex-col overflow-hidden p-5 text-white relative weather-bg bg-gradient-to-br from-gray-500 to-slate-800";
+                }
+            },
+
+            fetchWeather: async function(city) {
+                try {
+                    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
+                    const data = await res.json();
+                    this.applyEffects(data.weather[0].main.toLowerCase(), data.weather[0].icon.includes('d'));
+                    document.getElementById('hub-temp').innerText = Math.round(data.main.temp) + "°";
+                    document.getElementById('hub-city').innerText = data.name;
+                    document.getElementById('hub-desc').innerText = data.weather[0].description;
+                    this.fetchForecast(city);
+                } catch(err) { console.error(err); }
+            },
+
+            fetchForecast: async function(city) {
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
+                const data = await res.json();
+                let html = '';
+                for(let i = 0; i < data.list.length; i += 8) {
+                    const d = data.list[i];
+                    const day = this.nepaliDays[new Date(d.dt * 1000).getDay()].substring(0, 3);
+                    html += `<div class="flex flex-col items-center"><span class="text-[7px] text-white/60 font-bold">${day}</span><span class="text-[10px] font-bold">${Math.round(d.main.temp)}°</span></div>`;
+                }
+                document.getElementById('forecast-render').innerHTML = html;
+            }
+        };
+
+        window.onload = () => WeatherApp.init();
+    </script>
+</body>
+</html>
