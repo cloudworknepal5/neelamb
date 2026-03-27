@@ -2,104 +2,106 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Weather Widget</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'w-dark': '#0d1117', // Dark background
+                        'w-accent': '#ff5722', // Accent Orange
+                        'w-clear-start': '#1d4ed8', // Clear Sky Gradient Start (Blue)
+                        'w-clear-end': '#3b82f6',   // Clear Sky Gradient End
+                        'w-rain-start': '#475569',  // Rain Gradient Start (Slate)
+                        'w-rain-end': '#1e293b',    // Rain Gradient End
+                        'w-cloud-start': '#64748b', // Cloudy Gradient Start
+                        'w-cloud-end': '#475569',   // Cloudy Gradient End
+                        'w-thunder-start': '#581c87', // Thunderstorm Gradient Start (Purple)
+                        'w-thunder-end': '#1e293b', // Thunderstorm Gradient End
+                    },
+                    boxShadow: {
+                        'w-glow': '0 0 50px rgba(255, 87, 34, 0.3)', // Accent Orange Glow
+                    },
+                    backgroundImage: {
+                        'w-clear-sky': "url('https://cdn.pixabay.com/photo/2018/01/24/18/05/background-3104413_1280.jpg')",
+                        'w-rain': "url('https://cdn.pixabay.com/photo/2016/11/29/12/30/rain-1869519_1280.jpg')",
+                        'w-clouds': "url('https://cdn.pixabay.com/photo/2016/09/08/13/58/clouds-1654316_1280.jpg')",
+                        'w-thunder': "url('https://cdn.pixabay.com/photo/2016/11/22/19/25/thunderstorm-1850178_1280.jpg')",
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        :root { --accent: #ff5722; --bg: #121212; }
+        /* Pulse Animation for the Temperature */
+        @keyframes pulseAccent {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .w-animate-pulse {
+            animation: pulseAccent 2s infinite ease-in-out;
+        }
+
+        /* Fade-in for background changes */
+        .w-transition-bg {
+            transition: background-image 1.5s ease-in-out, background-color 1.5s ease-in-out, background-position 1.5s ease-in-out;
+        }
+
+        /* Pop-up is Centered on Screen */
+        #weather-popup {
+            position: fixed !important; 
+            top: 50% !important; 
+            left: 50% !important; 
+            transform: translate(-50%, -50%) !important; 
+            z-index: 10000000 !important;
+            display: none; /* Default hidden */
+        }
         
-        /* १. ट्रिगर बटन (२०x४० पिक्सल - No Padding) */
-        .weather-trigger {
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center;
-            cursor: pointer;
-            background: #000; 
-            border: 1px solid var(--accent);
-            border-radius: 2px;
-            height: 20px; 
-            width: 40px; 
-            padding: 0;
-            margin: 0;
-            overflow: hidden;
-            position: relative;
-            z-index: 999999;
-        }
-
-        .mini-info {
-            font-size: 8px; 
-            color: white;
-            display: flex;
-            flex-direction: column;
-            line-height: 9px;
-            text-align: center;
-            font-weight: bold;
-            font-family: sans-serif;
-        }
-
-        /* २. पपअप प्यानल (सिधै खुल्ने गरी सेट गरिएको) */
-        .weather-panel {
-            display: flex; /* सिधै देखिने बनाउन */
-            position: fixed; /* वेबसाइटको अन्य एलिमेन्ट भन्दा माथि बस्न */
-            top: 50px; 
-            right: 20px; 
-            width: 250px; 
-            height: 300px;
-            border-radius: 10px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.9);
-            background-color: var(--bg); 
-            border: 2px solid #fff;
-            z-index: 1000000; /* सबैभन्दा उच्च प्रायोरिटी */
-            flex-direction: column;
-            overflow: hidden;
-            font-family: sans-serif;
-        }
-
-        /* बन्द गर्न मिल्ने अप्सन */
-        .weather-panel.hide { display: none; }
-
-        .overlay {
-            flex: 1; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            color: white;
-        }
-
-        .clock { font-size: 1.5rem; font-weight: 800; margin: 0; }
-        .hub-temp { font-size: 2.5rem; font-weight: 900; color: var(--accent); margin: 5px 0; }
-        .hub-city { font-size: 1rem; font-weight: bold; margin: 0; }
-
-        .forecast-grid {
-            width: 100%; display: flex; justify-content: space-between;
-            margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.2);
-        }
-        .f-day { font-size: 0.55rem; text-align: center; flex: 1; }
-        .f-day img { width: 18px; }
-
-        .close-btn { 
-            position: absolute; top: 5px; right: 10px; 
-            font-size: 20px; cursor: pointer; color: white; 
-            background: rgba(255,255,255,0.1); border-radius: 50%; width: 25px; height: 25px;
-            display: flex; align-items: center; justify-content: center;
+        #weather-popup.active {
+            display: flex !important;
         }
     </style>
 </head>
-<body>
 
-    <div class="weather-trigger" onclick="WeatherApp.toggle()">
-        <div class="mini-info">
-            <span id="m-city">--</span>
-            <span id="m-temp" style="color:var(--accent)">--°</span>
+<body class="bg-gray-100 min-h-screen font-sans flex items-center justify-center p-4">
+
+    <div class="nb-weather-embed">
+        <div class="w-[40px] h-[20px] bg-black border border-w-accent rounded-sm cursor-pointer flex items-center justify-center m-0 p-0 overflow-hidden relative z-[999999]" id="weather-btn">
+            <div class="mini-info text-white text-[8px] flex flex-col leading-none text-center font-bold font-sans pointer-events-none">
+                <span id="m-city">BIR</span>
+                <span id="m-temp" class="text-w-accent">--°</span>
+            </div>
         </div>
-    </div>
 
-    <div class="weather-panel" id="weather-popup">
-        <span class="close-btn" onclick="WeatherApp.toggle()">&times;</span>
-        <div class="overlay" id="popup-bg">
-            <div class="clock" id="clock">00:00:00</div>
-            <div class="hub-temp" id="hub-temp">--°</div>
-            <p class="hub-city" id="hub-city">लोड हुँदै...</p>
-            <div class="forecast-grid" id="forecast-render"></div>
+        <div id="weather-popup" class="w-[300px] h-[360px] bg-w-dark border border-white rounded-3xl shadow-w-glow overflow-hidden w-transition-bg flex-col active">
+            
+            <span class="close-btn absolute top-3 right-4 text-3xl cursor-pointer text-white/70 hover:text-white z-20" id="close-popup">&times;</span>
+            
+            <div class="overlay flex-1 p-6 flex flex-col items-center justify-between text-white relative w-transition-bg bg-cover bg-center" id="popup-bg">
+                
+                <div class="text-center z-10 w-full">
+                    <div class="clock text-3xl font-bold tracking-tight mb-1" id="clock">20:16:48</div>
+                    <div class="date-nepali text-[10px] text-white/70 font-sans" id="en-date">---</div>
+                </div>
+
+                <div class="weather-main text-center z-10 flex flex-col items-center">
+                    <div class="hub-temp text-7xl font-black w-accent w-animate-pulse leading-none mb-1 text-w-accent" id="hub-temp">28°</div>
+                    <div style="text-align: center;">
+                        <p class="hub-city text-base font-bold tracking-wide" id="hub-city">Birgunj</p>
+                        <span class="hub-desc text-[11px] text-w-accent font-semibold tracking-wide uppercase" id="hub-desc">लोड हुँदै...</span>
+                    </div>
+                </div>
+
+                <div class="forecast-grid w-full z-10 pt-4 border-t border-white/20 mt-auto">
+                    <div class="flex items-center justify-around space-x-1" id="forecast-render">
+                        </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -107,10 +109,54 @@
         const WeatherApp = {
             apiKey: "9c17c4095ee2a4042c26bbd4d4de1726",
             
+            // मौसम अनुसारको पृष्ठभूमि इमेजेस
+            backgrounds: {
+                "Clear": "bg-w-clear-sky",
+                "Rain": "bg-w-rain",
+                "Clouds": "bg-w-clouds",
+                "Thunderstorm": "bg-w-thunder",
+                "Drizzle": "bg-w-rain",
+                "Snow": "bg-w-clouds",
+                "Default": "bg-w-clouds"
+            },
+            
+            // मौसम अनुसारको ग्रेडियन्ट्स
+            gradients: {
+                "Clear": "bg-gradient-to-b from-w-clear-start to-w-clear-end",
+                "Rain": "bg-gradient-to-b from-w-rain-start to-w-rain-end",
+                "Clouds": "bg-gradient-to-b from-w-cloud-start to-w-cloud-end",
+                "Thunderstorm": "bg-gradient-to-b from-w-thunder-start to-w-thunder-end",
+                "Default": "bg-gradient-to-b from-w-cloud-start to-w-cloud-end"
+            },
+
             init: function() {
                 this.updateClock();
                 setInterval(() => this.updateClock(), 1000);
                 this.autoDetect();
+                this.setupEventListeners();
+            },
+
+            setupEventListeners: function() {
+                const btn = document.getElementById('weather-btn');
+                const close = document.getElementById('close-popup');
+                const popup = document.getElementById('weather-popup');
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    popup.classList.add('active');
+                    this.autoDetect(); // Open हुँदा मौसम अपडेट गर्ने
+                });
+
+                close.addEventListener('click', () => {
+                    popup.classList.remove('active');
+                });
+
+                // पपअप बाहिर क्लिक गर्दा बन्द हुने
+                document.addEventListener('click', (e) => {
+                    if (!popup.contains(e.target) && !btn.contains(e.target)) {
+                        popup.classList.remove('active');
+                    }
+                });
             },
 
             autoDetect: async function() {
@@ -128,10 +174,19 @@
                     
                     document.getElementById('m-city').innerText = data.name.substring(0, 3).toUpperCase();
                     document.getElementById('m-temp').innerText = Math.round(data.main.temp) + "°";
-
                     document.getElementById('hub-temp').innerText = Math.round(data.main.temp) + "°";
                     document.getElementById('hub-city').innerText = data.name;
+                    document.getElementById('hub-desc').innerText = data.weather[0].description;
                     
+                    // मौसम अनुसारको पृष्ठभूमि र ग्रेडियन्ट अपडेट
+                    const weatherMain = data.weather[0].main;
+                    const bgClass = this.backgrounds[weatherMain] || this.backgrounds["Default"];
+                    const gradientClass = this.gradients[weatherMain] || this.gradients["Default"];
+                    
+                    // Update the popup with classes
+                    const popupBg = document.getElementById('popup-bg');
+                    popupBg.className = `overlay flex-1 p-6 flex flex-col items-center justify-between text-white relative w-transition-bg bg-cover bg-center ${bgClass} ${gradientClass}`;
+
                     this.fetchForecast(city);
                 } catch(err) { console.log(err); }
             },
@@ -140,10 +195,16 @@
                 const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${this.apiKey}&lang=ne`);
                 const data = await res.json();
                 let html = '';
+                // Every 8th element is a new day
                 for(let i = 0; i < data.list.length; i += 8) {
                     const d = data.list[i];
-                    const day = new Date(d.dt * 1000).toLocaleDateString('ne-NP', {weekday: 'short'});
-                    html += `<div class="f-day"><span>${day}</span><br><img src="https://openweathermap.org/img/wn/${d.weather[0].icon}.png"><br><b>${Math.round(d.main.temp)}°</b></div>`;
+                    const dayName = new Date(d.dt * 1000).toLocaleDateString('ne-NP', {weekday: 'short'});
+                    html += `
+                        <div class="f-day flex flex-col items-center text-center space-y-0.5 w-[50px]">
+                            <span class="text-[9px] font-semibold text-white/90">${dayName}</span>
+                            <img src="https://openweathermap.org/img/wn/${d.weather[0].icon}.png" class="w-6 h-6" alt="icon">
+                            <b class="text-[11px] font-bold">${Math.round(d.main.temp)}°</b>
+                        </div>`;
                 }
                 document.getElementById('forecast-render').innerHTML = html;
             },
@@ -151,16 +212,11 @@
             updateClock: function() {
                 const now = new Date();
                 document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', {hour12: false});
-            },
-
-            toggle: function() {
-                const popup = document.getElementById('weather-popup');
-                // सुरुमा देखिने भएकोले 'hide' क्लासलाई टगल गर्ने
-                popup.classList.toggle('hide');
+                document.getElementById('en-date').innerText = now.toLocaleDateString('en-US', {day: 'numeric', month: 'short', year: 'numeric'});
             }
         };
 
-        WeatherApp.init();
+        window.onload = () => WeatherApp.init();
     </script>
 </body>
 </html>
