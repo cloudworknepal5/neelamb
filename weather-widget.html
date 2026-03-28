@@ -3,103 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        /* १. मुख्य विजेट स्टाइल - No Padding/Margin */
-        .nb-weather-widget {
+        /* पारदर्शी र २०px उचाइ भएको विजेट */
+        .weather-auto-no-popup {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            background: #000; /* कालो ब्याकग्राउन्ड */
-            border: 1px solid #ff5722; /* ओरेन्ज बोर्डर */
-            border-radius: 2px;
-            height: 20px; /* २० पिक्सल हाइट */
-            min-width: 40px; /* न्युनतम ४० पिक्सल */
-            width: auto; /* पूरा नाम अटाउन अटोमेटिक विड्थ */
-            padding: 0 4px !important; /* दायाँ-बायाँ हल्का स्पेस ताकि अक्षर बोर्डरमा नटाँसियोस् */
-            margin: 0 !important;  
-            overflow: hidden;
-            box-sizing: border-box;
-            font-family: sans-serif;
-            vertical-align: middle;
-            line-height: normal;
-        }
-
-        /* अक्षरहरूको बनावट */
-        .weather-info {
-            font-size: 9px; 
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 4px; /* नाम र तापक्रम बीचको ग्याप */
-            white-space: nowrap; /* नामलाई अर्को लाइनमा जान नदिन */
-            font-weight: bold;
+            height: 20px;
             padding: 0;
-            margin: 0;
+            background: transparent;
+            color: inherit;
+            font-family: 'Segoe UI', sans-serif;
+            gap: 5px;
+            cursor: default;
+            border: none;
         }
 
-        .temp-text {
-            color: #ff5722; 
-        }
-
-        /* लोडिङ एनिमेसन (Optional) */
-        .loading { opacity: 0.5; font-size: 7px; }
+        #w-icon-smart { font-size: 14px; }
+        #w-temp-smart { font-size: 12px; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div class="nb-weather-widget">
-        <div class="weather-info" id="weather-content">
-            <span class="loading">खोज्दै...</span>
-        </div>
+    <div class="weather-auto-no-popup" id="weather-box-smart">
+        <span id="w-icon-smart">☀️</span>
+        <span id="w-temp-smart">--°C</span>
     </div>
 
     <script>
-        const WeatherWidget = {
-            apiKey: "9c17c4095ee2a4042c26bbd4d4de1726",
-            
-            init: function() {
-                this.autoDetect();
-                // हरेक ३० मिनेटमा अटो अपडेट
-                setInterval(() => this.autoDetect(), 1800000);
-            },
+        /**
+         * MULTI-FUNCTION IP-BASED WEATHER
+         * १. IP बाट लोकेसन पत्ता लगाउँछ (पप-अप विना)
+         * २. लोकेसन अनुसार मौसमको डाटा तान्छ
+         * ३. बीरगन्जलाई फलब्याक (Fallback) राख्छ
+         */
+        async function getIPWeather() {
+            const tEl = document.getElementById('w-temp-smart');
+            const iEl = document.getElementById('w-icon-smart');
+            const box = document.getElementById('weather-box-smart');
 
-            // IP को आधारमा अटोमेटिक लोकेशन पत्ता लगाउने
-            autoDetect: async function() {
-                try {
-                    const res = await fetch('https://ipapi.co/json/');
-                    const data = await res.json();
-                    if(data.city) {
-                        this.fetchWeather(data.city);
-                    } else {
-                        throw new Error("Location not found");
-                    }
-                } catch(e) {
-                    // यदि IP फेल भयो भने डिफल्ट Birgunj राख्ने
-                    this.fetchWeather("Birgunj");
+            try {
+                // १. IP बाट लोकेसन तान्ने (पप-अप नमाग्ने विधि)
+                const ipRes = await fetch('http://ip-api.com/json/');
+                const ipData = await ipRes.json();
+                
+                let lat = 27.01, lon = 84.87, city = "Birgunj"; // Default
+
+                if (ipData.status === 'success') {
+                    lat = ipData.lat;
+                    lon = ipData.lon;
+                    city = ipData.city;
                 }
-            },
 
-            // मौसम डाटा लिने
-            fetchWeather: async function(city) {
-                try {
-                    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${this.apiKey}`);
-                    const data = await res.json();
+                // २. मौसम डाटा तान्ने
+                const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                const wData = await weatherRes.json();
+                
+                if (wData.current_weather) {
+                    const temp = Math.round(wData.current_weather.temperature);
+                    const code = wData.current_weather.weathercode;
                     
-                    const fullCityName = data.name; // पूरा नाम
-                    const temperature = Math.round(data.main.temp);
+                    tEl.innerText = temp + "°C";
+                    box.title = `${city}: ${temp}°C`;
 
-                    // HTML अपडेट
-                    document.getElementById('weather-content').innerHTML = `
-                        <span id="widget-city">${fullCityName}</span>
-                        <span id="widget-temp" class="temp-text">${temperature}°</span>
-                    `;
-                } catch(err) {
-                    document.getElementById('weather-content').innerHTML = "Err";
+                    // ३. स्मार्ट आइकन लजिक (Multi-function)
+                    let icon = "☀️";
+                    if (code >= 1 && code <= 3) icon = "⛅";
+                    if (code >= 51 && code <= 67) icon = "🌧️";
+                    if (code >= 95) icon = "⛈️";
+                    
+                    iEl.innerHTML = icon;
                 }
+            } catch (err) {
+                console.log("IP Weather Error");
+                tEl.innerText = "Err";
             }
-        };
+        }
 
-        // पेज लोड भएपछि सुरु गर्ने
-        WeatherWidget.init();
+        // रन गर्ने
+        getIPWeather();
+        
+        // प्रत्येक ३० मिनेटमा अपडेट
+        setInterval(getIPWeather, 1800000);
     </script>
 
 </body>
