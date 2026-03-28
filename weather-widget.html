@@ -3,54 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        /* साना स्क्रिन र न्युज पोर्टलका लागि प्रिमियम लुक्स */
-        .n24-weather-container {
+        /* सबै मार्जिन र प्याडिङ हटाउन */
+        .weather-tight-widget {
             display: inline-flex;
             align-items: center;
-            height: 28px;
-            padding: 0 12px;
-            background: #f8f9fa; /* सफा हल्का ब्याकग्राउन्ड */
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            height: 20px; /* एकदमै सानो उचाइ */
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
         }
 
         .weather-vertical-slider {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            height: 24px;
-            overflow: hidden;
-            gap: 12px;
-            min-width: 160px;
+            height: 20px;
+            gap: 6px;
+            min-width: 140px;
         }
 
         .city-tag {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
+            color: #e74c3c;
             text-transform: uppercase;
-            color: #c0392b; /* नेपाल २४ न्युजको जस्तै रातो रङ */
-            border-right: 2px solid #e74c3c;
-            padding-right: 10px;
-            white-space: nowrap;
+            border-right: 1px solid rgba(0,0,0,0.1);
+            padding-right: 5px;
+            line-height: 20px;
+            display: inline-block;
         }
 
         .slide-container {
             position: relative;
-            height: 24px;
+            height: 20px;
             flex-grow: 1;
         }
 
         .weather-unit {
             position: absolute;
-            height: 24px;
+            top: 0;
+            left: 0;
+            height: 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             width: 100%;
-            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            transition: all 0.5s ease-in-out;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(10px); /* अलि कम दुरीबाट स्लाइड हुने */
         }
 
         .weather-unit.active {
@@ -60,96 +61,70 @@
 
         .weather-unit.exit {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translateY(-10px);
         }
 
-        .w-label { font-size: 11px; font-weight: bold; color: #2c3e50; }
-        .w-temp { font-size: 13px; font-weight: 800; color: #2980b9; }
+        .w-label { font-size: 10px; font-weight: bold; color: #333; }
+        .w-temp { font-size: 11px; font-weight: 700; color: #2980b9; }
     </style>
 </head>
-<body>
-
-    <div class="n24-weather-container">
+<body style="margin:0; padding:0;"> <div class="weather-tight-widget">
         <div class="weather-vertical-slider">
-            <span class="city-tag" id="city-name">अपडेट हुँदै...</span>
+            <span class="city-tag" id="city-name">...</span>
             <div class="slide-container" id="slide-wrapper"></div>
         </div>
     </div>
 
     <script>
-        async function startN24Weather() {
+        async function startTightWeather() {
             const wrapper = document.getElementById('slide-wrapper');
             const cityEl = document.getElementById('city-name');
-
-            // फल ब्याक लोकेसन: बीरगञ्ज
             let lat = 27.01, lon = 84.87, city = "BIRGUNJ";
 
             try {
-                // १. IP बाट लोकेसन तान्ने (HTTPS support)
                 const ipRes = await fetch('https://ipapi.co/json/');
                 if (ipRes.ok) {
                     const ipData = await ipRes.json();
-                    lat = ipData.latitude; 
-                    lon = ipData.longitude; 
+                    lat = ipData.latitude; lon = ipData.longitude;
                     city = (ipData.city || "NEPAL").toUpperCase();
                 }
-            } catch (err) {
-                console.warn("Location error, fallback to default.");
-            }
+            } catch (err) { console.warn("Location error"); }
 
             cityEl.innerText = city;
 
             try {
-                // २. ५ दिनको मौसम डाटा फेच
                 const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max&timezone=auto`);
                 const wData = await wRes.json();
-                
                 const days = ["आज", "भोलि", "पर्सि", "निर्सि", "कान्छि"];
                 wrapper.innerHTML = ""; 
 
                 wData.daily.temperature_2m_max.forEach((temp, i) => {
                     if(i > 4) return;
                     const code = wData.daily.weathercode[i];
-                    // Multi-function icons
-                    let icon = (code === 0) ? "☀️" : (code < 4) ? "⛅" : (code < 70) ? "🌧️" : "⛈️";
+                    let icon = (code === 0) ? "☀️" : (code < 4) ? "⛅" : "🌧️";
                     
                     const div = document.createElement('div');
                     div.className = 'weather-unit';
-                    div.innerHTML = `
-                        <span class="w-label">${days[i]}</span>
-                        <span style="font-size:14px;">${icon}</span>
-                        <span class="w-temp">${Math.round(temp)}°C</span>
-                    `;
+                    div.innerHTML = `<span class="w-label">${days[i]}</span><span>${icon}</span><span class="w-temp">${Math.round(temp)}°C</span>`;
                     wrapper.appendChild(div);
                 });
 
-                // ३. अप-डाउन एनिमेसन लजिक
                 const slides = document.querySelectorAll('.weather-unit');
                 let current = 0;
-
                 function rotate() {
                     if (slides.length === 0) return;
                     slides.forEach((s, idx) => {
                         s.classList.remove('active', 'exit');
-                        if (idx === current) {
-                            s.classList.add('active');
-                        } else if (idx === (current === 0 ? slides.length - 1 : current - 1)) {
-                            s.classList.add('exit');
-                        }
+                        if (idx === current) s.classList.add('active');
+                        else if (idx === (current === 0 ? slides.length - 1 : current - 1)) s.classList.add('exit');
                     });
                     current = (current + 1) % slides.length;
                 }
-
                 rotate();
-                setInterval(rotate, 4000); // ४ सेकेन्डमा स्लाइड हुने
-
-            } catch (e) {
-                cityEl.innerText = "OFFLINE";
-            }
+                setInterval(rotate, 3500);
+            } catch (e) { cityEl.innerText = "ERROR"; }
         }
-
-        window.addEventListener('load', startN24Weather);
+        window.onload = startTightWeather;
     </script>
-
 </body>
 </html>
