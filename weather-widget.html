@@ -2,141 +2,158 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal24News Weather Widget</title>
+    
     <style>
-        /* नेभबारका लागि पारदर्शी र २०px उचाइको स्लाइडर */
-        .weather-vertical-slider {
+        /* आधारभूत सेटिङ */
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5; /* परिक्षणका लागि हल्का ब्याकग्राउन्ड */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* २० पिक्सेल उचाइको पारदर्शी विजेट */
+        .n24-weather-box {
             display: inline-flex;
             align-items: center;
             height: 20px;
             overflow: hidden;
             background: transparent;
-            color: inherit;
-            font-family: 'Segoe UI', sans-serif;
-            gap: 8px;
-            min-width: 130px;
+            color: #333; /* अक्षरको रङ (आवश्यकता अनुसार #fff राख्न सक्नुहुन्छ) */
+            gap: 10px;
+            min-width: 160px;
+            border-left: 3px solid #e74c3c;
+            padding-left: 8px;
+            cursor: default;
         }
 
-        .city-tag {
+        .n24-city {
             font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
-            color: #e74c3c; /* रातो रङको शहरको नाम */
-            border-right: 1px solid rgba(255,255,255,0.2);
-            padding-right: 5px;
+            color: #e74c3c;
+            white-space: nowrap;
         }
 
-        .slide-container {
+        .n24-slider {
             position: relative;
             height: 20px;
             flex-grow: 1;
         }
 
-        .weather-unit {
+        .n24-unit {
             position: absolute;
             height: 20px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             width: 100%;
+            opacity: 0;
+            transform: translateY(-20px);
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
-            opacity: 0;
-            transform: translateY(-20px); /* माथिबाट सुरु हुने */
+            white-space: nowrap;
         }
 
-        .weather-unit.active {
+        .n24-unit.active {
             opacity: 1;
-            transform: translateY(0); /* बीचमा आउने */
+            transform: translateY(0);
         }
 
-        .weather-unit.exit {
+        .n24-unit.exit {
             opacity: 0;
-            transform: translateY(20px); /* तल झरेर हराउने */
+            transform: translateY(20px);
         }
 
-        .w-label { font-size: 10px; opacity: 0.8; font-weight: bold; }
-        .w-temp { font-size: 12px; font-weight: 700; color: #00d2ff; }
+        .n24-day { font-size: 10px; opacity: 0.7; font-weight: bold; }
+        .n24-temp { font-size: 12px; font-weight: 700; color: #007bff; }
     </style>
 </head>
 <body>
 
-    <div class="weather-vertical-slider">
-        <span class="city-tag" id="city-name">...</span>
-        <div class="slide-container" id="slide-wrapper">
+    <div class="n24-weather-box" id="n24-weather-container">
+        <span class="n24-city" id="n24-city-display">पर्खनुहोस्...</span>
+        <div class="n24-slider" id="n24-slide-wrapper">
             </div>
     </div>
-
     <script>
         /**
-         * MULTI-FUNCTION UP-DOWN SLIDER
-         * १. IP बाट सहर पत्ता लगाउँछ।
-         * २. ५ दिनको अधिकतम तापक्रम तान्छ।
-         * ३. CSS क्लास प्रयोग गरेर भर्टिकल स्लाइड गराउँछ।
+         * MULTI-FUNCTION WEATHER CONTROLLER
+         * १. HTTPS सपोर्ट गर्ने IPAPI बाट सहर पत्ता लगाउँछ (No Popup)
+         * २. Open-Meteo बाट ५ दिनको डाटा तान्छ
+         * ३. माथिबाट तल स्लाइड हुने एनिमेसन दिन्छ
          */
-        async function startVerticalWeather() {
-            const wrapper = document.getElementById('slide-wrapper');
-            const cityEl = document.getElementById('city-name');
+        async function startSmartWeather() {
+            const wrapper = document.getElementById('n24-slide-wrapper');
+            const cityEl = document.getElementById('n24-city-display');
 
             try {
-                // १. लोकेसन फेच
-                const ipRes = await fetch('http://ip-api.com/json/');
+                // १. लोकेसन फेच (IP को आधारमा)
+                const ipRes = await fetch('https://ipapi.co/json/');
                 const ipData = await ipRes.json();
-                let lat = 27.01, lon = 84.87, city = "BIRGUNJ";
+                
+                let lat = 27.01, lon = 84.87, city = "BIRGUNJ"; // फलब्याक
 
-                if (ipData.status === 'success') {
-                    lat = ipData.lat; lon = ipData.lon; city = ipData.city.toUpperCase();
+                if (ipData.latitude) {
+                    lat = ipData.latitude;
+                    lon = ipData.longitude;
+                    city = ipData.city ? ipData.city.toUpperCase() : "NEPAL";
                 }
                 cityEl.innerText = city;
 
-                // २. ५ दिनको मौसम डाटा
+                // २. मौसम डाटा फेच
                 const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max&timezone=auto`);
                 const wData = await wRes.json();
                 
-                const days = ["आज", "भोलि", "पर्सि", "निर्सि", "कान्छि"];
-                wrapper.innerHTML = ""; // सफा गर्ने
+                if (wData.daily) {
+                    const days = ["आज", "भोलि", "पर्सि", "निर्सि", "कान्छि"];
+                    wrapper.innerHTML = ""; 
 
-                // ३. स्लाइडहरू तयार पार्ने
-                wData.daily.temperature_2m_max.forEach((temp, i) => {
-                    if(i > 4) return;
-                    const code = wData.daily.weathercode[i];
-                    let icon = (code < 3) ? "☀️" : (code < 60) ? "⛅" : "🌧️";
-                    
-                    const div = document.createElement('div');
-                    div.className = 'weather-unit';
-                    div.innerHTML = `
-                        <span class="w-label">${days[i]}</span>
-                        <span>${icon}</span>
-                        <span class="w-temp">${Math.round(temp)}°C</span>
-                    `;
-                    wrapper.appendChild(div);
-                });
+                    // ३. युनिटहरू तयार गर्ने
+                    wData.daily.temperature_2m_max.forEach((temp, i) => {
+                        if(i > 4) return;
+                        const code = wData.daily.weathercode[i];
+                        
+                        let icon = "☀️";
+                        if (code >= 1 && code <= 3) icon = "⛅";
+                        else if (code >= 51 && code <= 67) icon = "🌧️";
+                        else if (code >= 95) icon = "⛈️";
+                        
+                        const div = document.createElement('div');
+                        div.className = 'n24-unit';
+                        div.innerHTML = `
+                            <span class="n24-day">${days[i]}</span>
+                            <span>${icon}</span>
+                            <span class="n24-temp">${Math.round(temp)}°C</span>
+                        `;
+                        wrapper.appendChild(div);
+                    });
 
-                // ४. एनिमेसन कन्ट्रोल (Vertical Slide Logic)
-                let current = 0;
-                const slides = document.querySelectorAll('.weather-unit');
-                
-                function nextSlide() {
-                    slides.forEach(s => s.classList.remove('active', 'exit'));
+                    // ४. भर्टिकल स्लाइडर एनिमेसन
+                    let current = 0;
+                    const slides = document.querySelectorAll('.n24-unit');
                     
-                    // पुरानो स्लाइडलाई तल पठाउने
-                    const prev = current === 0 ? slides.length - 1 : current - 1;
-                    slides[prev].classList.add('exit');
+                    function runSlide() {
+                        slides.forEach(s => s.classList.remove('active', 'exit'));
+                        
+                        const prev = (current === 0) ? slides.length - 1 : current - 1;
+                        slides[prev].classList.add('exit');
+                        slides[current].classList.add('active');
+                        
+                        current = (current + 1) % slides.length;
+                    }
 
-                    // नयाँ स्लाइडलाई बीचमा ल्याउने
-                    slides[current].classList.add('active');
-                    
-                    current = (current + 1) % slides.length;
+                    runSlide();
+                    setInterval(runSlide, 4000); // ४ सेकेन्डमा स्लाइड हुने
                 }
-
-                nextSlide();
-                setInterval(nextSlide, 3500); // प्रत्येक ३.५ सेकेन्डमा स्लाइड हुने
-
-            } catch (e) {
+            } catch (err) {
                 cityEl.innerText = "OFFLINE";
+                console.error("Fetch Error:", err);
             }
         }
 
-        startVerticalWeather();
+        window.onload = startSmartWeather;
     </script>
-
 </body>
 </html>
