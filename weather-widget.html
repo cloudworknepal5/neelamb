@@ -2,28 +2,16 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* नेभबारको आधारभूत स्टाइल */
-        .custom-navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 20px;
-            background: #1a1a1a; /* गाढा रङ */
-            color: white;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            height: 40px;
-        }
-
-        /* वेदर स्लाइडर सेक्सन */
-        .weather-nav-item {
+        /* विजेटको मुख्य कन्टेनर */
+        .weather-widget-container {
             display: inline-flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 0 12px;
-            border-radius: 50px;
-            height: 28px;
+            height: 24px;
+            padding: 2px 10px;
+            background: rgba(0, 0, 0, 0.05); /* हल्का ब्याकग्राउन्ड, आवश्यक नभए हटाउन सकिन्छ */
+            border-radius: 5px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .weather-vertical-slider {
@@ -31,16 +19,16 @@
             align-items: center;
             height: 20px;
             overflow: hidden;
-            gap: 8px;
-            min-width: 145px;
+            gap: 10px;
+            min-width: 150px;
         }
 
         .city-tag {
             font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
-            color: #ff4757;
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e74c3c;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
             padding-right: 8px;
             white-space: nowrap;
         }
@@ -51,13 +39,12 @@
             flex-grow: 1;
         }
 
-        /* एनिमेसन लजिक */
         .weather-unit {
             position: absolute;
             height: 20px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             width: 100%;
             transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
@@ -74,24 +61,18 @@
             transform: translateY(-15px);
         }
 
-        .w-label { font-size: 10px; opacity: 0.8; font-weight: bold; color: #ced4da; }
-        .w-temp { font-size: 12px; font-weight: 700; color: #00d2ff; }
-        
-        .nav-logo { font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .w-label { font-size: 11px; font-weight: 600; color: #555; }
+        .w-temp { font-size: 13px; font-weight: 700; color: #0984e3; }
     </style>
 </head>
 <body>
 
-    <nav class="custom-navbar">
-        <div class="nav-logo">My Website</div>
-        
-        <div class="weather-nav-item">
-            <div class="weather-vertical-slider">
-                <span class="city-tag" id="city-name">लोडिङ...</span>
-                <div class="slide-container" id="slide-wrapper"></div>
-            </div>
+    <div class="weather-widget-container">
+        <div class="weather-vertical-slider">
+            <span class="city-tag" id="city-name">लोडिङ...</span>
+            <div class="slide-container" id="slide-wrapper"></div>
         </div>
-    </nav>
+    </div>
 
     <script>
         async function startVerticalWeather() {
@@ -101,7 +82,7 @@
             let lat = 27.01, lon = 84.87, city = "BIRGUNJ";
 
             try {
-                // १. IP बाट लोकेसन (HTTPS)
+                // १. सुरक्षित लोकेसन फेच
                 const ipRes = await fetch('https://ipapi.co/json/');
                 if (ipRes.ok) {
                     const ipData = await ipRes.json();
@@ -116,14 +97,13 @@
             cityEl.innerText = city;
 
             try {
-                // २. मौसम डाटा
+                // २. ५ दिनको मौसम डाटा
                 const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max&timezone=auto`);
                 const wData = await wRes.json();
                 
                 const days = ["आज", "भोलि", "पर्सि", "निर्सि", "कान्छि"];
                 wrapper.innerHTML = ""; 
 
-                // ३. HTML एलिमेन्ट निर्माण
                 wData.daily.temperature_2m_max.forEach((temp, i) => {
                     if(i > 4) return;
                     const code = wData.daily.weathercode[i];
@@ -139,7 +119,7 @@
                     wrapper.appendChild(div);
                 });
 
-                // ४. एनिमेसन लजिक (तपाईँले दिनुभएको लजिक अनुसार)
+                // ३. एनिमेसन लजिक
                 const slides = document.querySelectorAll('.weather-unit');
                 let currentIndex = 0;
 
