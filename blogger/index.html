@@ -167,12 +167,11 @@
         },
 
         init() {
-            window.onpopstate = () => this.handleRouting();
-            this.handleRouting();
-            // Initial URL set
-            document.getElementById('og-url').content = window.location.href;
-        },
-
+    window.onpopstate = () => this.handleRouting();
+    this.handleRouting();
+    // यो लाइनले ब्राउजरमा भएको वास्तविक URL लाई फेसबुकलाई पठाउँछ
+    document.getElementById('og-url').setAttribute('content', window.location.href);
+}
         utils: {
             getThumbnail(content) {
                 const match = content.match(/<img[^>]+src="([^">]+)"/);
