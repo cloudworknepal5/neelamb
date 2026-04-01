@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SubhLabh News - समाचार पोर्टल</title>
     
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SubhLabh News" />
+    <meta id="og-title" property="og:title" content="SubhLabh News - समाचार पोर्टल" />
+    <meta id="og-description" property="og:description" content="नेपाल र विश्वभरका ताजा अपडेटका लागि सुभलाभ न्यूज।" />
+    <meta id="og-image" property="og:image" content="https://via.placeholder.com/1200x630?text=SubhLabh+News" />
+    <meta id="og-url" property="og:url" content="" />
+
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700&display=swap" rel="stylesheet">
     <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css' rel='stylesheet'/>
     <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/designers2077/code/header-2.css'/>
@@ -30,8 +37,8 @@
         .author-info { display: flex; align-items: center; gap: 12px; }
         .author-img { width: 45px; height: 45px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .share-icons { display: flex; gap: 8px; }
-        .share-btn { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; font-size: 15px; }
-        .bg-fb { background: #3b5998; } .bg-wa { background: #25d366; }
+        .share-btn { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; font-size: 15px; border: none; cursor: pointer; }
+        .bg-fb { background: #3b5998; } .bg-wa { background: #25d366; } .bg-tw { background: #1DA1F2; }
 
         .featured-image { width: 100%; max-height: 550px; object-fit: cover; border-radius: 8px; margin-bottom: 25px; }
         .post-content-text { font-size: 19px; line-height: 1.9; color: #222; }
@@ -162,6 +169,8 @@
         init() {
             window.onpopstate = () => this.handleRouting();
             this.handleRouting();
+            // Initial URL set
+            document.getElementById('og-url').content = window.location.href;
         },
 
         utils: {
@@ -174,6 +183,15 @@
             },
             getShortDate(dateStr) {
                 return new Date(dateStr).toISOString().split('T')[0];
+            },
+            // Multi-function: Updates all meta tags for social media dynamic sharing
+            updateMeta(title, desc, img, url) {
+                document.title = title;
+                // Update OG tags for browsers/crawlers that support dynamic JS
+                document.getElementById('og-title').content = title;
+                document.getElementById('og-description').content = desc.replace(/<[^>]*>/g, '').substring(0, 150) + '...';
+                document.getElementById('og-image').content = img;
+                document.getElementById('og-url').content = url;
             }
         },
 
@@ -195,7 +213,6 @@
             const contentArea = document.getElementById('main-content');
             contentArea.innerHTML = '<div class="loader">लोड हुँदैछ...</div>';
             
-            // Blogger API URL for Labels
             let url = `${this.CONFIG.BASE_URL}${this.CONFIG.BLOG_ID}/posts?key=${this.CONFIG.API_KEY}&maxResults=15`;
             if (label) url += `&labels=${encodeURIComponent(label)}`;
 
@@ -203,6 +220,9 @@
                 const res = await fetch(url);
                 const data = await res.json();
                 
+                // Reset Meta on Home/List
+                this.utils.updateMeta("SubhLabh News - समाचार पोर्टल", "नेपाल र विश्वभरका ताजा अपडेट", App.CONFIG.PLACEHOLDER, window.location.href);
+
                 let html = label ? `<div class="cat-title">${label}</div>` : '';
                 html += '<div class="news-grid">';
                 
@@ -224,7 +244,6 @@
                         </article>`;
                 });
                 contentArea.innerHTML = html + '</div>';
-                document.title = label ? `${label} - SubhLabh News` : "SubhLabh News - समाचार पोर्टल";
             } catch (e) {
                 contentArea.innerHTML = '<div class="error-msg">डाटा लोड गर्न सकिएन।</div>';
             }
@@ -236,9 +255,14 @@
             try {
                 const res = await fetch(`${this.CONFIG.BASE_URL}${this.CONFIG.BLOG_ID}/posts/${id}?key=${this.CONFIG.API_KEY}`);
                 const post = await res.json();
-                const featuredImg = post.content.match(/<img[^>]+src="([^">]+)"/)?.[1] || '';
+                
+                const featuredImg = this.utils.getThumbnail(post.content);
                 const bodyCleaned = post.content.replace(/<img[^>]+>/i, '');
-                document.title = `${post.title} - SubhLabh News`;
+                const currentUrl = window.location.href;
+
+                // MULTI-FUNCTION: Update Meta Tags for Sharing
+                this.utils.updateMeta(post.title, post.content, featuredImg, currentUrl);
+
                 contentArea.innerHTML = `
                     <div class="post-layout">
                         <article class="post-main">
@@ -249,8 +273,15 @@
                                         <div><div class="author-name">सुभलाभ ब्युरो</div><div class="post-date">${this.utils.formatDate(post.published)}</div></div>
                                     </div>
                                     <div class="share-icons">
-                                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn bg-fb"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn bg-wa"><i class="fab fa-whatsapp"></i></a>
+                                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}" 
+                                           onclick="window.open(this.href, 'share', 'width=600,height=400'); return false;" 
+                                           class="share-btn bg-fb"><i class="fab fa-facebook-f"></i></a>
+                                        
+                                        <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(post.title + ' ' + currentUrl)}" 
+                                           target="_blank" class="share-btn bg-wa"><i class="fab fa-whatsapp"></i></a>
+                                        
+                                        <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(currentUrl)}" 
+                                           target="_blank" class="share-btn bg-tw"><i class="fab fa-twitter"></i></a>
                                     </div>
                                 </div>
                             </header>
@@ -258,15 +289,17 @@
                             <div class="post-content-text">${bodyCleaned}</div>
                         </article>
                         <aside class="sidebar">
-                            <h3 style="margin-top:0;">विज्ञापन</h3>
-                            <div style="background:#eee; height:250px; display:flex; align-items:center; justify-content:center; color:#999;">३००x२५०</div>
+                            <h3 style="margin-top:0; border-bottom:2px solid var(--primary); padding-bottom:10px;">विज्ञापन</h3>
+                            <div style="background:#eee; height:250px; display:flex; align-items:center; justify-content:center; color:#999; margin-top:15px;">३००x२५०</div>
+                            
+                            <h3 style="margin-top:30px; border-bottom:2px solid var(--primary); padding-bottom:10px;">ताजा अपडेट</h3>
+                            <p style="font-size:14px; color:#666;">हाम्रो मोबाइल एप डाउनलोड गर्नुहोस्।</p>
                         </aside>
                     </div>`;
                 window.scrollTo(0, 0);
             } catch (e) { contentArea.innerHTML = '<div class="error-msg">समाचार फेला परेन।</div>'; }
         },
 
-        // Click on category
         filterByCategory(label) {
             const newUrl = `${window.location.pathname}?label=${encodeURIComponent(label)}`;
             window.history.pushState({label: label}, '', newUrl);
